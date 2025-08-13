@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -41,6 +43,16 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* ViuWi brand colors */
+  --color-viuwi-orange: var(--viuwi-orange);
+  --color-viuwi-text-primary: var(--viuwi-text-primary);
+  --color-viuwi-text-secondary: var(--viuwi-text-secondary);
+  --color-viuwi-text-muted: var(--viuwi-text-muted);
+  --color-viuwi-text-link: var(--viuwi-text-link);
+  --color-viuwi-border: var(--viuwi-border);
+  --color-viuwi-divider: var(--viuwi-divider);
+  --color-viuwi-section-text: var(--viuwi-section-text);
 }
 
 :root {
@@ -76,6 +88,16 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  
+  /* ViuWi brand colors */
+  --viuwi-orange: #ed561d;
+  --viuwi-text-primary: #020202;
+  --viuwi-text-secondary: rgba(2, 2, 2, 0.50);
+  --viuwi-text-muted: #718096;
+  --viuwi-text-link: #1c4532;
+  --viuwi-border: #b1b1b1;
+  --viuwi-divider: #cfd9e0;
+  --viuwi-section-text: #293854;
 }
 
 .dark {
@@ -110,6 +132,42 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Custom typography utilities for ViuWi - Responsive */
+@utility viuwi-title {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 1.75rem); /* 24px - 28px responsive */
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility viuwi-heading {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: clamp(1.125rem, 3vw, 1.25rem); /* 18px - 20px responsive */
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+@utility viuwi-body {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: clamp(1rem, 2.5vw, 1.25rem); /* 16px - 20px responsive */
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@utility viuwi-button-text {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.125rem); /* 16px - 18px responsive */
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+@utility viuwi-small-text {
+  font-family: Inter, sans-serif;
+  font-size: clamp(0.875rem, 1.5vw, 1rem); /* 14px - 16px responsive */
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 @layer base {
