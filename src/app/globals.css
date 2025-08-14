@@ -1,27 +1,289 @@
 @import "tailwindcss";
-@plugin "daisyui";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "daisyui" {
+  themes: false;
+  root: ":root";
+  logs: true;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Custom ViuWi themes using CSS custom properties */
+/* Fallback theme for all browsers */
+[data-theme="viuwi-light"] {
+  color-scheme: light;
+
+  /* DaisyUI base colors */
+  --color-base-100: oklch(98% 0.01 240);
+  --color-base-200: oklch(96% 0.02 240);
+  --color-base-300: oklch(94% 0.03 240);
+  --color-base-content: oklch(15% 0.05 240);
+  --color-primary: oklch(55% 0.25 25);
+  --color-primary-content: oklch(98% 0.01 25);
+  --color-secondary: oklch(70% 0.15 200);
+  --color-secondary-content: oklch(15% 0.05 200);
+  --color-accent: oklch(65% 0.2 160);
+  --color-accent-content: oklch(15% 0.05 160);
+  --color-neutral: oklch(45% 0.05 240);
+  --color-neutral-content: oklch(98% 0.01 240);
+  --color-info: oklch(70% 0.2 220);
+  --color-info-content: oklch(15% 0.05 220);
+  --color-success: oklch(65% 0.25 140);
+  --color-success-content: oklch(15% 0.05 140);
+  --color-warning: oklch(80% 0.25 80);
+  --color-warning-content: oklch(15% 0.05 80);
+  --color-error: oklch(65% 0.3 30);
+  --color-error-content: oklch(98% 0.01 30);
+
+  /* Custom ViuWi brand colors for light theme - Enhanced for better vibrancy while maintaining accessibility */
+  --color-brand-orange: oklch(68% 0.28 25);
+  --color-brand-orange-light: oklch(75% 0.25 25);
+  --color-brand-orange-dark: oklch(60% 0.3 25);
+  --color-text-muted: oklch(50% 0.05 240);
+  --color-border-light: oklch(85% 0.05 240);
+  --color-border-input: oklch(70% 0.02 240);
+
+  /* Border radius */
+  --radius-selector: 0.375rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.5rem;
+
+  /* Border size */
+  --border: 1px;
+
+  /* Shadow effects */
+  --shadow-brand-orange: 0px 4px 20px 0px oklch(68% 0.28 25 / 0.12);
+  --shadow-brand-orange-hover: 0px 6px 25px 0px oklch(68% 0.28 25 / 0.18);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Progressive enhancement for browsers that support :has() */
+@supports(selector(:has(input.theme-controller[value=viuwi-light]:checked))) {
+  :root:has(input.theme-controller[value=viuwi-light]:checked) {
+    color-scheme: light;
+
+    /* Base colors */
+    --color-base-100: oklch(98% 0.01 240);
+    --color-base-200: oklch(95% 0.02 240);
+    --color-base-300: oklch(90% 0.03 240);
+    --color-base-content: oklch(15% 0.05 240);
+
+    /* Neutral colors */
+    --color-neutral: oklch(25% 0.02 240);
+    --color-neutral-content: oklch(98% 0.01 240);
+
+    /* Primary colors */
+    --color-primary: oklch(68% 0.28 25);
+    --color-primary-content: var(--color-base-content);
+
+    /* Secondary colors */
+    --color-secondary: oklch(70% 0.15 200);
+    --color-secondary-content: var(--color-base-content);
+
+    /* Accent colors */
+    --color-accent: oklch(75% 0.2 150);
+    --color-accent-content: oklch(15% 0.05 150);
+
+    /* Info colors */
+    --color-info: oklch(70% 0.2 220);
+    --color-info-content: oklch(15% 0.05 220);
+
+    /* State colors */
+    --color-success: oklch(70% 0.25 140);
+    --color-success-content: var(--color-base-content);
+
+    --color-warning: oklch(80% 0.25 70);
+    --color-warning-content: oklch(15% 0.05 70);
+
+    --color-error: oklch(65% 0.3 30);
+    --color-error-content: oklch(98% 0.01 30);
+
+    /* Custom ViuWi brand colors for light theme - Enhanced for better vibrancy while maintaining accessibility */
+    --color-brand-orange: oklch(68% 0.28 25);
+    --color-brand-orange-light: oklch(75% 0.25 25);
+    --color-brand-orange-dark: oklch(60% 0.3 25);
+    --color-text-muted: oklch(50% 0.05 240);
+    --color-border-light: oklch(85% 0.05 240);
+    --color-border-input: oklch(70% 0.02 240);
+
+    /* Border radius */
+    --radius-selector: 0.375rem;
+    --radius-field: 0.375rem;
+    --radius-box: 0.5rem;
+
+    /* Border size */
+    --border: 1px;
+
+    /* Shadow effects */
+    --shadow-brand-orange: 0px 4px 20px 0px oklch(68% 0.28 25 / 0.12);
+    --shadow-brand-orange-hover: 0px 6px 25px 0px oklch(68% 0.28 25 / 0.18);
   }
 }
 
+:root:has(input.theme-controller[value=viuwi-dark]:checked),
+[data-theme="viuwi-dark"] {
+  color-scheme: dark;
+
+  /* DaisyUI base colors */
+  --color-base-100: oklch(15% 0.02 240);
+  --color-base-200: oklch(18% 0.03 240);
+  --color-base-300: oklch(22% 0.04 240);
+  --color-base-content: oklch(90% 0.02 240);
+  --color-primary: oklch(65% 0.25 25);
+  --color-primary-content: oklch(15% 0.05 25);
+  --color-secondary: oklch(70% 0.15 200);
+  --color-secondary-content: oklch(15% 0.05 200);
+  --color-accent: oklch(65% 0.2 160);
+  --color-accent-content: oklch(15% 0.05 160);
+  --color-neutral: oklch(35% 0.05 240);
+  --color-neutral-content: oklch(90% 0.02 240);
+  --color-info: oklch(70% 0.2 220);
+  --color-info-content: oklch(15% 0.05 220);
+  --color-success: oklch(65% 0.25 140);
+  --color-success-content: oklch(15% 0.05 140);
+  --color-warning: oklch(80% 0.25 80);
+  --color-warning-content: oklch(15% 0.05 80);
+  --color-error: oklch(65% 0.3 30);
+  --color-error-content: oklch(98% 0.01 30);
+
+  /* Custom ViuWi brand colors for dark theme - Enhanced for better vibrancy while maintaining accessibility */
+  --color-brand-orange: oklch(72% 0.28 25);
+  --color-brand-orange-light: oklch(78% 0.25 25);
+  --color-brand-orange-dark: oklch(65% 0.3 25);
+  --color-text-muted: oklch(60% 0.05 240);
+  --color-border-light: oklch(30% 0.05 240);
+  --color-border-input: oklch(40% 0.02 240);
+
+  /* Border radius */
+  --radius-selector: 0.375rem;
+  --radius-field: 0.375rem;
+  --radius-box: 0.5rem;
+
+  /* Border size */
+  --border: 1px;
+
+  /* Shadow effects */
+  --shadow-brand-orange: 0px 4px 20px 0px oklch(72% 0.28 25 / 0.12);
+  --shadow-brand-orange-hover: 0px 6px 25px 0px oklch(72% 0.28 25 / 0.18);
+}
+
+/* ViuWi Brand Color Utility Classes */
+.text-brand-orange {
+  color: var(--color-brand-orange);
+}
+
+.bg-brand-orange {
+  background-color: var(--color-brand-orange);
+}
+
+.text-brand-orange-light {
+  color: var(--color-brand-orange-light);
+}
+
+.bg-brand-orange-light {
+  background-color: var(--color-brand-orange-light);
+}
+
+.border-brand-orange {
+  border-color: var(--color-brand-orange);
+}
+
+.hover\:bg-brand-orange:hover {
+  background-color: var(--color-brand-orange);
+}
+
+.hover\:bg-brand-orange-light:hover {
+  background-color: var(--color-brand-orange-light);
+}
+
+.hover\:text-brand-orange:hover {
+  color: var(--color-brand-orange);
+}
+
+.hover\:text-brand-orange-light:hover {
+  color: var(--color-brand-orange-light);
+}
+
+/* Additional brand color utilities for enhanced design system */
+.text-brand-orange-dark {
+  color: var(--color-brand-orange-dark);
+}
+
+.bg-brand-orange-dark {
+  background-color: var(--color-brand-orange-dark);
+}
+
+.border-brand-orange-light {
+  border-color: var(--color-brand-orange-light);
+}
+
+.border-brand-orange-dark {
+  border-color: var(--color-brand-orange-dark);
+}
+
+.hover\:bg-brand-orange-dark:hover {
+  background-color: var(--color-brand-orange-dark);
+}
+
+.hover\:text-brand-orange-dark:hover {
+  color: var(--color-brand-orange-dark);
+}
+
+.border-input {
+  border-color: var(--color-border-input);
+}
+
+/* Enhanced button shadows for better visual hierarchy */
+.shadow-brand-orange {
+  box-shadow: var(--shadow-brand-orange);
+}
+
+.shadow-brand-orange-hover {
+  box-shadow: var(--shadow-brand-orange-hover);
+}
+
+/* Typography System - Nunito Sans based design system */
+.font-nunito {
+  font-family: var(--font-nunito-sans), sans-serif;
+}
+
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* Brand Typography Classes */
+.text-brand-heading {
+  font-family: var(--font-nunito-sans), sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.text-brand-subheading {
+  font-family: var(--font-nunito-sans), sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.text-brand-label {
+  font-family: var(--font-nunito-sans), sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.text-brand-body {
+  font-family: var(--font-nunito-sans), sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.text-brand-button {
+  font-family: var(--font-nunito-sans), sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+/* Base font family override for consistent typography */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-nunito-sans), sans-serif;
 }
