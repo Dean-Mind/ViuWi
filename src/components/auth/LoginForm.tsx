@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { LoginData } from '@/types/auth';
+import { validateEmail } from '@/utils/validation';
 import AuthInput from '../ui/AuthInput';
 import AuthButton from '../ui/AuthButton';
 import GoogleOAuthButton from '../ui/GoogleOAuthButton';
@@ -32,19 +33,18 @@ export default function LoginForm({
 
   const validateForm = () => {
     const newErrors: {email?: string; password?: string} = {};
-    
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      newErrors.email = emailValidation.error;
     }
-    
+
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'Kata sandi wajib diisi';
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = 'Kata sandi minimal 6 karakter';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -104,6 +104,9 @@ export default function LoginForm({
             onChange={setEmail}
             error={errors.email}
             required
+            id="email"
+            name="email"
+            autoComplete="email"
           />
         </div>
 
@@ -118,6 +121,9 @@ export default function LoginForm({
             onChange={setPassword}
             error={errors.password}
             required
+            id="password"
+            name="password"
+            autoComplete="current-password"
           />
         </div>
 

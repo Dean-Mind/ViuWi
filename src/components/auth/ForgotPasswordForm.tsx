@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ForgotPasswordData } from '@/types/auth';
 import AuthInput from '../ui/AuthInput';
 import AuthButton from '../ui/AuthButton';
+import FormLabel from '../ui/FormLabel';
 import Alert from '../ui/Alert';
 
 interface ForgotPasswordFormProps {
@@ -81,9 +82,9 @@ export default function ForgotPasswordForm({
         )}
 
         <div>
-          <label className="block text-brand-label text-base-content mb-2">
+          <FormLabel htmlFor="email" required>
             Email
-          </label>
+          </FormLabel>
           <AuthInput
             type="email"
             placeholder="email@gmail.com"
@@ -91,6 +92,9 @@ export default function ForgotPasswordForm({
             onChange={setEmail}
             error={emailError}
             required
+            id="email"
+            name="email"
+            autoComplete="email"
           />
         </div>
 

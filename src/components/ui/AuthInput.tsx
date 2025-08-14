@@ -10,6 +10,9 @@ interface AuthInputProps {
   onChange: (value: string) => void;
   error?: string;
   required?: boolean;
+  id?: string;
+  name?: string;
+  autoComplete?: string;
 }
 
 export default function AuthInput({
@@ -18,7 +21,10 @@ export default function AuthInput({
   value,
   onChange,
   error,
-  required = false
+  required = false,
+  id,
+  name,
+  autoComplete
 }: AuthInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const inputType = type === 'password' && showPassword ? 'text' : type;
@@ -38,6 +44,9 @@ export default function AuthInput({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         className={inputClassName}
+        id={id}
+        name={name}
+        autoComplete={autoComplete}
       />
       
       {type === 'password' && (

@@ -107,7 +107,7 @@ export default function RegisterForm({
         )}
 
         <div>
-          <FormLabel required>
+          <FormLabel htmlFor="fullName" required>
             Nama Lengkap
           </FormLabel>
           <AuthInput
@@ -117,11 +117,14 @@ export default function RegisterForm({
             onChange={setFullName}
             error={errors.fullName}
             required
+            id="fullName"
+            name="fullName"
+            autoComplete="name"
           />
         </div>
 
         <div>
-          <FormLabel required>
+          <FormLabel htmlFor="email" required>
             Email
           </FormLabel>
           <AuthInput
@@ -131,11 +134,14 @@ export default function RegisterForm({
             onChange={setEmail}
             error={errors.email}
             required
+            id="email"
+            name="email"
+            autoComplete="email"
           />
         </div>
 
         <div>
-          <FormLabel required>
+          <FormLabel htmlFor="password" required>
             Password
           </FormLabel>
           <AuthInput
@@ -145,11 +151,14 @@ export default function RegisterForm({
             onChange={setPassword}
             error={errors.password}
             required
+            id="password"
+            name="password"
+            autoComplete="new-password"
           />
         </div>
 
         <div>
-          <FormLabel required>
+          <FormLabel htmlFor="confirmPassword" required>
             Konfirmasi Password
           </FormLabel>
           <AuthInput
@@ -159,6 +168,9 @@ export default function RegisterForm({
             onChange={setConfirmPassword}
             error={errors.confirmPassword}
             required
+            id="confirmPassword"
+            name="confirmPassword"
+            autoComplete="new-password"
           />
         </div>
 
