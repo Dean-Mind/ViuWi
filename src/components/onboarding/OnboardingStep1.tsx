@@ -26,7 +26,7 @@ export default function OnboardingStep1({
 
   // Reset website extraction state when URL changes
   useEffect(() => {
-    if (websiteUrl.trim() === '') {
+    if (websiteExtracted) {
       setWebsiteExtracted(false);
     }
   }, [websiteUrl]);
