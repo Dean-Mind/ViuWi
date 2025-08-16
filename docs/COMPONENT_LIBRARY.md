@@ -249,10 +249,13 @@ interface AuthLayoutProps {
 - Supports theme toggle positioning
 
 **Features**:
-- Responsive layout design
-- Theme toggle integration
-- Brand logo display
-- Centered content layout
+- Professional header with sticky positioning
+- 65:35 responsive layout design (form content : mascot)
+- Integrated brand logo in header structure
+- Theme toggle in header actions area
+- Robot mascot display on desktop screens
+- Mobile-first spacing optimization
+- Semantic HTML structure with header/main elements
 
 **Theme Compatibility**: ✅ Light & Dark themes
 
@@ -268,8 +271,13 @@ interface ThemeToggleProps {
   className?: string;
 }
 
-// Usage
-<ThemeToggle className="absolute top-4 right-4" />
+// Usage in Header
+<header>
+  <div className="flex items-center justify-between">
+    <div>Brand Logo</div>
+    <ThemeToggle />
+  </div>
+</header>
 ```
 
 **DaisyUI Integration**:
@@ -290,14 +298,14 @@ interface ThemeToggleProps {
 ## Design System Integration
 
 ### Typography Classes
-All components use consistent typography classes:
+All components use consistent responsive typography classes:
 
 ```css
-.text-brand-heading    /* 28px, font-weight: 700 */
-.text-brand-subheading /* 20px, font-weight: 600 */
-.text-brand-label      /* 20px, font-weight: 600 */
+.text-brand-heading    /* 20px mobile, 24px desktop, font-weight: 700 */
+.text-brand-subheading /* 16px mobile, 18px desktop, font-weight: 600 */
+.text-brand-label      /* 14px, font-weight: 600 */
 .text-brand-body       /* 16px, font-weight: 400 */
-.text-brand-button     /* 20px, font-weight: 700 */
+.text-brand-button     /* 16px, font-weight: 700 */
 ```
 
 ### Color System
