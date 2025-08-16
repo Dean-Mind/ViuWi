@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import EyeIcon from '../icons/EyeIcon';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface AuthInputProps {
   type: 'text' | 'email' | 'password';
@@ -53,10 +53,10 @@ export default function AuthInput({
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="btn btn-ghost btn-sm absolute right-2 top-1/2 transform -translate-y-1/2"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-base-content/60 hover:text-base-content transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-1 rounded"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
-          <EyeIcon width={20} height={15} color="var(--color-text-muted)" />
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         </button>
       )}
 

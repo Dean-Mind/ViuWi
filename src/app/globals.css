@@ -247,25 +247,37 @@
   font-family: var(--font-inter), sans-serif;
 }
 
-/* Brand Typography Classes */
+/* Brand Typography Classes - Mobile-First Responsive */
 .text-brand-heading {
   font-family: var(--font-nunito-sans), sans-serif;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 20px;
   line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .text-brand-heading {
+    font-size: 24px;
+  }
 }
 
 .text-brand-subheading {
   font-family: var(--font-nunito-sans), sans-serif;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  .text-brand-subheading {
+    font-size: 18px;
+  }
 }
 
 .text-brand-label {
   font-family: var(--font-nunito-sans), sans-serif;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 14px;
   line-height: 1.4;
 }
 
@@ -279,7 +291,7 @@
 .text-brand-button {
   font-family: var(--font-nunito-sans), sans-serif;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1.2;
 }
 
