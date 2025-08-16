@@ -65,22 +65,22 @@ export default function EmailVerificationPage({
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-[40px] font-bold text-base-content">Cek inbox Anda</h2>
-        <p className="text-[24px] font-normal text-base-content">
+        <h2 className="text-xl md:text-2xl font-bold text-base-content">Cek inbox Anda</h2>
+        <p className="text-base md:text-lg font-normal text-base-content">
           Kami telah mengirimkan email verifikasi ke{' '}
           <span className="text-brand-orange font-medium">{email}</span>
         </p>
       </div>
 
       <div className="space-y-4">
-        <p className="text-[20px] font-semibold text-base-content">
+        <p className="text-sm md:text-base font-semibold text-base-content">
           Tidak mendapatkan email?
         </p>
         
         <button
           onClick={handleResendEmail}
           disabled={resendCooldown > 0 || isResending}
-          className="text-[20px] font-semibold text-brand-orange underline hover:text-brand-orange-light disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-sm md:text-base font-semibold text-brand-orange underline hover:text-brand-orange-light disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isResending ? (
             <span className="flex items-center justify-center gap-2">
