@@ -1,8 +1,8 @@
 // Props types for onboarding components
 export interface OnboardingStep1Props {
   onDocumentUpload: (files: FileList) => void;
-  onTextSubmit: (text: string) => void;
-  onWebsiteLinkSubmit: (url: string) => void;
+  onTextSubmit: (text: string) => Promise<void>;
+  onWebsiteLinkSubmit: (url: string) => Promise<void>;
   onNext: () => void;
   isLoading?: boolean;
   error?: string;

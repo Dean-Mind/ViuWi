@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { OnboardingStep1Props } from '@/types/onboarding';
 import { mockOnboardingData } from '@/data/onboardingMockData';
 import FileUploadArea from './FileUploadArea';
@@ -19,9 +19,17 @@ export default function OnboardingStep1({
   const [textInput, setTextInput] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [hasUploadedDoc, setHasUploadedDoc] = useState(false);
+  const [websiteExtracted, setWebsiteExtracted] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
 
   const { knowledgeBaseOptions } = mockOnboardingData;
+
+  // Reset website extraction state when URL changes
+  useEffect(() => {
+    if (websiteUrl.trim() === '') {
+      setWebsiteExtracted(false);
+    }
+  }, [websiteUrl]);
 
   const handleFileUpload = (files: FileList) => {
     setHasUploadedDoc(true);
@@ -29,25 +37,44 @@ export default function OnboardingStep1({
   };
 
   const handleExtractContent = async () => {
-    if (!websiteUrl) return;
-    
+    if (!websiteUrl.trim()) return;
+
     setIsExtracting(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate extraction
-      onWebsiteLinkSubmit(websiteUrl);
+      await onWebsiteLinkSubmit(websiteUrl);
+      setWebsiteExtracted(true);
+    } catch (error) {
+      // Error handling - don't set websiteExtracted to true
+      console.error('Website extraction failed:', error);
     } finally {
       setIsExtracting(false);
     }
   };
 
-  const handleNext = () => {
-    if (textInput) {
-      onTextSubmit(textInput);
+  const handleNext = async () => {
+    try {
+      // Submit text input if provided
+      if (textInput.trim()) {
+        await onTextSubmit(textInput);
+      }
+
+      // Auto-submit website URL if it exists but wasn't extracted yet
+      if (websiteUrl.trim() && !websiteExtracted) {
+        await onWebsiteLinkSubmit(websiteUrl);
+        setWebsiteExtracted(true);
+      }
+
+      // Only proceed if we have valid content
+      if (canProceed || websiteExtracted) {
+        onNext();
+      }
+    } catch (error) {
+      console.error('Submission failed:', error);
+      // Don't proceed if submission fails - error will be shown by parent component
     }
-    onNext();
   };
 
-  const canProceed = hasUploadedDoc || textInput.trim() || websiteUrl.trim();
+  const canProceed = !!hasUploadedDoc || !!textInput.trim() || websiteExtracted;
 
   return (
     <div className="space-y-6">

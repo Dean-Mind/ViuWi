@@ -29,7 +29,7 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
     }
   };
 
-  const handleTextSubmit = async (text: string) => {
+  const handleTextSubmit = async (text: string): Promise<void> => {
     setIsLoading(true);
     setError('');
     try {
@@ -38,12 +38,13 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
       console.log('Text submitted:', text);
     } catch (err) {
       setError('Failed to process text');
+      throw err; // Re-throw to allow child component to handle
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleWebsiteLinkSubmit = async (url: string) => {
+  const handleWebsiteLinkSubmit = async (url: string): Promise<void> => {
     setIsLoading(true);
     setError('');
     try {
@@ -52,6 +53,7 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
       console.log('Website content extracted:', url);
     } catch (err) {
       setError('Failed to extract website content');
+      throw err; // Re-throw to allow child component to handle
     } finally {
       setIsLoading(false);
     }
