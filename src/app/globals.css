@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 @import "tailwindcss";
 @plugin "daisyui" {
   themes: false;
@@ -39,6 +43,8 @@
   --color-text-muted: oklch(50% 0.05 240);
   --color-border-light: oklch(85% 0.05 240);
   --color-border-input: oklch(70% 0.02 240);
+
+
 
   /* Border radius */
   --radius-selector: 0.375rem;
@@ -102,6 +108,8 @@
     --color-border-light: oklch(85% 0.05 240);
     --color-border-input: oklch(70% 0.02 240);
 
+
+
     /* Border radius */
     --radius-selector: 0.375rem;
     --radius-field: 0.375rem;
@@ -149,6 +157,8 @@
   --color-text-muted: oklch(60% 0.05 240);
   --color-border-light: oklch(30% 0.05 240);
   --color-border-input: oklch(40% 0.02 240);
+
+
 
   /* Border radius */
   --radius-selector: 0.375rem;
@@ -298,4 +308,50 @@
 /* Base font family override for consistent typography */
 body {
   font-family: var(--font-nunito-sans), sans-serif;
+}
+
+/* Theme-aware custom colors using @theme directive */
+@theme {
+  /* Section label colors - Light theme */
+  --color-label-cs: oklch(85% 0.15 140);
+  --color-label-cs-content: oklch(25% 0.12 140);
+  --color-label-bot: oklch(85% 0.15 40);
+  --color-label-bot-content: oklch(25% 0.12 40);
+
+  /* Avatar colors - Light theme */
+  --color-avatar-teal: oklch(88% 0.12 180);
+  --color-avatar-teal-content: oklch(25% 0.08 180);
+  --color-avatar-purple: oklch(88% 0.12 280);
+  --color-avatar-purple-content: oklch(25% 0.08 280);
+  --color-avatar-orange: oklch(88% 0.12 40);
+  --color-avatar-orange-content: oklch(25% 0.08 40);
+  --color-avatar-green: oklch(88% 0.12 140);
+  --color-avatar-green-content: oklch(25% 0.08 140);
+  --color-avatar-blue: oklch(88% 0.12 220);
+  --color-avatar-blue-content: oklch(25% 0.08 220);
+  --color-avatar-pink: oklch(88% 0.12 320);
+  --color-avatar-pink-content: oklch(25% 0.08 320);
+}
+
+/* Dark theme overrides */
+[data-theme="viuwi-dark"] {
+  /* Section label colors - Dark theme */
+  --color-label-cs: oklch(35% 0.12 140);
+  --color-label-cs-content: oklch(85% 0.08 140);
+  --color-label-bot: oklch(35% 0.12 40);
+  --color-label-bot-content: oklch(85% 0.08 40);
+
+  /* Avatar colors - Dark theme */
+  --color-avatar-teal: oklch(32% 0.10 180);
+  --color-avatar-teal-content: oklch(85% 0.06 180);
+  --color-avatar-purple: oklch(32% 0.10 280);
+  --color-avatar-purple-content: oklch(85% 0.06 280);
+  --color-avatar-orange: oklch(32% 0.10 40);
+  --color-avatar-orange-content: oklch(85% 0.06 40);
+  --color-avatar-green: oklch(32% 0.10 140);
+  --color-avatar-green-content: oklch(85% 0.06 140);
+  --color-avatar-blue: oklch(32% 0.10 220);
+  --color-avatar-blue-content: oklch(85% 0.06 220);
+  --color-avatar-pink: oklch(32% 0.10 320);
+  --color-avatar-pink-content: oklch(85% 0.06 320);
 }

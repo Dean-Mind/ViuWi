@@ -17,6 +17,26 @@ const config = {
         'brand-orange': 'var(--color-brand-orange)',
         'brand-orange-light': 'var(--color-brand-orange-light)',
         'brand-orange-dark': 'var(--color-brand-orange-dark)',
+
+        // Section label colors for CS and Bot badges
+        'label-cs': 'var(--color-label-cs)',
+        'label-cs-content': 'var(--color-label-cs-content)',
+        'label-bot': 'var(--color-label-bot)',
+        'label-bot-content': 'var(--color-label-bot-content)',
+
+        // Avatar colors for subtle, theme-aware user avatars
+        'avatar-teal': 'var(--color-avatar-teal)',
+        'avatar-teal-content': 'var(--color-avatar-teal-content)',
+        'avatar-purple': 'var(--color-avatar-purple)',
+        'avatar-purple-content': 'var(--color-avatar-purple-content)',
+        'avatar-orange': 'var(--color-avatar-orange)',
+        'avatar-orange-content': 'var(--color-avatar-orange-content)',
+        'avatar-green': 'var(--color-avatar-green)',
+        'avatar-green-content': 'var(--color-avatar-green-content)',
+        'avatar-blue': 'var(--color-avatar-blue)',
+        'avatar-blue-content': 'var(--color-avatar-blue-content)',
+        'avatar-pink': 'var(--color-avatar-pink)',
+        'avatar-pink-content': 'var(--color-avatar-pink-content)',
       },
       boxShadow: {
         'brand-orange': 'var(--shadow-brand-orange)',
