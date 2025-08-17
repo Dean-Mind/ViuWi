@@ -92,14 +92,14 @@ export default function Header({
 
           {/* Language Switcher */}
           <div className="dropdown dropdown-end">
-            <div
+            <button
+              type="button"
               tabIndex={0}
-              role="button"
               className="btn btn-ghost btn-circle"
               aria-label="Change language"
             >
               <Languages size={20} className="text-base-content/70" />
-            </div>
+            </button>
             <ul
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow border border-base-300"
@@ -133,9 +133,9 @@ export default function Header({
 
           {/* Notification */}
           <div className="dropdown dropdown-end">
-            <div
+            <button
+              type="button"
               tabIndex={0}
-              role="button"
               className="btn btn-ghost btn-circle"
               aria-label="Notifications"
             >
@@ -145,7 +145,7 @@ export default function Header({
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
                 )}
               </div>
-            </div>
+            </button>
             <ul
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-80 p-2 shadow border border-base-300"
@@ -207,9 +207,9 @@ export default function Header({
 
           {/* User Profile */}
           <div className="dropdown dropdown-end">
-            <div
+            <button
+              type="button"
               tabIndex={0}
-              role="button"
               className="btn btn-ghost flex items-center gap-3 px-4 py-2 h-auto min-h-0"
               aria-label="User menu"
             >
@@ -240,7 +240,7 @@ export default function Header({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
-            </div>
+            </button>
             <ul
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow border border-base-300"

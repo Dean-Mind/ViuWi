@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 // Dashboard navigation and chat related enums
 
 export enum NavigationItem {
@@ -170,6 +172,6 @@ export interface ChatData {
 export interface NavigationItemData {
   id: NavigationItem;
   label: string;
-  icon: string;
+  icon: ReactNode;
   isActive: boolean;
 }

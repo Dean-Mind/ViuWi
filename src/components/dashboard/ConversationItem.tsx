@@ -14,9 +14,11 @@ export default function ConversationItem({ conversation, onClick, avatarColor = 
   const { user, lastMessage, timestamp, unreadCount } = conversation;
 
   return (
-    <div
+    <button
+      type="button"
       onClick={() => onClick(conversation.id)}
-      className="flex items-center gap-3 p-3 w-full"
+      className="flex items-center gap-3 p-3 w-full hover:bg-base-200 transition-colors text-left"
+      aria-label={`Open conversation with ${user.name}`}
     >
       {/* Avatar */}
       <div className="flex-shrink-0">
@@ -53,6 +55,6 @@ export default function ConversationItem({ conversation, onClick, avatarColor = 
       <div className="flex-shrink-0">
         <ChevronRight size={16} className="text-base-content/40" />
       </div>
-    </div>
+    </button>
   );
 }
