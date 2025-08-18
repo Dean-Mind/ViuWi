@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito_Sans, Inter, Montserrat } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ErrorBoundary } from "@/components/providers/ErrorBoundary";
+import ToastProvider from "@/components/ui/ToastProvider";
 import "./globals.css";
 
 const nunitoSans = Nunito_Sans({
@@ -46,7 +47,9 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <ThemeProvider>
-            {children}
+            <ToastProvider>
+              {children}
+            </ToastProvider>
           </ThemeProvider>
         </ErrorBoundary>
       </body>

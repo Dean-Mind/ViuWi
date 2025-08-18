@@ -1,51 +1,51 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChatTabType, ChatUserType, mockChatData } from '@/data/dashboardMockData';
-import ConversationItem from './ConversationItem';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChatTabType } from '@/data/dashboardMockData';
+import UnifiedConversationItem from '@/components/shared/UnifiedConversationItem';
+import LabelSection from '@/components/shared/LabelSection';
+import { ChevronRight } from 'lucide-react';
+import {
+  useConversations,
+  useSetActiveConversation,
+  useBotConversations,
+  useCSConversations,
+  useUnreadConversations
+} from '@/stores/conversationStore';
 
-// Utility function to generate consistent, theme-aware avatar colors
-const getAvatarColor = (name: string, initials: string): string => {
-  const colors = [
-    'bg-[var(--color-avatar-teal)] text-[var(--color-avatar-teal-content)]',       // Subtle teal
-    'bg-[var(--color-avatar-purple)] text-[var(--color-avatar-purple-content)]',   // Subtle purple
-    'bg-[var(--color-avatar-orange)] text-[var(--color-avatar-orange-content)]',   // Subtle orange
-    'bg-[var(--color-avatar-green)] text-[var(--color-avatar-green-content)]',     // Subtle green
-    'bg-[var(--color-avatar-blue)] text-[var(--color-avatar-blue-content)]',       // Subtle blue
-    'bg-[var(--color-avatar-pink)] text-[var(--color-avatar-pink-content)]'        // Subtle pink
-  ];
 
-  // Create deterministic hash from name + initials
-  const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) +
-               initials.charCodeAt(0);
-
-  return colors[hash % colors.length];
-};
 
 interface ChatPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  onNavigateToCSHandover: () => void;
   isLoading?: boolean;
 }
 
-export default function ChatPanel({ isOpen, onClose, isLoading = false }: ChatPanelProps) {
+export default function ChatPanel({ isOpen, onClose, onNavigateToCSHandover, isLoading = false }: ChatPanelProps) {
   const [activeTab, setActiveTab] = useState<ChatTabType>(ChatTabType.MESSAGES);
   const [labelExpandedSections, setLabelExpandedSections] = useState({
+    bot: true,
     cs: true,
-    bot: true
+    unread: true
   });
 
-  const conversations = mockChatData.conversations;
-  const sortedConversations = [...conversations].sort((a, b) =>
-    b.timestamp.getTime() - a.timestamp.getTime()
+  // Use global conversation store
+  const conversations = useConversations();
+  const setActiveConversation = useSetActiveConversation();
+
+  // Get filtered conversations for Labels tab (now using memoized custom hooks)
+  const botConversations = useBotConversations();
+  const csConversations = useCSConversations();
+  const unreadConversations = useUnreadConversations();
+
+  // Sort conversations by timestamp for Messages tab (memoized to avoid re-sorting)
+  const sortedConversations = React.useMemo(() =>
+    [...conversations].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()),
+    [conversations]
   );
 
-  // For Labels tab sectioning
-  const csConversations = sortedConversations.filter(conv => conv.type === ChatUserType.CS);
-  const botConversations = sortedConversations.filter(conv => conv.type === ChatUserType.BOT);
-
-  const toggleLabelSection = (section: 'cs' | 'bot') => {
+  const toggleLabelSection = (section: 'bot' | 'cs' | 'unread') => {
     setLabelExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
@@ -53,13 +53,15 @@ export default function ChatPanel({ isOpen, onClose, isLoading = false }: ChatPa
   };
 
   const handleConversationClick = (id: string) => {
+    setActiveConversation(id);
+    onNavigateToCSHandover();
     console.log('Conversation clicked:', id);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="w-full md:w-72 lg:w-80 h-full bg-base-100 rounded-tl-3xl flex flex-col shadow-lg">
+    <div className="w-full md:w-72 lg:w-80 h-full bg-base-100 rounded-l-3xl flex flex-col shadow-lg">
       {/* Header with Close Button and Tab Navigation */}
       <div className="relative px-6 pt-6 pb-4">
         {/* Close Button */}
@@ -109,17 +111,20 @@ export default function ChatPanel({ isOpen, onClose, isLoading = false }: ChatPa
 
         {!isLoading && activeTab === ChatTabType.MESSAGES && (
           <>
+            {/* Latest Conversations */}
             {sortedConversations.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-2 px-4">
                 {sortedConversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    className="bg-base-100 hover:bg-base-200 rounded-2xl transition-colors"
+                    className="bg-base-100 hover:bg-base-200 rounded-3xl transition-colors"
                   >
-                    <ConversationItem
+                    <UnifiedConversationItem
                       conversation={conversation}
                       onClick={handleConversationClick}
-                      avatarColor={getAvatarColor(conversation.user.name, conversation.user.initials)}
+                      showArrow={true}
+                      showBadges={true}
+                      variant="button"
                     />
                   </div>
                 ))}
@@ -140,95 +145,35 @@ export default function ChatPanel({ isOpen, onClose, isLoading = false }: ChatPa
 
         {!isLoading && activeTab === ChatTabType.LABELS && (
           <div className="space-y-6">
-            {/* CS Section */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="bg-[var(--color-label-cs)] text-[var(--color-label-cs-content)] gap-2 px-3 py-2 text-sm font-semibold rounded-full">
-                  CS
-                </div>
-                <button
-                  onClick={() => toggleLabelSection('cs')}
-                  className="p-1 hover:bg-base-200 rounded transition-colors"
-                >
-                  <ChevronDown
-                    size={16}
-                    className={`text-base-content/60 transform transition-transform ${
-                      labelExpandedSections.cs ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {labelExpandedSections.cs && (
-                <>
-                  {csConversations.length > 0 ? (
-                    <div className="space-y-2">
-                      {csConversations.map((conversation) => (
-                        <div
-                          key={conversation.id}
-                          className="bg-base-100 hover:bg-base-200 rounded-2xl transition-colors"
-                        >
-                          <ConversationItem
-                            conversation={conversation}
-                            onClick={handleConversationClick}
-                            avatarColor={getAvatarColor(conversation.user.name, conversation.user.initials)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-base-content/60 text-sm">No CS conversations</p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
             {/* Bot Section */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="bg-[var(--color-label-bot)] text-[var(--color-label-bot-content)] gap-2 px-3 py-2 text-sm font-semibold rounded-full">
-                  Bot
-                </div>
-                <button
-                  onClick={() => toggleLabelSection('bot')}
-                  className="p-1 hover:bg-base-200 rounded transition-colors"
-                >
-                  <ChevronDown
-                    size={16}
-                    className={`text-base-content/60 transform transition-transform ${
-                      labelExpandedSections.bot ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-              </div>
+            <LabelSection
+              title="Bot"
+              conversations={botConversations}
+              isExpanded={labelExpandedSections.bot}
+              onToggle={() => toggleLabelSection('bot')}
+              color="info"
+              onConversationClick={handleConversationClick}
+            />
 
-              {labelExpandedSections.bot && (
-                <>
-                  {botConversations.length > 0 ? (
-                    <div className="space-y-2">
-                      {botConversations.map((conversation) => (
-                        <div
-                          key={conversation.id}
-                          className="bg-base-100 hover:bg-base-200 rounded-2xl transition-colors"
-                        >
-                          <ConversationItem
-                            conversation={conversation}
-                            onClick={handleConversationClick}
-                            avatarColor={getAvatarColor(conversation.user.name, conversation.user.initials)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <p className="text-base-content/60 text-sm">No Bot conversations</p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+            {/* CS Section */}
+            <LabelSection
+              title="CS"
+              conversations={csConversations}
+              isExpanded={labelExpandedSections.cs}
+              onToggle={() => toggleLabelSection('cs')}
+              color="error"
+              onConversationClick={handleConversationClick}
+            />
+
+            {/* Unread Section */}
+            <LabelSection
+              title="Unread"
+              conversations={unreadConversations}
+              isExpanded={labelExpandedSections.unread}
+              onToggle={() => toggleLabelSection('unread')}
+              color="primary"
+              onConversationClick={handleConversationClick}
+            />
           </div>
         )}
       </div>

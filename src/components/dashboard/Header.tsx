@@ -22,7 +22,7 @@ interface HeaderProps {
 export default function Header({
   user,
   isLive,
-  language,
+  language: _language,
   hasNotifications,
   isChatOpen,
   onLanguageChange,
@@ -31,13 +31,13 @@ export default function Header({
   onLiveToggle,
   onChatToggle
 }: HeaderProps) {
-  const [dropdownStates, setDropdownStates] = useState({
+  const [_dropdownStates, setDropdownStates] = useState({
     language: false,
     notifications: false,
     profile: false
   });
 
-  const toggleDropdown = (dropdown: keyof typeof dropdownStates) => {
+  const _toggleDropdown = (dropdown: keyof typeof _dropdownStates) => {
     setDropdownStates(prev => ({
       ...prev,
       [dropdown]: !prev[dropdown]
@@ -53,7 +53,7 @@ export default function Header({
   };
 
   return (
-    <header className="navbar bg-base-100 border-b border-base-300 h-20 px-8">
+    <header className="navbar bg-base-100 border-b border-base-300 h-20 px-8 rounded-3xl">
       {/* Left side - empty */}
       <div className="navbar-start">
       </div>

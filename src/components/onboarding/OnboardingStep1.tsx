@@ -26,9 +26,7 @@ export default function OnboardingStep1({
 
   // Reset website extraction state when URL changes
   useEffect(() => {
-    if (websiteExtracted) {
-      setWebsiteExtracted(false);
-    }
+    setWebsiteExtracted(false);
   }, [websiteUrl]);
 
   const handleFileUpload = (files: FileList) => {
@@ -124,11 +122,11 @@ export default function OnboardingStep1({
       {/* Website Link */}
       <div>
         <FormLabel>Link Website</FormLabel>
-        <div className="card border border-base-300 rounded-md p-6">
+        <div className="card border border-base-300 rounded-2xl p-6">
           <div className="space-y-4">
             <input
               type="url"
-              className="input input-bordered w-full text-brand-body"
+              className="input input-bordered w-full text-brand-body rounded-2xl"
               placeholder={knowledgeBaseOptions.websiteLink.placeholder}
               value={websiteUrl}
               onChange={(e) => setWebsiteUrl(e.target.value)}

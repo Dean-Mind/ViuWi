@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
       // Default fallback UI
       return (
         <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-base-200 rounded-lg p-6 text-center">
+          <div className="max-w-md w-full bg-base-200 rounded-2xl p-6 text-center">
             <div className="text-error text-4xl mb-4">⚠️</div>
             <h2 className="text-brand-heading text-base-content mb-2">
               Oops! Something went wrong

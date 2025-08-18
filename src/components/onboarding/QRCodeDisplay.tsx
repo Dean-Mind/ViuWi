@@ -1,19 +1,23 @@
 'use client';
 
+import Image from 'next/image';
+
 interface QRCodeDisplayProps {
   qrCodeUrl?: string;
 }
 
 export default function QRCodeDisplay({ qrCodeUrl }: QRCodeDisplayProps) {
   return (
-    <div className="card border border-base-300 rounded-md p-8">
+    <div className="card border border-base-300 rounded-2xl p-8">
       <div className="flex flex-col items-center text-center space-y-6">
-        <div className="w-80 h-80 bg-base-200 rounded-md flex items-center justify-center">
+        <div className="w-80 h-80 bg-base-200 rounded-2xl flex items-center justify-center">
           {qrCodeUrl ? (
-            <img 
-              src={qrCodeUrl} 
+            <Image
+              src={qrCodeUrl}
               alt="QR Code for WhatsApp connection"
-              className="w-full h-full object-contain rounded-md"
+              width={320}
+              height={320}
+              className="w-full h-full object-contain rounded-2xl"
             />
           ) : (
             <div className="text-center">

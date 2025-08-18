@@ -29,7 +29,7 @@ export default function FileUploadArea({ onFileSelect, supportedFormats, isLoadi
   };
 
   return (
-    <div className="card border border-base-300 rounded-md p-8">
+    <div className="card border border-base-300 rounded-2xl p-8">
       <div className="flex flex-col items-center text-center space-y-4">
         <CloudUploadIcon width={34} height={34} color="var(--color-base-content)" />
         

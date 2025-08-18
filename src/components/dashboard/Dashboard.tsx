@@ -5,6 +5,7 @@ import { NavigationItem, DashboardProps } from '@/data/dashboardMockData';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ChatPanel from './ChatPanel';
+import CSHandoverPage from '@/components/cshandover/CSHandoverPage';
 
 export default function Dashboard(props: DashboardProps) {
   const [activeNavItem, setActiveNavItem] = useState<NavigationItem>(props.activeNavItem);
@@ -38,11 +39,11 @@ export default function Dashboard(props: DashboardProps) {
   };
 
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer lg:drawer-open h-screen">
       <input id="sidebar-toggle" type="checkbox" className="drawer-toggle" />
 
       {/* Main Content */}
-      <div className="drawer-content flex flex-col bg-base-200">
+      <div className="drawer-content flex flex-col bg-base-200 overflow-hidden h-screen">
         {/* Header with mobile menu toggle */}
         <div className="flex items-center">
           <label
@@ -98,22 +99,28 @@ export default function Dashboard(props: DashboardProps) {
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex">
+        <div className="flex-1 flex border-t border-base-300 min-h-0">
           {/* Main Content */}
-          <div className="flex-1 p-8">
-            <div className="bg-base-100 rounded-lg shadow-sm h-full flex items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-base-content mb-4">
-                  Welcome to ViuWi Dashboard
-                </h2>
-                <p className="text-base-content/70">
-                  Main content area - ready for your components
-                </p>
-                <div className="mt-4 text-sm text-base-content/50">
-                  Active: {activeNavItem.replace('_', ' ').toUpperCase()}
+          <div className="flex-1 min-h-0">
+            {activeNavItem === NavigationItem.CS_HANDOVER ? (
+              <CSHandoverPage />
+            ) : (
+              <div className="p-8 h-full">
+                <div className="bg-base-100 rounded-3xl shadow-sm h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-base-content mb-4">
+                      Welcome to ViuWi Dashboard
+                    </h2>
+                    <p className="text-base-content/70">
+                      Main content area - ready for your components
+                    </p>
+                    <div className="mt-4 text-sm text-base-content/50">
+                      Active: {activeNavItem.replace('_', ' ').toUpperCase()}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Chat Panel */}
@@ -121,13 +128,14 @@ export default function Dashboard(props: DashboardProps) {
             <ChatPanel
               isOpen={isChatOpen}
               onClose={() => setIsChatOpen(false)}
+              onNavigateToCSHandover={() => setActiveNavItem(NavigationItem.CS_HANDOVER)}
             />
           )}
         </div>
       </div>
 
       {/* Sidebar */}
-      <div className="drawer-side">
+      <div className="drawer-side bg-base-200">
         <label htmlFor="sidebar-toggle" aria-label="close sidebar" className="drawer-overlay"></label>
         <Sidebar
           activeNavItem={activeNavItem}
