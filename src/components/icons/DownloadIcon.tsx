@@ -1,0 +1,4 @@
+import * as React from "react";
+import type { SVGProps } from "react";
+const Component = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14" {...props}><defs><clipPath xmlns="http://www.w3.org/2000/svg" id="prefix__a"><path fill="#fff" d="M0 0h14v14H0z" /></clipPath></defs><g xmlns="http://www.w3.org/2000/svg" stroke="#F35427" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} clipPath="url(#prefix__a)"><path d="M12.25 8.75v2.333a1.166 1.166 0 0 1-1.167 1.167H2.917a1.166 1.166 0 0 1-1.167-1.167V8.75M4.083 5.833 7 8.75l2.917-2.917M7 8.75v-7" /></g></svg>;
+export default Component;

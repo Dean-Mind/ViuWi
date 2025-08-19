@@ -1,0 +1,7 @@
+name,description,detail,category,price,status
+Chocolate Lava Cake,Rich chocolate cake with molten center,Made with premium Belgian chocolate and served warm,kue,25000,active
+,Missing name product,This product has no name,kue,15000,active
+Valid Product,Good description,Good detail,kue,35000,active
+Invalid Price Product,Product with invalid price,This has invalid price,kue,invalid_price,active
+Invalid Category Product,Product with invalid category,This has invalid category,invalid_category,12000,active
+Invalid Status Product,Product with invalid status,This has invalid status,kue,18000,invalid_status

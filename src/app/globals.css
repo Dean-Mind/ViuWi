@@ -1,3 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Nunito:wght@400&display=swap');
+
+/* CSS Variables for fonts */
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-nunito-sans: 'Nunito Sans', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+  --font-nunito: 'Nunito', sans-serif;
+}
+
 @import "tailwindcss";
 @plugin "daisyui" {
   themes: false;
@@ -493,4 +503,16 @@ body {
   --color-avatar-blue-content: oklch(85% 0.06 220);
   --color-avatar-pink: oklch(32% 0.10 320);
   --color-avatar-pink-content: oklch(85% 0.06 320);
+}
+
+/* Custom scrollbar hiding utility */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
 }

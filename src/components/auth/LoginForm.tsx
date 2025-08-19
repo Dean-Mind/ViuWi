@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { LoginData } from '@/types/auth';
 import { validateEmail } from '@/utils/validation';
 import AuthInput from '../ui/AuthInput';

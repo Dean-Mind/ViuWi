@@ -7,12 +7,14 @@ import ProgressIndicator from './ProgressIndicator';
 import OnboardingStep1 from './OnboardingStep1';
 import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
+import { useAppToast } from '@/hooks/useAppToast';
 
 export default function OnboardingFlow({ initialStep = 1, onComplete }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [features, setFeatures] = useState<FeatureOption[]>(mockOnboardingData.features);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const toast = useAppToast();
 
   // Step 1 handlers
   const handleDocumentUpload = async (files: FileList) => {
@@ -22,8 +24,10 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
       // Simulate upload
       await new Promise(resolve => setTimeout(resolve, 1000));
       console.log('Documents uploaded:', files);
+      toast.success(`Successfully uploaded ${files.length} document${files.length > 1 ? 's' : ''}`);
     } catch (_err) {
       setError('Failed to upload documents');
+      toast.error('Failed to upload documents. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -36,8 +40,10 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
       // Simulate text processing
       await new Promise(resolve => setTimeout(resolve, 500));
       console.log('Text submitted:', text);
+      toast.success('Content processed successfully');
     } catch (err) {
       setError('Failed to process text');
+      toast.error('Failed to process content. Please try again.');
       throw err; // Re-throw to allow child component to handle
     } finally {
       setIsLoading(false);
@@ -51,8 +57,10 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
       // Simulate content extraction
       await new Promise(resolve => setTimeout(resolve, 1500));
       console.log('Website content extracted:', url);
+      toast.success('Website content extracted successfully');
     } catch (err) {
       setError('Failed to extract website content');
+      toast.error('Failed to extract website content. Please try again.');
       throw err; // Re-throw to allow child component to handle
     } finally {
       setIsLoading(false);
@@ -78,9 +86,11 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
     try {
       // Simulate WhatsApp connection
       await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('WhatsApp connected successfully');
       onComplete();
     } catch (_err) {
       setError('Failed to connect WhatsApp');
+      toast.error('Failed to connect WhatsApp. Please try again.');
     } finally {
       setIsLoading(false);
     }
