@@ -5,6 +5,7 @@ import { UserProfile } from '@/data/dashboardMockData';
 import { Languages, Bell, User, Settings, LogOut, MessageCircle } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import Image from 'next/image';
+import { useAppToast } from '@/hooks/useAppToast';
 
 interface HeaderProps {
   user: UserProfile;
@@ -36,6 +37,7 @@ export default function Header({
     notifications: false,
     profile: false
   });
+  const toast = useAppToast();
 
   const _toggleDropdown = (dropdown: keyof typeof _dropdownStates) => {
     setDropdownStates(prev => ({
@@ -74,7 +76,11 @@ export default function Header({
                 type="checkbox"
                 className="toggle toggle-success"
                 checked={isLive}
-                onChange={(e) => onLiveToggle?.(e.target.checked)}
+                onChange={(e) => {
+                  const newStatus = e.target.checked;
+                  onLiveToggle?.(newStatus);
+                  toast.info(`Status changed to ${newStatus ? 'online' : 'offline'}`);
+                }}
                 aria-label="Toggle between live and offline status"
                 aria-describedby="live-status-description"
               />
@@ -108,6 +114,7 @@ export default function Header({
                 <button
                   onClick={() => {
                     onLanguageChange?.('English');
+                    toast.info('Language changed to English');
                     closeAllDropdowns();
                   }}
                   className="flex items-center gap-3"
@@ -120,6 +127,7 @@ export default function Header({
                 <button
                   onClick={() => {
                     onLanguageChange?.('Bahasa Indonesia');
+                    toast.info('Language changed to Bahasa Indonesia');
                     closeAllDropdowns();
                   }}
                   className="flex items-center gap-3"
@@ -273,6 +281,7 @@ export default function Header({
                 <button
                   onClick={() => {
                     onProfileAction?.('logout');
+                    toast.success('Logged out successfully');
                     closeAllDropdowns();
                   }}
                   className="flex items-center gap-3 text-error"

@@ -6,6 +6,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import ChatPanel from './ChatPanel';
 import CSHandoverPage from '@/components/cshandover/CSHandoverPage';
+import ProductCatalogPage from '@/components/productCatalog/ProductCatalogPage';
 
 export default function Dashboard(props: DashboardProps) {
   const [activeNavItem, setActiveNavItem] = useState<NavigationItem>(props.activeNavItem);
@@ -104,6 +105,8 @@ export default function Dashboard(props: DashboardProps) {
           <div className="flex-1 min-h-0">
             {activeNavItem === NavigationItem.CS_HANDOVER ? (
               <CSHandoverPage />
+            ) : activeNavItem === NavigationItem.KATALOG_PRODUK ? (
+              <ProductCatalogPage />
             ) : (
               <div className="p-8 h-full">
                 <div className="bg-base-100 rounded-3xl shadow-sm h-full flex items-center justify-center">
