@@ -21,33 +21,33 @@ Always use brand typography classes instead of hardcoded values:
 
 ### 2. Form Components
 
-#### Form Structure (Preferred)
+#### Form Structure (Preferred - Apple-Style Rounded Corners)
 ```tsx
 <div className="form-control w-full">
   <label className="label">
     <span className="label-text text-brand-label">Field Label</span>
   </label>
-  <input className="input input-bordered" />
+  <input className="input input-bordered rounded-2xl" />
   <label className="label">
     <span className="label-text-alt text-error">Error message</span>
   </label>
 </div>
 ```
 
-#### Button Patterns
+#### Button Patterns (Apple-Style Rounded Corners)
 ```tsx
 // Primary button
-<button className="btn bg-brand-orange hover:bg-brand-orange-light text-white">
+<button className="btn bg-brand-orange hover:bg-brand-orange-light text-white rounded-2xl">
   Primary Action
 </button>
 
 // Secondary button
-<button className="btn btn-outline border-base-300 hover:border-brand-orange">
+<button className="btn btn-outline border-base-300 hover:border-brand-orange rounded-2xl">
   Secondary Action
 </button>
 
 // Ghost button
-<button className="btn btn-ghost">
+<button className="btn btn-ghost rounded-2xl">
   Tertiary Action
 </button>
 ```
@@ -67,7 +67,33 @@ Always use brand typography classes instead of hardcoded values:
 <Alert type="info">Information message</Alert>
 ```
 
-### 4. Color Usage Priority
+### 4. Apple-Style Rounded Corner System
+
+Our design system uses Apple-inspired rounded corners for a warm, organic feel:
+
+#### Radius Scale
+```css
+--radius-xs: 0.25rem;    /* 4px - tiny elements */
+--radius-sm: 0.5rem;     /* 8px - small elements */
+--radius-md: 0.75rem;    /* 12px - medium elements */
+--radius-lg: 1rem;       /* 16px - buttons, cards (Apple standard) */
+--radius-xl: 1.25rem;    /* 20px - large panels */
+--radius-2xl: 1.5rem;    /* 24px - major containers */
+--radius-3xl: 2rem;      /* 32px - hero elements */
+```
+
+#### Usage Guidelines
+- **Buttons & Interactive Elements**: `rounded-2xl` (24px)
+- **Input Fields**: `rounded-2xl` (24px)
+- **Cards & Containers**: `rounded-2xl` (24px)
+- **Message Bubbles**: `rounded-2xl` (24px)
+- **Avatars (Large)**: `rounded-2xl` (24px)
+- **Alerts & Notifications**: `rounded-2xl` (24px)
+- **Small Buttons**: `rounded-md` (12px)
+- **Small/Medium Avatars**: `rounded-full` (circular)
+- **Badges & Pills**: `rounded-full` (capsule shape)
+
+### 5. Color Usage Priority
 
 1. **DaisyUI Semantic Colors** (First choice)
    - `base-100`, `base-200`, `base-300`, `base-content`
@@ -82,27 +108,27 @@ Always use brand typography classes instead of hardcoded values:
 
 ### 5. Layout Patterns
 
-#### Card Structure
+#### Card Structure (Apple-Style Rounded Corners)
 ```tsx
-<div className="card bg-base-100 shadow-xl">
+<div className="card bg-base-100 shadow-xl rounded-2xl">
   <div className="card-body">
     <h2 className="card-title text-brand-heading">Card Title</h2>
     <p className="text-brand-body">Card content</p>
     <div className="card-actions justify-end">
-      <button className="btn btn-primary">Action</button>
+      <button className="btn btn-primary rounded-2xl">Action</button>
     </div>
   </div>
 </div>
 ```
 
-#### Modal Structure
+#### Modal Structure (Apple-Style Rounded Corners)
 ```tsx
 <div className="modal modal-open">
-  <div className="modal-box">
+  <div className="modal-box rounded-2xl">
     <h3 className="text-brand-heading">Modal Title</h3>
     <p className="text-brand-body py-4">Modal content</p>
     <div className="modal-action">
-      <button className="btn">Close</button>
+      <button className="btn rounded-2xl">Close</button>
     </div>
   </div>
 </div>

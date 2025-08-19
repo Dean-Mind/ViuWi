@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
       // Default fallback UI
       return (
         <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-base-200 rounded-lg p-6 text-center">
+          <div className="max-w-md w-full bg-base-200 rounded-2xl p-6 text-center">
             <div className="text-error text-4xl mb-4">⚠️</div>
             <h2 className="text-brand-heading text-base-content mb-2">
               Oops! Something went wrong
@@ -55,7 +55,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="btn bg-brand-orange hover:bg-brand-orange-light text-white border-none"
+              className="btn bg-brand-orange hover:bg-brand-orange-light text-white border-0"
             >
               Refresh Page
             </button>
@@ -111,7 +111,7 @@ export function AuthErrorBoundary({ children }: { children: ReactNode }) {
             </p>
             <button
               onClick={() => router.replace('/')}
-              className="btn bg-brand-orange hover:bg-brand-orange-light text-white border-none"
+              className="btn bg-brand-orange hover:bg-brand-orange-light text-white border-0"
             >
               Go to Login
             </button>

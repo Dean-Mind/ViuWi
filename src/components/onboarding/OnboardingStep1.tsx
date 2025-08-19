@@ -26,9 +26,7 @@ export default function OnboardingStep1({
 
   // Reset website extraction state when URL changes
   useEffect(() => {
-    if (websiteExtracted) {
-      setWebsiteExtracted(false);
-    }
+    setWebsiteExtracted(false);
   }, [websiteUrl]);
 
   const handleFileUpload = (files: FileList) => {
@@ -39,10 +37,14 @@ export default function OnboardingStep1({
   const handleExtractContent = async () => {
     if (!websiteUrl.trim()) return;
 
+    const currentUrl = websiteUrl; // Capture current URL to check for stale state
     setIsExtracting(true);
     try {
-      await onWebsiteLinkSubmit(websiteUrl);
-      setWebsiteExtracted(true);
+      await onWebsiteLinkSubmit(currentUrl);
+      // Only update state if URL hasn't changed during async operation
+      if (websiteUrl === currentUrl) {
+        setWebsiteExtracted(true);
+      }
     } catch (error) {
       // Error handling - don't set websiteExtracted to true
       console.error('Website extraction failed:', error);
@@ -60,8 +62,12 @@ export default function OnboardingStep1({
 
       // Auto-submit website URL if it exists but wasn't extracted yet
       if (websiteUrl.trim() && !websiteExtracted) {
-        await onWebsiteLinkSubmit(websiteUrl);
-        setWebsiteExtracted(true);
+        const currentUrl = websiteUrl; // Capture current URL to check for stale state
+        await onWebsiteLinkSubmit(currentUrl);
+        // Only update state if URL hasn't changed during async operation
+        if (websiteUrl === currentUrl) {
+          setWebsiteExtracted(true);
+        }
       }
 
       // Only proceed if we have valid content
@@ -124,11 +130,11 @@ export default function OnboardingStep1({
       {/* Website Link */}
       <div>
         <FormLabel>Link Website</FormLabel>
-        <div className="card border border-base-300 rounded-md p-6">
+        <div className="card border border-base-300 rounded-2xl p-6">
           <div className="space-y-4">
             <input
               type="url"
-              className="input input-bordered w-full text-brand-body"
+              className="input input-bordered w-full text-brand-body rounded-2xl"
               placeholder={knowledgeBaseOptions.websiteLink.placeholder}
               value={websiteUrl}
               onChange={(e) => setWebsiteUrl(e.target.value)}

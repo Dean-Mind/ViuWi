@@ -5,6 +5,33 @@
   logs: true;
 }
 
+/* CS Handover messaging theme updates */
+@plugin "daisyui/theme" {
+  name: "cs-handover";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  /* Message-specific colors */
+  --color-message-incoming-bg: oklch(96% 0.01 240);
+  --color-message-outgoing-bg: oklch(68% 0.28 25);
+  --color-message-outgoing-content: oklch(98% 0.01 25);
+  
+  /* Unread message indicator colors */
+  --color-unread-indicator: oklch(65% 0.3 30);
+  --color-unread-indicator-content: oklch(98% 0.01 30);
+  
+  /* Message type label colors */
+  --color-label-cs-bg: oklch(70% 0.25 140);
+  --color-label-cs-content: oklch(98% 0.01 140);
+  --color-label-bot-bg: oklch(75% 0.25 40);
+  --color-label-bot-content: oklch(98% 0.01 40);
+  
+  /* Bot toggle colors */
+  --color-bot-toggle-bg: oklch(70% 0.25 140);
+  --color-bot-toggle-content: oklch(98% 0.01 140);
+}
+
 /* Custom ViuWi themes using CSS custom properties */
 /* Fallback theme for all browsers */
 [data-theme="viuwi-light"] {
@@ -40,12 +67,37 @@
   --color-border-light: oklch(85% 0.05 240);
   --color-border-input: oklch(70% 0.02 240);
 
+  /* NEW: AI vs CS Message Colors - Light Theme */
+  /* AI Messages - Cool, efficient, helpful tones */
+  --color-ai-message-bg: oklch(95% 0.05 220);      /* Light blue background */
+  --color-ai-message-text: oklch(25% 0.15 220);    /* Dark blue text */
+  --color-ai-message-border: oklch(80% 0.08 220);  /* Medium blue border */
+
+  /* CS Messages - Warm, human, personal tones */
+  --color-cs-message-bg: oklch(95% 0.05 280);      /* Light purple background */
+  --color-cs-message-text: oklch(25% 0.15 280);    /* Dark purple text */
+  --color-cs-message-border: oklch(80% 0.08 280);  /* Medium purple border */
+
+  /* Handover Separator Colors */
+  --color-separator-line: oklch(85% 0.02 240);     /* Light separator line */
+  --color-separator-bg: oklch(98% 0.01 240);       /* Separator background */
+  --color-separator-text: oklch(50% 0.05 240);     /* Separator text */
 
 
-  /* Border radius */
-  --radius-selector: 0.375rem;
-  --radius-field: 0.375rem;
-  --radius-box: 0.5rem;
+
+  /* Apple-inspired border radius system */
+  --radius-xs: 0.25rem;    /* 4px - tiny elements */
+  --radius-sm: 0.5rem;     /* 8px - small elements */
+  --radius-md: 0.75rem;    /* 12px - medium elements */
+  --radius-lg: 1rem;       /* 16px - buttons, cards (Apple standard) */
+  --radius-xl: 1.25rem;    /* 20px - large panels */
+  --radius-2xl: 1.5rem;    /* 24px - major containers */
+  --radius-3xl: 2rem;      /* 32px - hero elements */
+
+  /* Legacy variables for backward compatibility */
+  --radius-selector: 0.75rem;  /* Updated to Apple-style */
+  --radius-field: 1rem;        /* Updated to Apple-style */
+  --radius-box: 1.25rem;       /* Updated to Apple-style */
 
   /* Border size */
   --border: 1px;
@@ -104,12 +156,37 @@
     --color-border-light: oklch(85% 0.05 240);
     --color-border-input: oklch(70% 0.02 240);
 
+    /* NEW: AI vs CS Message Colors - Light Theme */
+    /* AI Messages - Cool, efficient, helpful tones */
+    --color-ai-message-bg: oklch(95% 0.05 220);      /* Light blue background */
+    --color-ai-message-text: oklch(25% 0.15 220);    /* Dark blue text */
+    --color-ai-message-border: oklch(80% 0.08 220);  /* Medium blue border */
+
+    /* CS Messages - Warm, human, personal tones */
+    --color-cs-message-bg: oklch(95% 0.05 280);      /* Light purple background */
+    --color-cs-message-text: oklch(25% 0.15 280);    /* Dark purple text */
+    --color-cs-message-border: oklch(80% 0.08 280);  /* Medium purple border */
+
+    /* Handover Separator Colors */
+    --color-separator-line: oklch(85% 0.02 240);     /* Light separator line */
+    --color-separator-bg: oklch(98% 0.01 240);       /* Separator background */
+    --color-separator-text: oklch(50% 0.05 240);     /* Separator text */
 
 
-    /* Border radius */
-    --radius-selector: 0.375rem;
-    --radius-field: 0.375rem;
-    --radius-box: 0.5rem;
+
+    /* Apple-inspired border radius system */
+    --radius-xs: 0.25rem;    /* 4px - tiny elements */
+    --radius-sm: 0.5rem;     /* 8px - small elements */
+    --radius-md: 0.75rem;    /* 12px - medium elements */
+    --radius-lg: 1rem;       /* 16px - buttons, cards (Apple standard) */
+    --radius-xl: 1.25rem;    /* 20px - large panels */
+    --radius-2xl: 1.5rem;    /* 24px - major containers */
+    --radius-3xl: 2rem;      /* 32px - hero elements */
+
+    /* Legacy variables for backward compatibility */
+    --radius-selector: 0.75rem;  /* Updated to Apple-style */
+    --radius-field: 1rem;        /* Updated to Apple-style */
+    --radius-box: 1.25rem;       /* Updated to Apple-style */
 
     /* Border size */
     --border: 1px;
@@ -154,12 +231,37 @@
   --color-border-light: oklch(30% 0.05 240);
   --color-border-input: oklch(40% 0.02 240);
 
+  /* NEW: AI vs CS Message Colors - Dark Theme */
+  /* AI Messages - Cooler tones for dark mode */
+  --color-ai-message-bg: oklch(25% 0.08 220);      /* Dark blue background */
+  --color-ai-message-text: oklch(85% 0.06 220);    /* Light blue text */
+  --color-ai-message-border: oklch(40% 0.10 220);  /* Medium blue border */
+
+  /* CS Messages - Warmer tones for dark mode */
+  --color-cs-message-bg: oklch(25% 0.08 280);      /* Dark purple background */
+  --color-cs-message-text: oklch(85% 0.06 280);    /* Light purple text */
+  --color-cs-message-border: oklch(40% 0.10 280);  /* Medium purple border */
+
+  /* Handover Separator Colors */
+  --color-separator-line: oklch(30% 0.02 240);     /* Dark separator line */
+  --color-separator-bg: oklch(18% 0.03 240);       /* Separator background */
+  --color-separator-text: oklch(70% 0.05 240);     /* Separator text */
 
 
-  /* Border radius */
-  --radius-selector: 0.375rem;
-  --radius-field: 0.375rem;
-  --radius-box: 0.5rem;
+
+  /* Apple-inspired border radius system */
+  --radius-xs: 0.25rem;    /* 4px - tiny elements */
+  --radius-sm: 0.5rem;     /* 8px - small elements */
+  --radius-md: 0.75rem;    /* 12px - medium elements */
+  --radius-lg: 1rem;       /* 16px - buttons, cards (Apple standard) */
+  --radius-xl: 1.25rem;    /* 20px - large panels */
+  --radius-2xl: 1.5rem;    /* 24px - major containers */
+  --radius-3xl: 2rem;      /* 32px - hero elements */
+
+  /* Legacy variables for backward compatibility */
+  --radius-selector: 0.75rem;  /* Updated to Apple-style */
+  --radius-field: 1rem;        /* Updated to Apple-style */
+  --radius-box: 1.25rem;       /* Updated to Apple-style */
 
   /* Border size */
   --border: 1px;
@@ -233,6 +335,43 @@
 
 .border-input {
   border-color: var(--color-border-input);
+}
+
+/* NEW: AI vs CS Message Color Utility Classes */
+.bg-ai-message {
+  background-color: var(--color-ai-message-bg);
+}
+
+.text-ai-message {
+  color: var(--color-ai-message-text);
+}
+
+.border-ai-message {
+  border-color: var(--color-ai-message-border);
+}
+
+.bg-cs-message {
+  background-color: var(--color-cs-message-bg);
+}
+
+.text-cs-message {
+  color: var(--color-cs-message-text);
+}
+
+.border-cs-message {
+  border-color: var(--color-cs-message-border);
+}
+
+.bg-separator {
+  background-color: var(--color-separator-bg);
+}
+
+.text-separator {
+  color: var(--color-separator-text);
+}
+
+.border-separator {
+  border-color: var(--color-separator-line);
 }
 
 /* Enhanced button shadows for better visual hierarchy */

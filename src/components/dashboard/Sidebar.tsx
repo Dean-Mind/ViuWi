@@ -92,7 +92,7 @@ const bottomItems = [
 export default function Sidebar({ activeNavItem, onNavItemClick, isCollapsed, onToggleCollapse }: SidebarProps) {
   return (
     <aside
-      className={`menu bg-base-100 text-base-content min-h-full flex flex-col transition-[width] duration-75 ease-out transform-gpu will-change-[width] ${
+      className={`menu bg-base-100 text-base-content min-h-full flex flex-col transition-[width] duration-75 ease-out transform-gpu will-change-[width] border-r border-base-300 rounded-r-3xl ${
         isCollapsed ? 'w-16' : 'w-64'
       }`}
       role="navigation"
@@ -153,7 +153,7 @@ export default function Sidebar({ activeNavItem, onNavItemClick, isCollapsed, on
                 <button
                   onClick={() => onNavItemClick(item.id)}
                   className={`
-                    tooltip tooltip-right flex items-center justify-center w-10 h-10 mx-auto p-1 rounded-lg
+                    tooltip tooltip-right flex items-center justify-center w-10 h-10 mx-auto p-1 rounded-3xl
                     transition-[background-color,transform] duration-200 ease-out hover:scale-105
                     focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2
                     ${activeNavItem === item.id
@@ -177,7 +177,7 @@ export default function Sidebar({ activeNavItem, onNavItemClick, isCollapsed, on
                 <button
                   onClick={() => onNavItemClick(item.id)}
                   className={`
-                    flex items-center gap-2 w-full px-3 py-2 rounded-2xl text-left
+                    flex items-center gap-2 w-full px-3 py-2 rounded-3xl text-left
                     transition-[background-color,transform] duration-200 ease-out hover:scale-[1.02]
                     focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2
                     ${activeNavItem === item.id
@@ -212,7 +212,7 @@ export default function Sidebar({ activeNavItem, onNavItemClick, isCollapsed, on
                 <button
                   onClick={() => onNavItemClick(item.id)}
                   className={`
-                    tooltip tooltip-right flex items-center justify-center w-10 h-10 mx-auto p-1 rounded-lg
+                    tooltip tooltip-right flex items-center justify-center w-10 h-10 mx-auto p-1 rounded-3xl
                     transition-[background-color,transform] duration-200 ease-out hover:scale-105
                     focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2
                     ${activeNavItem === item.id
@@ -236,7 +236,7 @@ export default function Sidebar({ activeNavItem, onNavItemClick, isCollapsed, on
                 <button
                   onClick={() => onNavItemClick(item.id)}
                   className={`
-                    flex items-center gap-2 w-full px-3 py-2 rounded-2xl text-left
+                    flex items-center gap-2 w-full px-3 py-2 rounded-3xl text-left
                     transition-[background-color,transform] duration-200 ease-out hover:scale-[1.02]
                     focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2
                     ${activeNavItem === item.id

@@ -22,7 +22,7 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
       // Simulate upload
       await new Promise(resolve => setTimeout(resolve, 1000));
       console.log('Documents uploaded:', files);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to upload documents');
     } finally {
       setIsLoading(false);
@@ -79,7 +79,7 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
       // Simulate WhatsApp connection
       await new Promise(resolve => setTimeout(resolve, 1000));
       onComplete();
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to connect WhatsApp');
     } finally {
       setIsLoading(false);

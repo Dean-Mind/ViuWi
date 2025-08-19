@@ -77,7 +77,7 @@ export const mockRootProps = {
   language: "English" as const,
   hasNotifications: true as const,
   isChatOpen: false as const,
-  activeNavItem: NavigationItem.KATALOG_PRODUK as const
+  activeNavItem: NavigationItem.CS_HANDOVER as const
 };
 
 // Mock chat conversations data

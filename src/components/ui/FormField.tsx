@@ -30,8 +30,8 @@ export default function FormField({
   const inputType = type === 'password' && showPassword ? 'text' : type;
   const fieldId = id || `field-${label.toLowerCase().replace(/\s+/g, '-')}`;
 
-  // DaisyUI form-control structure with semantic classes
-  const inputClasses = `input input-bordered w-full ${error ? 'input-error' : ''}`;
+  // DaisyUI form-control structure with semantic classes and Apple-style rounded corners
+  const inputClasses = `input input-bordered w-full rounded-2xl ${error ? 'input-error' : ''}`;
 
   return (
     <div className="form-control w-full">

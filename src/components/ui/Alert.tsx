@@ -46,7 +46,7 @@ export default function Alert({
   
   return (
     <div
-      className={`flex items-start gap-3 p-4 rounded-lg border ${alertClass} ${className}`}
+      className={`flex items-start gap-3 p-4 rounded-2xl border ${alertClass} ${className}`}
       role="alert"
       aria-label={ariaLabel}
     >
@@ -55,7 +55,7 @@ export default function Alert({
       {dismissible && onDismiss && (
         <button
           onClick={onDismiss}
-          className="flex-shrink-0 p-1 text-current/60 hover:text-current transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-current focus:ring-offset-1 rounded"
+          className="flex-shrink-0 p-1 text-current/60 hover:text-current transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-current focus:ring-offset-1 rounded-md"
           aria-label="Dismiss alert"
         >
           <X size={16} />

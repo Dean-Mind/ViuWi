@@ -12,14 +12,14 @@ interface FeatureCardProps {
 
 export default function FeatureCard({ feature, onToggle, onExpand }: FeatureCardProps) {
   return (
-    <div className="card border border-base-300 rounded-md p-6">
+    <div className="card border border-base-300 rounded-2xl p-6">
       <div className="flex items-start gap-4">
         {/* Checkbox */}
         <div className="flex-shrink-0 mt-1">
           <button
             onClick={() => onToggle(feature.id, !feature.enabled)}
             className={`
-              w-6 h-6 border-2 rounded-sm flex items-center justify-center
+              w-6 h-6 border-2 rounded-md flex items-center justify-center
               ${feature.enabled
                 ? 'border-brand-orange bg-brand-orange/10 hover:bg-brand-orange/20'
                 : 'border-base-content/30 bg-base-100 hover:border-base-content/50'

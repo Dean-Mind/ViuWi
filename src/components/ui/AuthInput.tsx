@@ -29,8 +29,8 @@ export default function AuthInput({
   const [showPassword, setShowPassword] = useState(false);
   const inputType = type === 'password' && showPassword ? 'text' : type;
 
-  // Clean class organization following DaisyUI patterns
-  const baseClasses = "input input-bordered w-full h-[55px] text-brand-label bg-base-100 border-input";
+  // Clean class organization following DaisyUI patterns with Apple-style rounded corners
+  const baseClasses = "input input-bordered w-full h-[55px] text-brand-label bg-base-100 border-input rounded-2xl";
   const focusClasses = "focus:border-brand-orange hover:border-brand-orange-light transition-all duration-200";
   const errorClasses = error ? "input-error border-error focus:border-error" : "";
   const inputClassName = `${baseClasses} ${focusClasses} ${errorClasses}`;

@@ -19,8 +19,9 @@ export type AuthButtonVariant = keyof typeof AUTH_BUTTON_VARIANTS;
 
 /**
  * Base classes for AuthButton component
+ * Updated with Apple-style rounded corners
  */
-export const AUTH_BUTTON_BASE_CLASSES = "btn w-full h-[55px] text-brand-button rounded-md border-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2";
+export const AUTH_BUTTON_BASE_CLASSES = "btn w-full h-[55px] text-brand-button rounded-2xl border-0 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2";
 
 /**
  * Default variant for AuthButton
