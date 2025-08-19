@@ -52,13 +52,13 @@ export default function FileUploadModal({ isOpen, onClose, onImportComplete }: F
   };
 
   const handleFileSelect = (file: File) => {
-    const allowedTypes = [
-      'text/csv',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    ];
+    // Use extension-based validation instead of MIME type
+    const fileName = file.name.toLowerCase();
+    const allowedExtensions = ['.csv', '.xls', '.xlsx', '.xlsm'];
 
-    if (!allowedTypes.includes(file.type)) {
+    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+
+    if (!hasValidExtension) {
       toast.fileUploadError('Format file tidak didukung. Harap gunakan file CSV atau Excel.');
       return;
     }
@@ -86,7 +86,11 @@ export default function FileUploadModal({ isOpen, onClose, onImportComplete }: F
     try {
       let result: ImportResult;
 
-      if (selectedFile.type === 'text/csv') {
+      // Determine parser by file extension instead of MIME type
+      const fileName = selectedFile.name.toLowerCase();
+      const isCSV = fileName.endsWith('.csv');
+
+      if (isCSV) {
         result = await parseCSVFile(selectedFile, categories);
       } else {
         result = await parseExcelFile(selectedFile, categories);

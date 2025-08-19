@@ -78,13 +78,26 @@ export default function ImportPreviewModal({
     onConfirmImport(selectedData);
   };
 
+  // Helper function to escape CSV cell values
+  const escapeCsvCell = (value: any): string => {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    const cellStr = String(value);
+    // Escape double quotes by replacing them with two double quotes
+    const escaped = cellStr.replace(/"/g, '""');
+    // Wrap in quotes to handle commas, newlines, and quotes
+    return `"${escaped}";
+  };
+
   const downloadErrorReport = () => {
     if (errors.length === 0) return;
 
     const csvContent = [
       'Row,Field,Value,Error Message',
-      ...errors.map(error => 
-        `${error.row},"${error.field}","${error.value}","${error.message}"`
+      ...errors.map(error =>
+        `${escapeCsvCell(error.row)},${escapeCsvCell(error.field)},${escapeCsvCell(error.value)},${escapeCsvCell(error.message)}`
       )
     ].join('\n');
 
@@ -259,7 +272,7 @@ export default function ImportPreviewModal({
                     <td className="font-medium">{item.name}</td>
                     <td className="max-w-xs truncate">{item.description}</td>
                     <td className="font-medium">{getCategoryName(item.categoryId)}</td>
-                    <td>{item.price ? formatPriceWithCurrency(item.price) : '-'}</td>
+                    <td>{item.price !== null && item.price !== undefined ? formatPriceWithCurrency(item.price) : '-'}</td>
                     <td>
                       {rowErrors.length > 0 && (
                         <div className="tooltip tooltip-left" data-tip={rowErrors.map(e => e.message).join(', ')}>
