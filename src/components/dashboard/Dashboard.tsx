@@ -128,7 +128,10 @@ export default function Dashboard(props: DashboardProps) {
             <ChatPanel
               isOpen={isChatOpen}
               onClose={() => setIsChatOpen(false)}
-              onNavigateToCSHandover={() => setActiveNavItem(NavigationItem.CS_HANDOVER)}
+              onNavigateToCSHandover={() => {
+                setIsChatOpen(false);
+                setActiveNavItem(NavigationItem.CS_HANDOVER);
+              }}
             />
           )}
         </div>

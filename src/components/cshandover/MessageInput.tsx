@@ -10,12 +10,13 @@ interface MessageInputProps {
   disabled?: boolean;
 }
 
-export default function MessageInput({ 
-  onSendMessage, 
+export default function MessageInput({
+  onSendMessage,
   placeholder = "Type a message",
   disabled = false
 }: MessageInputProps) {
   const [message, setMessage] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) {
@@ -28,10 +29,18 @@ export default function MessageInput({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposing && !e.nativeEvent.isComposing) {
       e.preventDefault();
       handleSubmit();
     }
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
   };
 
   return (
@@ -53,6 +62,8 @@ export default function MessageInput({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
             placeholder={placeholder}
             disabled={disabled}
             className="input input-bordered w-full pr-12 text-sm bg-base-100 border-base-300 focus:border-brand-orange hover:border-base-400 transition-all duration-200 disabled:opacity-50 focus:ring-2 focus:ring-brand-orange/20 rounded-2xl"

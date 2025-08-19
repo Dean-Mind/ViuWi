@@ -37,10 +37,14 @@ export default function OnboardingStep1({
   const handleExtractContent = async () => {
     if (!websiteUrl.trim()) return;
 
+    const currentUrl = websiteUrl; // Capture current URL to check for stale state
     setIsExtracting(true);
     try {
-      await onWebsiteLinkSubmit(websiteUrl);
-      setWebsiteExtracted(true);
+      await onWebsiteLinkSubmit(currentUrl);
+      // Only update state if URL hasn't changed during async operation
+      if (websiteUrl === currentUrl) {
+        setWebsiteExtracted(true);
+      }
     } catch (error) {
       // Error handling - don't set websiteExtracted to true
       console.error('Website extraction failed:', error);
@@ -58,8 +62,12 @@ export default function OnboardingStep1({
 
       // Auto-submit website URL if it exists but wasn't extracted yet
       if (websiteUrl.trim() && !websiteExtracted) {
-        await onWebsiteLinkSubmit(websiteUrl);
-        setWebsiteExtracted(true);
+        const currentUrl = websiteUrl; // Capture current URL to check for stale state
+        await onWebsiteLinkSubmit(currentUrl);
+        // Only update state if URL hasn't changed during async operation
+        if (websiteUrl === currentUrl) {
+          setWebsiteExtracted(true);
+        }
       }
 
       // Only proceed if we have valid content

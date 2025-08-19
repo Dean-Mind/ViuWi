@@ -24,6 +24,11 @@ export const truncateText = (text: string, maxLength: number = 30): string => {
     return text;
   }
 
-  // Truncate and trim whitespace, then add ellipsis
-  return text.substring(0, maxLength).trim() + '...';
+  // Handle edge cases for very short maxLength values
+  if (maxLength <= 3) {
+    return '...'.substring(0, maxLength);
+  }
+
+  // Reserve space for ellipsis and truncate accordingly
+  return text.substring(0, maxLength - 3).trim() + '...';
 };

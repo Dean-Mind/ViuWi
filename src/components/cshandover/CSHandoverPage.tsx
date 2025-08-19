@@ -177,14 +177,13 @@ export default function CSHandoverPage({
         }
       };
 
-      // Update local active conversation state
-      setActiveConversationState({
-        ...activeConversation,
-        messages: [...activeConversation.messages, newMessage]
+      // Update local active conversation state with functional update to avoid stale closures
+      setActiveConversationState(prev => {
+        if (!prev) return prev;
+        const updated = { ...prev, messages: [...prev.messages, newMessage] };
+        updateLastMessage(updated.id, content);
+        return updated;
       });
-
-      // Update global store with new last message
-      updateLastMessage(activeConversation.id, content);
     }
   };
 
@@ -214,12 +213,15 @@ export default function CSHandoverPage({
         agentName: enabled ? 'AI Assistant' : 'CS Agent'
       };
 
-      // Update local active conversation state with handover tracking
-      setActiveConversationState({
-        ...activeConversation,
-        botEnabled: enabled,
-        handoverHistory: [...activeConversation.handoverHistory, handoverEvent],
-        currentHandler: newCurrentHandler
+      // Update local active conversation state with handover tracking using functional update
+      setActiveConversationState(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          botEnabled: enabled,
+          handoverHistory: [...prev.handoverHistory, handoverEvent],
+          currentHandler: newCurrentHandler
+        };
       });
 
       // Update global store with bot status

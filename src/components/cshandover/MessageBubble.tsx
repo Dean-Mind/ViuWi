@@ -71,23 +71,20 @@ export default function MessageBubble({ message, userAvatar, userName }: Message
 
       {/* Message content */}
       <div className={`flex flex-col gap-2 max-w-xs ${isIncoming ? 'items-start' : 'items-end'}`}>
-        {message.content.split('\n').map((text, index) => (
-          <div
-            key={index}
-            className={`px-4 py-2 rounded-2xl font-inter text-sm ${getMessageStyle()}`}
-          >
-            <div>{text}</div>
-            <div className={`flex items-center justify-between mt-2 gap-2 text-xs ${
-              isIncoming
-                ? 'text-base-content/60'
-                : 'opacity-70'
-            }`}>
-              <span>{formatMessageTimestamp(message.timestamp)}</span>
-              {/* NEW: Enhanced sender indicator */}
-              {getSenderIndicator()}
-            </div>
+        <div
+          className={`px-4 py-2 rounded-2xl font-inter text-sm ${getMessageStyle()}`}
+        >
+          <div className="whitespace-pre-wrap">{message.content}</div>
+          <div className={`flex items-center justify-between mt-2 gap-2 text-xs ${
+            isIncoming
+              ? 'text-base-content/60'
+              : 'opacity-70'
+          }`}>
+            <span>{formatMessageTimestamp(message.timestamp)}</span>
+            {/* NEW: Enhanced sender indicator */}
+            {getSenderIndicator()}
           </div>
-        ))}
+        </div>
       </div>
 
       {/* Avatar for outgoing messages */}

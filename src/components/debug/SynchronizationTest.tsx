@@ -12,7 +12,7 @@ export default function SynchronizationTest() {
   const activeConversationId = useActiveConversationId();
   const setActiveConversation = useSetActiveConversation();
 
-  const handleSetActive = (id: string) => {
+  const handleSetActive = (id: string | null) => {
     console.log('Setting active conversation to:', id);
     setActiveConversation(id);
   };
@@ -46,7 +46,7 @@ export default function SynchronizationTest() {
         </div>
         
         <button
-          onClick={() => handleSetActive('')}
+          onClick={() => handleSetActive(null)}
           className="btn btn-xs btn-error btn-outline"
         >
           Clear Selection

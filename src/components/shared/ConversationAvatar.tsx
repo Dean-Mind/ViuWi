@@ -28,7 +28,7 @@ const textSizeClasses = {
 const getAvatarColor = (name: string, initials: string): string => {
   const colors = [
     'bg-red-500 text-white',
-    'bg-blue-500 text-white', 
+    'bg-blue-500 text-white',
     'bg-green-500 text-white',
     'bg-yellow-500 text-black',
     'bg-purple-500 text-white',
@@ -37,8 +37,14 @@ const getAvatarColor = (name: string, initials: string): string => {
     'bg-teal-500 text-white'
   ];
 
-  const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) +
-               initials.charCodeAt(0);
+  // Safely handle empty or undefined name and initials
+  const safeName = name || '';
+  const safeInitials = initials || '';
+
+  const nameHash = safeName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const initialsHash = safeInitials.length > 0 ? safeInitials.charCodeAt(0) : 0;
+
+  const hash = Math.abs(nameHash + initialsHash) || 0;
 
   return colors[hash % colors.length];
 };

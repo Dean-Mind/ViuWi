@@ -20,11 +20,13 @@ export default function ConversationListItem({
   };
 
   return (
-    <div
+    <button
+      type="button"
       onClick={handleClick}
-      className={`flex items-start gap-4 p-4 cursor-pointer transition-colors hover:bg-base-200 rounded-3xl ${
+      className={`flex items-start gap-4 p-4 cursor-pointer transition-colors hover:bg-base-200 rounded-3xl border-0 bg-transparent text-left w-full ${
         isActive ? 'bg-primary/10 border-l-4 border-primary' : ''
       }`}
+      aria-label={`Open conversation ${conversation.user.name || conversation.id}`}
     >
       {/* Avatar */}
       <div className="avatar">
@@ -75,6 +77,6 @@ export default function ConversationListItem({
           )}
         </div>
       </div>
-    </div>
+    </button>
   );
 }
