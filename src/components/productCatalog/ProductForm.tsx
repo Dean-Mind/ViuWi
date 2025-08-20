@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { X } from 'lucide-react';
 import { Product, ProductFormData, ProductStatus, formatFileSize } from '@/data/productCatalogMockData';
-import { useAddProduct, useUpdateProduct, useCategories } from '@/stores/productStore';
+import { useAddProduct, useUpdateProduct } from '@/stores/productStore';
 import CategorySelector from './CategorySelector';
 import CloudUploadIcon from '@/components/icons/CloudUploadIcon';
 import { useAppToast } from '@/hooks/useAppToast';
 import {
   CurrencyType,
-  getCurrencySymbol,
   getAvailableCurrencies,
   getPriceStep,
   getPricePlaceholder
@@ -24,7 +24,7 @@ interface ProductFormProps {
 export default function ProductForm({ isOpen, onClose, editProduct }: ProductFormProps) {
   const addProduct = useAddProduct();
   const updateProduct = useUpdateProduct();
-  const categories = useCategories();
+
   const toast = useAppToast();
 
   const [formData, setFormData] = useState<ProductFormData>({
@@ -165,7 +165,7 @@ export default function ProductForm({ isOpen, onClose, editProduct }: ProductFor
     onClose();
   };
 
-  const handleInputChange = (field: keyof ProductFormData, value: any) => {
+  const handleInputChange = (field: keyof ProductFormData, value: string | number | File | null | ProductStatus) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
@@ -423,9 +423,11 @@ export default function ProductForm({ isOpen, onClose, editProduct }: ProductFor
             >
               {previewUrl ? (
                 <div className="space-y-4">
-                  <img
+                  <Image
                     src={previewUrl}
                     alt="Preview"
+                    width={192}
+                    height={192}
                     className="mx-auto max-h-48 rounded-lg object-cover"
                   />
                   <div className="space-y-2">

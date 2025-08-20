@@ -9,10 +9,13 @@
 }
 
 @import "tailwindcss";
+
+/* DaisyUI Configuration */
 @plugin "daisyui" {
   themes: false;
   root: ":root";
   logs: true;
+  exclude: rootscrollgutter; /* Fix: Prevents white line on modal right side by excluding scrollbar-gutter: stable */
 }
 
 /* CS Handover messaging theme updates */
@@ -514,5 +517,16 @@ body {
   .no-scrollbar {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;     /* Firefox */
+  }
+
+  /* Custom number input spinbutton hiding utility */
+  .no-spinbutton::-webkit-outer-spin-button,
+  .no-spinbutton::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .no-spinbutton {
+    -moz-appearance: textfield; /* Firefox */
   }
 }

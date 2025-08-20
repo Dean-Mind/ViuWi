@@ -102,7 +102,7 @@ export const validatePrice = (price: number | string): boolean => {
 /**
  * Get step value for price input based on currency
  */
-export const getPriceStep = (currencyType: CurrencyType = 'IDR'): string => {
+export const getPriceStep = (_currencyType: CurrencyType = 'IDR'): string => {
   // Always return "1" as requested - allows precise pricing for both currencies
   return "1";
 };

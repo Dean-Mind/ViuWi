@@ -3,38 +3,13 @@
 import React from 'react';
 import Image from 'next/image';
 import { Product, ProductStatus, formatPrice } from '@/data/productCatalogMockData';
-import { useFilteredProducts, useCategoryById } from '@/stores/productStore';
+import { usePaginatedProducts, useCategoryById } from '@/stores/productStore';
 import ProductActions from './ProductActions';
+import TablePagination from '@/components/ui/TablePagination';
+import StatusDropdown from './StatusDropdown';
+import { useProductStatusUpdate } from '@/hooks/useProductStatusUpdate';
 
-// Status badge function
-const getStatusBadge = (status: ProductStatus) => {
-  switch (status) {
-    case ProductStatus.ACTIVE:
-      return (
-        <div className="badge badge-outline badge-success badge-sm">
-          Aktif
-        </div>
-      );
-    case ProductStatus.INACTIVE:
-      return (
-        <div className="badge badge-outline badge-error badge-sm">
-          Tidak Aktif
-        </div>
-      );
-    case ProductStatus.OUT_OF_STOCK:
-      return (
-        <div className="badge badge-outline badge-warning badge-sm">
-          Stok Habis
-        </div>
-      );
-    default:
-      return (
-        <div className="badge badge-outline badge-sm">
-          Aktif
-        </div>
-      );
-  }
-};
+
 
 interface ProductTableProps {
   onEditProduct: (product: Product) => void;
@@ -42,12 +17,22 @@ interface ProductTableProps {
   onViewProduct: (product: Product) => void;
 }
 
-function ProductRow({ product, index, onEditProduct, onDeleteProduct, onViewProduct }: {
+function ProductRow({
+  product,
+  index,
+  onEditProduct,
+  onDeleteProduct,
+  onViewProduct,
+  onStatusChange,
+  isStatusUpdating = false
+}: {
   product: Product;
   index: number;
   onEditProduct: (product: Product) => void;
   onDeleteProduct: (productId: string) => void;
   onViewProduct: (product: Product) => void;
+  onStatusChange: (productId: string, newStatus: ProductStatus) => Promise<void> | void;
+  isStatusUpdating?: boolean;
 }) {
   const category = useCategoryById(product.categoryId);
 
@@ -94,8 +79,14 @@ function ProductRow({ product, index, onEditProduct, onDeleteProduct, onViewProd
         <div className="text-sm text-base-content">{category?.name || 'Unknown'}</div>
       </td>
       <td className="p-4">
-          {getStatusBadge(product.status)}
-        </td>
+        <StatusDropdown
+          productId={product.id}
+          currentStatus={product.status}
+          productName={product.name}
+          onStatusChange={onStatusChange}
+          disabled={isStatusUpdating}
+        />
+      </td>
       <td className="p-4">
         <div className="font-medium text-base-content">{formatPrice(product.price)}</div>
       </td>
@@ -112,9 +103,30 @@ function ProductRow({ product, index, onEditProduct, onDeleteProduct, onViewProd
 }
 
 export default function ProductTable({ onEditProduct, onDeleteProduct, onViewProduct }: ProductTableProps) {
-  const products = useFilteredProducts();
+  const {
+    paginatedData: products,
+    currentPage,
+    totalPages,
+    pageSize,
+    totalItems,
+    hasNextPage,
+    hasPreviousPage,
+    goToPage,
+    setPageSize,
+    getStartItem,
+    getEndItem,
+    pageSizeOptions
+  } = usePaginatedProducts();
 
-  if (products.length === 0) {
+  // Status update functionality
+  const { updateProductStatus, loadingStates } = useProductStatusUpdate();
+
+  // Calculate row numbers for current page
+  const getRowNumber = (index: number) => {
+    return (currentPage - 1) * pageSize + index + 1;
+  };
+
+  if (totalItems === 0) {
     return (
       <div className="bg-base-100 rounded-2xl shadow-sm p-8 text-center">
         <p className="text-base-content/60">Tidak ada produk yang ditemukan.</p>
@@ -128,31 +140,52 @@ export default function ProductTable({ onEditProduct, onDeleteProduct, onViewPro
         <table className="table w-full">
           <thead>
             <tr className="bg-brand-orange text-white">
-              <th className="p-4 text-center font-semibold uppercase text-sm w-12">No.</th>
-              <th className="p-4 text-left font-semibold uppercase text-sm w-16">FOTO</th>
-              <th className="p-4 text-left font-semibold uppercase text-sm w-28">NAMA</th>
-              <th className="p-4 text-left font-semibold uppercase text-sm w-36">DESKRIPSI</th>
-              <th className="p-4 text-left font-semibold uppercase text-sm w-36">DETAIL</th>
-              <th className="p-4 text-left font-semibold uppercase text-sm w-20">KATEGORI</th>
-              <th className="p-4 text-left font-semibold uppercase text-sm w-20">STATUS</th>
-              <th className="p-4 text-left font-semibold uppercase text-sm w-24">HARGA</th>
-              <th className="p-4 text-left font-semibold uppercase text-sm w-15">AKSI</th>
+              <th className="p-4 text-center font-semibold text-sm w-12">#</th>
+              <th className="p-4 text-left font-semibold text-sm w-16">Foto</th>
+              <th className="p-4 text-left font-semibold text-sm w-28">Nama</th>
+              <th className="p-4 text-left font-semibold text-sm w-36">Deskripsi</th>
+              <th className="p-4 text-left font-semibold text-sm w-36">Detail</th>
+              <th className="p-4 text-left font-semibold text-sm w-20">Kategori</th>
+              <th className="p-4 text-left font-semibold text-sm w-20">Status</th>
+              <th className="p-4 text-left font-semibold text-sm w-24">Harga</th>
+              <th className="p-4 text-center font-semibold text-sm w-32">Aksi</th>
             </tr>
           </thead>
           <tbody>
-            {products.map((product, index) => (
+            {products.map((product: Product, index: number) => (
               <ProductRow
                 key={product.id}
                 product={product}
-                index={index}
+                index={getRowNumber(index) - 1} // Convert back to 0-based for ProductRow
                 onEditProduct={onEditProduct}
                 onDeleteProduct={onDeleteProduct}
                 onViewProduct={onViewProduct}
+                onStatusChange={updateProductStatus}
+                isStatusUpdating={!!loadingStates[product.id]}
               />
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        totalItems={totalItems}
+        startItem={getStartItem()}
+        endItem={getEndItem()}
+        pageSizeOptions={pageSizeOptions}
+        onPageChange={goToPage}
+        onPageSizeChange={setPageSize}
+        hasNextPage={hasNextPage}
+        hasPreviousPage={hasPreviousPage}
+        itemName="produk"
+        size="sm"
+        showPageNumbers={true}
+        maxVisiblePages={5}
+      />
     </div>
   );
 }

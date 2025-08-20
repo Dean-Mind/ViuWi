@@ -7,6 +7,8 @@ import Header from './Header';
 import ChatPanel from './ChatPanel';
 import CSHandoverPage from '@/components/cshandover/CSHandoverPage';
 import ProductCatalogPage from '@/components/productCatalog/ProductCatalogPage';
+import CustomerManagementPage from '@/components/customerManagement/CustomerManagementPage';
+import PesananPage from '@/components/pesanan/PesananPage';
 
 export default function Dashboard(props: DashboardProps) {
   const [activeNavItem, setActiveNavItem] = useState<NavigationItem>(props.activeNavItem);
@@ -28,6 +30,12 @@ export default function Dashboard(props: DashboardProps) {
   }, [isCollapsed]);
 
   const handleNavItemClick = (item: NavigationItem) => {
+    if (item === NavigationItem.GET_HELP) {
+      // Open WhatsApp in new tab for Bantuan with security protection
+      const newWin = window.open('https://wa.me/prasetya', '_blank', 'noopener,noreferrer');
+      if (newWin) newWin.opener = null;
+      return;
+    }
     setActiveNavItem(item);
   };
 
@@ -103,12 +111,39 @@ export default function Dashboard(props: DashboardProps) {
         <div className="flex-1 flex border-t border-base-300 min-h-0">
           {/* Main Content */}
           <div className="flex-1 min-h-0">
-            {activeNavItem === NavigationItem.CS_HANDOVER ? (
+            {activeNavItem === NavigationItem.DASHBOARD ? (
+              <div className="h-full">
+                <div className="bg-base-100 rounded-3xl shadow-sm h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-base-content mb-4">
+                      Welcome to ViuWi Dashboard
+                    </h2>
+                    <p className="text-base-content/70">
+                      Your central hub for managing all ViuWi operations
+                    </p>
+                    <div className="mt-6 grid grid-cols-2 gap-4 max-w-md mx-auto">
+                      <div className="bg-primary/10 p-4 rounded-lg">
+                        <div className="text-primary font-semibold">Quick Stats</div>
+                        <div className="text-sm text-base-content/70">Overview ready</div>
+                      </div>
+                      <div className="bg-secondary/10 p-4 rounded-lg">
+                        <div className="text-secondary font-semibold">Recent Activity</div>
+                        <div className="text-sm text-base-content/70">Updates available</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : activeNavItem === NavigationItem.CS_HANDOVER ? (
               <CSHandoverPage />
             ) : activeNavItem === NavigationItem.KATALOG_PRODUK ? (
               <ProductCatalogPage />
+            ) : activeNavItem === NavigationItem.PELANGGAN ? (
+              <CustomerManagementPage />
+            ) : activeNavItem === NavigationItem.PESANAN ? (
+              <PesananPage />
             ) : (
-              <div className="p-8 h-full">
+              <div className="h-full">
                 <div className="bg-base-100 rounded-3xl shadow-sm h-full flex items-center justify-center">
                   <div className="text-center">
                     <h2 className="text-2xl font-bold text-base-content mb-4">

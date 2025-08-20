@@ -65,6 +65,22 @@ export const useAppToast = () => {
     // Processing states
     processing: (action: string) => showToast(`${action}... Please wait.`, 'info'),
     processingComplete: (action: string) => showToast(`${action} completed successfully`, 'success'),
+
+    // Order operations
+    orderStatusChanged: (orderId: string, customerName: string, status: string) =>
+      showToast(`Status pesanan ${orderId} (${customerName}) berhasil diubah ke "${status}"`, 'success'),
+    orderStatusError: (orderId: string) =>
+      showToast(`Gagal mengubah status pesanan ${orderId}. Silakan coba lagi.`, 'error'),
+    orderCancelled: (orderId: string, customerName: string) =>
+      showToast(`Pesanan ${orderId} dari ${customerName} berhasil dibatalkan`, 'success'),
+    orderCancelError: (orderId: string) =>
+      showToast(`Gagal membatalkan pesanan ${orderId}. Silakan coba lagi.`, 'error'),
+    orderCreated: (orderId: string, customerName: string) =>
+      showToast(`Pesanan ${orderId} untuk ${customerName} berhasil dibuat`, 'success'),
+    orderUpdated: (orderId: string, customerName: string) =>
+      showToast(`Pesanan ${orderId} (${customerName}) berhasil diperbarui`, 'success'),
+    orderError: (action: string) =>
+      showToast(`Gagal ${action} pesanan. Silakan coba lagi.`, 'error'),
   };
 };
 

@@ -13,7 +13,7 @@ import { analyzeCategoriesInImport } from './categoryAnalysis';
 export interface ImportValidationError {
   row: number;
   field: string;
-  value: any;
+  value: unknown;
   message: string;
 }
 
@@ -117,7 +117,7 @@ export const parseExcelFile = (file: File, categories: Category[] = []): Promise
         const jsonData = XLSX.utils.sheet_to_json(worksheet, {
           header: 1,
           defval: ''
-        }) as any[][];
+        }) as unknown[][];
         
         if (jsonData.length === 0) {
           resolve({
@@ -144,12 +144,12 @@ export const parseExcelFile = (file: File, categories: Category[] = []): Promise
         }
         
         // Convert to object format with headers
-        const headers = jsonData[0].map((h: string) => h.toLowerCase().trim());
+        const headers = jsonData[0].map((h: unknown) => String(h).toLowerCase().trim());
         const rows = jsonData.slice(1).map(row => {
           const obj: ParsedRow = {};
           headers.forEach((header, index) => {
             if (ALL_COLUMNS.includes(header)) {
-              obj[header as keyof ParsedRow] = row[index];
+              obj[header as keyof ParsedRow] = String(row[index] ?? '');
             }
           });
           return obj;
@@ -214,7 +214,7 @@ export const parseExcelFile = (file: File, categories: Category[] = []): Promise
  */
 const processImportData = (
   rows: ParsedRow[],
-  parseErrors: any[],
+  parseErrors: { row?: number; message?: string }[],
   categories: Category[] = []
 ): ImportResult => {
   const errors: ImportValidationError[] = [];

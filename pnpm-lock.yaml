@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@lottiefiles/dotlottie-react':
+        specifier: ^0.15.0
+        version: 0.15.0(react@19.1.0)
       daisyui:
         specifier: ^5.0.50
         version: 5.0.50
@@ -279,6 +282,14 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.30':
     resolution: {integrity: sha512-GQ7Nw5G2lTu/BtHTKfXhKHok2WGetd4XYcVKGx00SjAk8GMwgJM3zr6zORiPGuOE+/vkc90KtTosSSvaCjKb2Q==}
+
+  '@lottiefiles/dotlottie-react@0.15.0':
+    resolution: {integrity: sha512-2/yH3jR+CFTQgW40yZ1DvyEsBkb5MUVHfcNrobZifU86DmpOjOOurXfFbRotV3Y+C2KWZbujNLtzmlBqdbXKTg==}
+    peerDependencies:
+      react: ^17 || ^18 || ^19
+
+  '@lottiefiles/dotlottie-web@0.50.0':
+    resolution: {integrity: sha512-l8mEWe+SZ76RKj2R8BiqU5Pc/q4aj6YTunXuXW/JLMjKVJEpefRE+E7d6CnZxSnpf36bvd1zGdopATzjJEHlgA==}
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
@@ -2070,6 +2081,13 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lottiefiles/dotlottie-react@0.15.0(react@19.1.0)':
+    dependencies:
+      '@lottiefiles/dotlottie-web': 0.50.0
+      react: 19.1.0
+
+  '@lottiefiles/dotlottie-web@0.50.0': {}
 
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import { Product, Category, ProductFormData, CategoryFormData, mockQuery } from '@/data/productCatalogMockData';
+import { Product, Category, mockQuery, ProductStatus } from '@/data/productCatalogMockData';
+import { usePagination } from '@/hooks/usePagination';
+import { useProductTablePagination } from '@/stores/paginationStore';
 
 interface ProductState {
   // State
@@ -12,6 +14,19 @@ interface ProductState {
   showUploadModal: boolean;
   showAddProductForm: boolean;
   showAddCategoryForm: boolean;
+
+  // Filter state
+  filters: {
+    categoryIds: string[];
+    statuses: ProductStatus[];
+    priceRange: {
+      min: number;
+      max: number;
+      absoluteMin: number;
+      absoluteMax: number;
+    };
+  };
+  showFilterPopover: boolean;
 
   // Actions
   setProducts: (products: Product[]) => void;
@@ -29,6 +44,14 @@ interface ProductState {
   setShowAddProductForm: (show: boolean) => void;
   setShowAddCategoryForm: (show: boolean) => void;
   clearProducts: () => void;
+
+  // Filter actions
+  setFilterCheckbox: (group: 'categoryIds' | 'statuses', value: string, checked: boolean) => void;
+  setPriceRange: (min: number, max: number) => void;
+  resetPriceRange: () => void;
+  clearAllFilters: () => void;
+  setShowFilterPopover: (show: boolean) => void;
+  getFilteredProducts: () => Product[];
 }
 
 export const useProductStore = create<ProductState>()((set, get) => ({
@@ -41,6 +64,19 @@ export const useProductStore = create<ProductState>()((set, get) => ({
   showUploadModal: false,
   showAddProductForm: false,
   showAddCategoryForm: false,
+
+  // Filter state
+  filters: {
+    categoryIds: [],
+    statuses: [],
+    priceRange: {
+      min: 10000,
+      max: 40000,
+      absoluteMin: 10000,
+      absoluteMax: 40000,
+    },
+  },
+  showFilterPopover: false,
 
   // Actions
   setProducts: (products: Product[]) => {
@@ -118,6 +154,98 @@ export const useProductStore = create<ProductState>()((set, get) => ({
 
   clearProducts: () => {
     set({ products: [], selectedProducts: [] });
+  },
+
+  // Filter actions
+  setFilterCheckbox: (group: 'categoryIds' | 'statuses', value: string, checked: boolean) => {
+    set(state => ({
+      filters: {
+        ...state.filters,
+        [group]: checked
+          ? Array.from(new Set([...(state.filters[group] as string[]), value]))
+          : (state.filters[group] as string[]).filter(item => item !== value)
+      }
+    }));
+  },
+
+  setPriceRange: (min: number, max: number) => {
+    set(state => ({
+      filters: {
+        ...state.filters,
+        priceRange: {
+          ...state.filters.priceRange,
+          min,
+          max
+        }
+      }
+    }));
+  },
+
+  resetPriceRange: () => {
+    set(state => ({
+      filters: {
+        ...state.filters,
+        priceRange: {
+          ...state.filters.priceRange,
+          min: state.filters.priceRange.absoluteMin,
+          max: state.filters.priceRange.absoluteMax
+        }
+      }
+    }));
+  },
+
+  clearAllFilters: () => {
+    set(state => ({
+      filters: {
+        categoryIds: [],
+        statuses: [],
+        priceRange: {
+          ...state.filters.priceRange,
+          min: state.filters.priceRange.absoluteMin,
+          max: state.filters.priceRange.absoluteMax
+        }
+      }
+    }));
+  },
+
+  setShowFilterPopover: (showFilterPopover: boolean) => {
+    set({ showFilterPopover });
+  },
+
+  getFilteredProducts: () => {
+    const { products, searchQuery, filters } = get();
+    let filtered = products;
+
+    // Apply search first
+    if (searchQuery?.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply category filter
+    if (filters.categoryIds.length > 0) {
+      filtered = filtered.filter(product =>
+        filters.categoryIds.includes(product.categoryId)
+      );
+    }
+
+    // Apply status filter
+    if (filters.statuses.length > 0) {
+      filtered = filtered.filter(product =>
+        filters.statuses.includes(product.status)
+      );
+    }
+
+    // Apply price range filter
+    const { min, max } = filters.priceRange;
+    filtered = filtered.filter(product =>
+      product.price >= min && product.price <= max
+    );
+
+    return filtered;
   }
 }));
 
@@ -148,21 +276,68 @@ export const useSetShowAddProductForm = () => useProductStore(state => state.set
 export const useSetShowAddCategoryForm = () => useProductStore(state => state.setShowAddCategoryForm);
 export const useClearProducts = () => useProductStore(state => state.clearProducts);
 
+// Filter selectors
+export const useProductFilters = () => useProductStore(state => state.filters);
+export const useShowFilterPopover = () => useProductStore(state => state.showFilterPopover);
+export const useSetFilterCheckbox = () => useProductStore(state => state.setFilterCheckbox);
+export const useSetPriceRange = () => useProductStore(state => state.setPriceRange);
+export const useResetPriceRange = () => useProductStore(state => state.resetPriceRange);
+export const useClearAllFilters = () => useProductStore(state => state.clearAllFilters);
+export const useSetShowFilterPopover = () => useProductStore(state => state.setShowFilterPopover);
+
 // Custom hooks for computed values
-export const useFilteredProducts = () => {
-  return useProductStore(
-    useShallow(state => {
-      if (!state.searchQuery) return state.products;
-      return state.products.filter(product =>
-        product.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(state.searchQuery.toLowerCase())
-      );
-    })
-  );
-};
+export const useFilteredProducts = () => useProductStore(
+  useShallow(state => state.getFilteredProducts())
+);
 
 export const useCategoryById = (categoryId: string) => {
   return useProductStore(
     useShallow(state => state.categories.find(cat => cat.id === categoryId) || null)
   );
+};
+
+// Product statistics hook
+export const useProductStatistics = () => {
+  return useProductStore(
+    useShallow(state => {
+      const total = state.products.length;
+      const active = state.products.filter(product => product.status === ProductStatus.ACTIVE).length;
+      const inactive = state.products.filter(product => product.status === ProductStatus.INACTIVE).length;
+      const outOfStock = state.products.filter(product => product.status === ProductStatus.OUT_OF_STOCK).length;
+
+      return {
+        total,
+        active,
+        inactive,
+        outOfStock
+      };
+    })
+  );
+};
+
+// Paginated products hook that combines filtering and pagination
+export const usePaginatedProducts = () => {
+  const filteredProducts = useFilteredProducts();
+  const {
+    currentPage,
+    pageSize,
+    setPage,
+    setPageSize: setPaginationPageSize,
+    resetPage,
+    pageSizeOptions
+  } = useProductTablePagination();
+
+  const paginationResult = usePagination({
+    data: filteredProducts,
+    pageSize,
+    currentPage, // Use controlled mode
+    onPageChange: setPage, // Handle page changes through store
+    onPageSizeChange: setPaginationPageSize // Handle page size changes through store
+  });
+
+  return {
+    ...paginationResult,
+    pageSizeOptions,
+    resetPage
+  };
 };

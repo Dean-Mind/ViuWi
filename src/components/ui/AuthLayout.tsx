@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import LottieMascot from './LottieMascot';
 import ThemeToggle from './ThemeToggle';
 
 interface AuthLayoutProps {
@@ -38,17 +38,13 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           </div>
 
           {/* Right side - Robot illustration */}
-          <div className="hidden lg:flex lg:w-[35%] items-center justify-center bg-gradient-to-br from-base-100 to-base-200">
-            <div className="relative w-full h-full max-w-lg">
-              <Image
-                src="/images/robot-mascot.png"
-                alt="ViuWi Robot Mascot"
-                fill
-                sizes="(max-width: 1024px) 0px, 35vw"
-                className="object-contain"
-                priority
-              />
-            </div>
+          <div className="hidden lg:flex lg:w-[35%] items-center justify-center bg-gradient-to-br from-base-100 to-base-200 sticky top-16 h-[calc(100vh-4rem)]">
+            <LottieMascot
+              autoplay={true}
+              loop={true}
+              onLoad={() => console.log('Mascot animation loaded')}
+              onError={(error) => console.error('Mascot animation error:', error)}
+            />
           </div>
         </div>
       </main>
