@@ -62,21 +62,14 @@ export default function LottieMascot({
       onError?.(new Error('Failed to load Lottie animation'));
     };
 
-    const handleRenderError = () => {
-      setHasError(true);
-      onError?.(new Error('Failed to render Lottie animation'));
-    };
-
     // Add event listeners
     dotLottieEl.addEventListener('load', handleLoad);
     dotLottieEl.addEventListener('loadError', handleLoadError);
-    dotLottieEl.addEventListener('renderError', handleRenderError);
 
     // Cleanup function
     return () => {
       dotLottieEl.removeEventListener('load', handleLoad);
       dotLottieEl.removeEventListener('loadError', handleLoadError);
-      dotLottieEl.removeEventListener('renderError', handleRenderError);
     };
   }, [dotLottieEl, onLoad, onError]);
 
