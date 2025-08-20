@@ -182,7 +182,7 @@ export default function OrderEditForm({ isOpen, onClose, editOrder }: OrderEditF
     try {
       const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
       
-      const updatedOrderData = {
+      const updatedOrderData: Partial<Order> = {
         ...editOrder,
         customerId: selectedCustomerId,
         customerName: selectedCustomer?.name || editOrder.customerName,
@@ -220,7 +220,7 @@ export default function OrderEditForm({ isOpen, onClose, editOrder }: OrderEditF
       }
 
       updateOrder(editOrder.id, updatedOrderData);
-      toast.orderUpdated(editOrder.id, updatedOrderData.customerName);
+      toast.orderUpdated(editOrder.id, updatedOrderData.customerName || editOrder.customerName);
       onClose();
     } catch (error) {
       console.error('Error updating order:', error);

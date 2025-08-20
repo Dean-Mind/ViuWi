@@ -1,6 +1,6 @@
 'use client';
 
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { DotLottieReact, DotLottie } from '@lottiefiles/dotlottie-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
@@ -24,7 +24,7 @@ export default function LottieMascot({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [dotLottieEl, setDotLottieEl] = useState<any>(null);
+  const [dotLottieEl, setDotLottieEl] = useState<DotLottie | null>(null);
 
   // Check for reduced motion preference
   useEffect(() => {
@@ -40,10 +40,10 @@ export default function LottieMascot({
   }, []);
 
   // Store the dotLottie element reference
-  const dotLottieRef = useRef<any>(null);
+  const dotLottieRef = useRef<DotLottie | null>(null);
 
   // Ref callback to store the element
-  const handleDotLottieRef = useCallback((dotLottie: any) => {
+  const handleDotLottieRef = useCallback((dotLottie: DotLottie | null) => {
     dotLottieRef.current = dotLottie;
     setDotLottieEl(dotLottie);
   }, []);
@@ -57,26 +57,26 @@ export default function LottieMascot({
       onLoad?.();
     };
 
-    const handleError = (_error: unknown) => {
-      setHasError(true);
-      onError?.(new Error('Failed to load Lottie animation'));
-    };
-
     const handleLoadError = () => {
       setHasError(true);
       onError?.(new Error('Failed to load Lottie animation'));
     };
 
+    const handleRenderError = () => {
+      setHasError(true);
+      onError?.(new Error('Failed to render Lottie animation'));
+    };
+
     // Add event listeners
     dotLottieEl.addEventListener('load', handleLoad);
-    dotLottieEl.addEventListener('error', handleError);
     dotLottieEl.addEventListener('loadError', handleLoadError);
+    dotLottieEl.addEventListener('renderError', handleRenderError);
 
     // Cleanup function
     return () => {
       dotLottieEl.removeEventListener('load', handleLoad);
-      dotLottieEl.removeEventListener('error', handleError);
       dotLottieEl.removeEventListener('loadError', handleLoadError);
+      dotLottieEl.removeEventListener('renderError', handleRenderError);
     };
   }, [dotLottieEl, onLoad, onError]);
 
