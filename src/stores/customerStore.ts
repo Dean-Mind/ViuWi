@@ -116,7 +116,6 @@ export const useCustomerStore = create<CustomerState>()((set, get) => ({
     // Reset to first page when filters change
     usePaginationStore.getState().setCustomerTablePage(1);
   },
-
   clearAllFilters: () => {
     set(() => ({
       filters: {
