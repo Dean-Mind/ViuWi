@@ -8,7 +8,7 @@ import { parsePriceInput } from '@/utils/currency';
 
 export interface ValidationError {
   field: string;
-  value: any;
+  value: unknown;
   message: string;
   severity: 'error' | 'warning';
 }
@@ -30,7 +30,7 @@ export interface DuplicateCheck {
  * Validate a single product row
  */
 export const validateProductRow = (
-  row: any,
+  row: Record<string, unknown>,
   categories: Category[],
   existingProducts: Product[] = [],
   allowCategoryCreation: boolean = true
@@ -99,7 +99,7 @@ export const validateProductRow = (
 /**
  * Validate product name
  */
-const validateName = (name: any, existingProducts: Product[] = []): {
+const validateName = (name: unknown, existingProducts: Product[] = []): {
   isValid: boolean;
   errors: ValidationError[];
   warnings: ValidationError[];
@@ -147,7 +147,7 @@ const validateName = (name: any, existingProducts: Product[] = []): {
 /**
  * Validate description
  */
-const validateDescription = (description: any): {
+const validateDescription = (description: unknown): {
   isValid: boolean;
   errors: ValidationError[];
 } => {
@@ -179,7 +179,7 @@ const validateDescription = (description: any): {
 /**
  * Validate detail
  */
-const validateDetail = (detail: any): {
+const validateDetail = (detail: unknown): {
   isValid: boolean;
   errors: ValidationError[];
 } => {
@@ -212,7 +212,7 @@ const validateDetail = (detail: any): {
  * Validate category with flexible handling for missing categories
  */
 const validateCategory = (
-  category: any,
+  category: unknown,
   categories: Category[],
   allowCategoryCreation: boolean = true
 ): {
@@ -271,7 +271,7 @@ const validateCategory = (
 /**
  * Validate price
  */
-const validatePrice = (price: any): {
+const validatePrice = (price: unknown): {
   isValid: boolean;
   errors: ValidationError[];
   price?: number;
@@ -314,7 +314,7 @@ const validatePrice = (price: any): {
 /**
  * Validate status
  */
-const validateStatus = (status: any): {
+const validateStatus = (status: unknown): {
   isValid: boolean;
   errors: ValidationError[];
   status?: ProductStatus;

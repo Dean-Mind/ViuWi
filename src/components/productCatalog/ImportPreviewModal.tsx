@@ -79,7 +79,7 @@ export default function ImportPreviewModal({
   };
 
   // Helper function to escape CSV cell values
-  const escapeCsvCell = (value: any): string => {
+  const escapeCsvCell = (value: unknown): string => {
     if (value === null || value === undefined) {
       return '';
     }
@@ -88,7 +88,7 @@ export default function ImportPreviewModal({
     // Escape double quotes by replacing them with two double quotes
     const escaped = cellStr.replace(/"/g, '""');
     // Wrap in quotes to handle commas, newlines, and quotes
-    return `"${escaped}";
+    return `"${escaped}"`;
   };
 
   const downloadErrorReport = () => {
@@ -96,9 +96,13 @@ export default function ImportPreviewModal({
 
     const csvContent = [
       'Row,Field,Value,Error Message',
-      ...errors.map(error =>
-        `${escapeCsvCell(error.row)},${escapeCsvCell(error.field)},${escapeCsvCell(error.value)},${escapeCsvCell(error.message)}`
-      )
+      ...errors.map(error => {
+        const row = escapeCsvCell(error.row);
+        const field = escapeCsvCell(error.field);
+        const value = escapeCsvCell(error.value);
+        const message = escapeCsvCell(error.message);
+        return row + ',' + field + ',' + value + ',' + message;
+      })
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });

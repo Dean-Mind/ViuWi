@@ -68,9 +68,9 @@ export default function MessageListPanel({
       <div className="p-4 border-b border-base-300">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <h2 className="font-inter text-xl font-semibold text-base-content">
-              Messages
-            </h2>
+            <h2 className="text-3xl font-bold text-brand-orange">
+          Messages
+        </h2>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-inter text-sm font-semibold text-base-content">

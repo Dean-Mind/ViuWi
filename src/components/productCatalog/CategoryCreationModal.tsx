@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Edit2, Check, AlertTriangle } from 'lucide-react';
+import { X, Edit2, Check, AlertTriangle } from 'lucide-react';
 import { Category } from '@/data/productCatalogMockData';
 import { MissingCategory } from '@/utils/fileImport';
-import { validateCategoryName, generateCategorySuggestions } from '@/utils/categoryAnalysis';
+import { validateCategoryName } from '@/utils/categoryAnalysis';
 import Alert from '@/components/ui/Alert';
 import { useAppToast } from '@/hooks/useAppToast';
 
@@ -153,7 +153,7 @@ export default function CategoryCreationModal({
             <div className="flex items-center gap-2">
               <AlertTriangle size={16} />
               <span>
-                These categories don't exist in your system. Select which ones to create automatically.
+                These categories don&apos;t exist in your system. Select which ones to create automatically.
               </span>
             </div>
           </Alert>

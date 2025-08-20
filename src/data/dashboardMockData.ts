@@ -3,8 +3,11 @@ import { ReactNode } from 'react';
 // Dashboard navigation and chat related enums
 
 export enum NavigationItem {
+  DASHBOARD = 'dashboard',
   CS_HANDOVER = 'cs_handover',
-  KATALOG_PRODUK = 'katalog_produk', 
+  KATALOG_PRODUK = 'katalog_produk',
+  PELANGGAN = 'pelanggan',
+  PESANAN = 'pesanan',
   BOOKING_JADWAL = 'booking_jadwal',
   PEMBAYARAN = 'pembayaran',
   FORMULIR = 'formulir',
@@ -77,7 +80,7 @@ export const mockRootProps = {
   language: "English" as const,
   hasNotifications: true as const,
   isChatOpen: false as const,
-  activeNavItem: NavigationItem.CS_HANDOVER as const
+  activeNavItem: NavigationItem.DASHBOARD as const
 };
 
 // Mock chat conversations data

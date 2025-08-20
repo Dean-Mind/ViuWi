@@ -4,10 +4,9 @@ import React, { useState, useRef } from 'react';
 import { X, Download, Upload } from 'lucide-react';
 import CloudUploadIcon from '@/components/icons/CloudUploadIcon';
 import { formatFileSize, Category, Product } from '@/data/productCatalogMockData';
-import { useSetShowUploadModal, useCategories, useAddCategory } from '@/stores/productStore';
+import { useCategories, useAddCategory } from '@/stores/productStore';
 import { downloadCSVTemplate, downloadExcelTemplate } from '@/utils/templateGenerator';
-import { parseCSVFile, parseExcelFile, ImportResult, mapCategoriesToIds } from '@/utils/fileImport';
-import { findCategoryByName } from '@/utils/categoryAnalysis';
+import { parseCSVFile, parseExcelFile, ImportResult } from '@/utils/fileImport';
 import ImportPreviewModal from './ImportPreviewModal';
 import CategoryCreationModal from './CategoryCreationModal';
 import { useAppToast } from '@/hooks/useAppToast';
@@ -25,7 +24,7 @@ export default function FileUploadModal({ isOpen, onClose, onImportComplete }: F
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showCategoryCreation, setShowCategoryCreation] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [createdCategories, setCreatedCategories] = useState<Category[]>([]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const categories = useCategories();
   const addCategory = useAddCategory();
@@ -134,7 +133,7 @@ export default function FileUploadModal({ isOpen, onClose, onImportComplete }: F
       addCategory(category);
     });
 
-    setCreatedCategories(categoriesToCreate);
+
     setShowCategoryCreation(false);
 
     // Now update the import result with the new categories
@@ -181,14 +180,14 @@ export default function FileUploadModal({ isOpen, onClose, onImportComplete }: F
     setShowPreview(false);
     setSelectedFile(null);
     setImportResult(null);
-    setCreatedCategories([]);
+
     onClose();
   };
 
   const handleClosePreview = () => {
     setShowPreview(false);
     setImportResult(null);
-    setCreatedCategories([]);
+
   };
 
   if (!isOpen) return null;

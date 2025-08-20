@@ -10,7 +10,7 @@ import { Category, ProductStatus } from '@/data/productCatalogMockData';
  * Sanitize cell content to prevent CSV/Excel formula injection
  * Prefixes dangerous characters with a single quote to neutralize formulas
  */
-export const sanitizeForSpreadsheet = (cell: any): string => {
+export const sanitizeForSpreadsheet = (cell: unknown): string => {
   if (cell === null || cell === undefined) {
     return '';
   }

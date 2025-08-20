@@ -18,7 +18,7 @@ export default function ChatView({
   const timeline = useMemo(() => {
     if (!conversation) return [];
     return createTimeline(conversation.messages, conversation.handoverHistory);
-  }, [conversation?.messages, conversation?.handoverHistory]);
+  }, [conversation]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
