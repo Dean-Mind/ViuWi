@@ -50,8 +50,7 @@ export default function LottieMascot({
 
   // Handle event listeners in useEffect with proper cleanup
   useEffect(() => {
-    const dotLottie = dotLottieRef.current;
-    if (!dotLottie) return;
+    if (!dotLottieEl) return;
 
     const handleLoad = () => {
       setIsLoaded(true);
@@ -69,17 +68,17 @@ export default function LottieMascot({
     };
 
     // Add event listeners
-    dotLottie.addEventListener('load', handleLoad);
-    dotLottie.addEventListener('error', handleError);
-    dotLottie.addEventListener('loadError', handleLoadError);
+    dotLottieEl.addEventListener('load', handleLoad);
+    dotLottieEl.addEventListener('error', handleError);
+    dotLottieEl.addEventListener('loadError', handleLoadError);
 
     // Cleanup function
     return () => {
-      dotLottie.removeEventListener('load', handleLoad);
-      dotLottie.removeEventListener('error', handleError);
-      dotLottie.removeEventListener('loadError', handleLoadError);
+      dotLottieEl.removeEventListener('load', handleLoad);
+      dotLottieEl.removeEventListener('error', handleError);
+      dotLottieEl.removeEventListener('loadError', handleLoadError);
     };
-  }, [onLoad, onError]);
+  }, [dotLottieEl, onLoad, onError]);
 
   // Fallback to static image on error or if user prefers reduced motion
   if (hasError || prefersReducedMotion) {
