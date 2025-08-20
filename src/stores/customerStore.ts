@@ -31,7 +31,7 @@ interface CustomerState {
   setSelectedCustomers: (ids: string[]) => void;
   setShowAddCustomerForm: (show: boolean) => void;
   setIsLoading: (loading: boolean) => void;
-  setFilterCheckbox: (group: 'customerTypes' | 'cityIds', value: string, checked: boolean) => void;
+  setFilterCheckbox: ((group: 'customerTypes', value: CustomerType, checked: boolean) => void) & ((group: 'cityIds', value: string, checked: boolean) => void);
   clearAllFilters: () => void;
   setShowFilterPopover: (show: boolean) => void;
   
@@ -85,14 +85,34 @@ export const useCustomerStore = create<CustomerState>()((set, get) => ({
   setIsLoading: (loading) => set({ isLoading: loading }),
 
   setFilterCheckbox: (group, value, checked) => {
-    set(state => ({
-      filters: {
-        ...state.filters,
-        [group]: checked
-          ? [...state.filters[group], value]
-          : state.filters[group].filter(item => item !== value)
+    set(state => {
+      if (group === 'customerTypes') {
+        const currentTypes = state.filters.customerTypes;
+        return {
+          filters: {
+            ...state.filters,
+            customerTypes: checked
+              ? currentTypes.includes(value as CustomerType)
+                ? currentTypes
+                : [...currentTypes, value as CustomerType]
+              : currentTypes.filter(item => item !== value)
+          }
+        };
+      } else {
+        // Handle cityIds as string[]
+        const currentIds = state.filters.cityIds;
+        return {
+          filters: {
+            ...state.filters,
+            cityIds: checked
+              ? currentIds.includes(value as string)
+                ? currentIds
+                : [...currentIds, value as string]
+              : currentIds.filter(item => item !== value)
+          }
+        };
       }
-    }));
+    });
     // Reset to first page when filters change
     usePaginationStore.getState().setCustomerTablePage(1);
   },

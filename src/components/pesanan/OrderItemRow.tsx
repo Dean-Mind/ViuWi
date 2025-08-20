@@ -10,7 +10,7 @@ interface OrderItemRowProps {
 
 export default function OrderItemRow({ item, index }: OrderItemRowProps) {
   return (
-    <tr className="bg-base-50 border-l-4 border-brand-orange/20">
+    <tr className="bg-base-100 border-l-4 border-brand-orange/20">
       <td className="p-3 pl-8 text-center">
         <div className="text-xs text-base-content/60">{index + 1}</div>
       </td>

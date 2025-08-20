@@ -24,6 +24,7 @@ export default function LottieMascot({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [dotLottieEl, setDotLottieEl] = useState<any>(null);
 
   // Check for reduced motion preference
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function LottieMascot({
   // Ref callback to store the element
   const handleDotLottieRef = useCallback((dotLottie: any) => {
     dotLottieRef.current = dotLottie;
+    setDotLottieEl(dotLottie);
   }, []);
 
   // Handle event listeners in useEffect with proper cleanup

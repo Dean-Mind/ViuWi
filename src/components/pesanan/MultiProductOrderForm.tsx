@@ -56,29 +56,31 @@ export default function MultiProductOrderForm({ isOpen, onClose }: MultiProductO
     // Simulate loading for better UX
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
+    setCartItems(prev => {
+      const existingItemIndex = prev.findIndex(item => item.productId === productId);
 
-    if (existingItemIndex >= 0) {
-      // Update existing item
-      setCartItems(prev => prev.map((item, index) =>
-        index === existingItemIndex
-          ? {
-              ...item,
-              quantity: item.quantity + quantity,
-              subtotal: (item.quantity + quantity) * product.price
-            }
-          : item
-      ));
-    } else {
-      // Add new item
-      const newItem: CartItem = {
-        productId,
-        quantity,
-        product,
-        subtotal: quantity * product.price
-      };
-      setCartItems(prev => [...prev, newItem]);
-    }
+      if (existingItemIndex >= 0) {
+        // Update existing item
+        return prev.map((item, index) =>
+          index === existingItemIndex
+            ? {
+                ...item,
+                quantity: item.quantity + quantity,
+                subtotal: (item.quantity + quantity) * product.price
+              }
+            : item
+        );
+      } else {
+        // Add new item
+        const newItem: CartItem = {
+          productId,
+          quantity,
+          product,
+          subtotal: quantity * product.price
+        };
+        return [...prev, newItem];
+      }
+    });
 
     setAddingProductId(null);
     toast.success(`${product.name} ditambahkan ke keranjang`);

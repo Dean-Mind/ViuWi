@@ -23,14 +23,16 @@ function ProductRow({
   onEditProduct,
   onDeleteProduct,
   onViewProduct,
-  onStatusChange
+  onStatusChange,
+  isStatusUpdating = false
 }: {
   product: Product;
   index: number;
   onEditProduct: (product: Product) => void;
   onDeleteProduct: (productId: string) => void;
   onViewProduct: (product: Product) => void;
-  onStatusChange: (productId: string, newStatus: ProductStatus) => void;
+  onStatusChange: (productId: string, newStatus: ProductStatus) => Promise<void> | void;
+  isStatusUpdating?: boolean;
 }) {
   const category = useCategoryById(product.categoryId);
 
@@ -82,6 +84,7 @@ function ProductRow({
           currentStatus={product.status}
           productName={product.name}
           onStatusChange={onStatusChange}
+          disabled={isStatusUpdating}
         />
       </td>
       <td className="p-4">
@@ -116,7 +119,7 @@ export default function ProductTable({ onEditProduct, onDeleteProduct, onViewPro
   } = usePaginatedProducts();
 
   // Status update functionality
-  const { updateProductStatus } = useProductStatusUpdate();
+  const { updateProductStatus, loadingStates } = useProductStatusUpdate();
 
   // Calculate row numbers for current page
   const getRowNumber = (index: number) => {
@@ -158,6 +161,7 @@ export default function ProductTable({ onEditProduct, onDeleteProduct, onViewPro
                 onDeleteProduct={onDeleteProduct}
                 onViewProduct={onViewProduct}
                 onStatusChange={updateProductStatus}
+                isStatusUpdating={!!loadingStates[product.id]}
               />
             ))}
           </tbody>

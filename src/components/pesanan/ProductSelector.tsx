@@ -133,6 +133,7 @@ export default function ProductSelector({ onAddProduct, selectedProductIds, addi
                   </div>
 
                   <button
+                    type="button"
                     onClick={() => handleAddProduct(product.id)}
                     disabled={isSelected || isAdding}
                     className={`btn btn-sm rounded-xl w-full sm:w-auto ${

@@ -31,8 +31,9 @@ export default function Dashboard(props: DashboardProps) {
 
   const handleNavItemClick = (item: NavigationItem) => {
     if (item === NavigationItem.GET_HELP) {
-      // Open WhatsApp in new tab for Bantuan
-      window.open('https://wa.me/prasetya', '_blank');
+      // Open WhatsApp in new tab for Bantuan with security protection
+      const newWin = window.open('https://wa.me/prasetya', '_blank', 'noopener,noreferrer');
+      if (newWin) newWin.opener = null;
       return;
     }
     setActiveNavItem(item);

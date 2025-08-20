@@ -90,7 +90,10 @@ function OrderRow({
           <div className="flex items-center justify-center gap-2">
             {(isMultiProduct || itemCount > 0) && (
               <button
-                onClick={handleToggleExpand}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleExpand();
+                }}
                 className="btn btn-xs btn-ghost p-0 w-4 h-4 min-h-0"
                 aria-label={isExpanded ? 'Collapse order items' : 'Expand order items'}
               >

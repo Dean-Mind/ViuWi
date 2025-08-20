@@ -82,7 +82,7 @@ export default function PriceRangeFilter({
         <input
           type="range"
           min={absoluteMin}
-          max={absoluteMax}
+          max={max - step}
           step={step}
           value={min}
           onChange={(e) => handleMinChange(Number(e.target.value))}
@@ -97,7 +97,7 @@ export default function PriceRangeFilter({
         {/* Max Range Input */}
         <input
           type="range"
-          min={absoluteMin}
+          min={min + step}
           max={absoluteMax}
           step={step}
           value={max}
@@ -115,8 +115,8 @@ export default function PriceRangeFilter({
           className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-brand-orange border-2 border-white rounded-full shadow-md cursor-pointer z-30 transition-all duration-150 ${
             isDragging && dragType === 'min' ? 'scale-110 shadow-lg' : 'hover:scale-105'
           }`}
-          style={{ 
-            left: `${((min - absoluteMin) / (absoluteMax - absoluteMin)) * 100}%`,
+          style={{
+            left: `${((min - absoluteMin) / denom) * 100}%`,
             pointerEvents: 'none'
           }}
         />
@@ -124,8 +124,8 @@ export default function PriceRangeFilter({
           className={`absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-brand-orange border-2 border-white rounded-full shadow-md cursor-pointer z-30 transition-all duration-150 ${
             isDragging && dragType === 'max' ? 'scale-110 shadow-lg' : 'hover:scale-105'
           }`}
-          style={{ 
-            left: `${((max - absoluteMin) / (absoluteMax - absoluteMin)) * 100}%`,
+          style={{
+            left: `${((max - absoluteMin) / denom) * 100}%`,
             pointerEvents: 'none'
           }}
         />
@@ -134,7 +134,7 @@ export default function PriceRangeFilter({
         {isDragging && dragType === 'min' && (
           <div 
             className="absolute -top-8 transform -translate-x-1/2 bg-base-content text-base-100 text-xs px-2 py-1 rounded shadow-lg z-40"
-            style={{ left: `${((min - absoluteMin) / (absoluteMax - absoluteMin)) * 100}%` }}
+            style={{ left: `${((min - absoluteMin) / denom) * 100}%` }}
           >
             {formatPrice(min)}
           </div>
@@ -142,7 +142,7 @@ export default function PriceRangeFilter({
         {isDragging && dragType === 'max' && (
           <div 
             className="absolute -top-8 transform -translate-x-1/2 bg-base-content text-base-100 text-xs px-2 py-1 rounded shadow-lg z-40"
-            style={{ left: `${((max - absoluteMin) / (absoluteMax - absoluteMin)) * 100}%` }}
+            style={{ left: `${((max - absoluteMin) / denom) * 100}%` }}
           >
             {formatPrice(max)}
           </div>

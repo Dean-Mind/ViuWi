@@ -34,6 +34,7 @@ export default function CustomerSearchBar() {
 
       {searchQuery && (
         <button
+          type="button"
           onClick={handleClearSearch}
           className="absolute inset-y-0 right-0 pr-3 flex items-center text-base-content/40 hover:text-base-content transition-colors"
           aria-label="Clear search"

@@ -8,7 +8,7 @@ interface StatusDropdownProps {
   productId: string;
   currentStatus: ProductStatus;
   productName: string;
-  onStatusChange?: (productId: string, newStatus: ProductStatus) => void;
+  onStatusChange?: (productId: string, newStatus: ProductStatus) => Promise<void> | void;
   disabled?: boolean;
 }
 

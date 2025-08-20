@@ -12,21 +12,13 @@ import {
   isMultiProductOrder,
   getOrderItemCount,
   getOrderTotalQuantity,
-  generateOrderItemId
+  generateOrderItemId,
+  generateOrderId
 } from '@/data/orderMockData';
 import { usePagination } from '@/hooks/usePagination';
 import { useOrderTablePagination, usePaginationStore } from '@/stores/paginationStore';
 
-// Generate robust unique ID for orders
-const generateOrderId = (): string => {
-  // Use crypto.randomUUID() if available (Node 14.17+/modern browsers)
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return `ORD_${crypto.randomUUID()}`;
-  }
 
-  // Fallback for older environments
-  return `ORD_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
-};
 
 // Helper function to calculate total range from orders
 const calculateTotalRange = (orders: Order[]) => {
@@ -81,7 +73,7 @@ interface OrderState {
   setSelectedOrders: (orderIds: string[]) => void;
   setIsLoading: (loading: boolean) => void;
   setShowAddOrderForm: (show: boolean) => void;
-  setFilterCheckbox: (filterType: 'statuses' | 'paymentMethods' | 'customerIds', value: string, checked: boolean) => void;
+  setFilterCheckbox: ((filterType: 'statuses', value: OrderStatus, checked: boolean) => void) & ((filterType: 'paymentMethods', value: PaymentMethod, checked: boolean) => void) & ((filterType: 'customerIds', value: string, checked: boolean) => void);
   setDateRange: (from: Date | null, to: Date | null) => void;
   setTotalRange: (min: number, max: number) => void;
   resetTotalRange: () => void;
@@ -157,17 +149,47 @@ export const useOrderStore = create<OrderState>()((set, get) => {
   // Filter actions
   setFilterCheckbox: (filterType, value, checked) => {
     set((state) => {
-      const currentFilters = state.filters[filterType] as string[];
-      const newFilters = checked
-        ? [...currentFilters, value]
-        : currentFilters.filter(item => item !== value);
-
-      return {
-        filters: {
-          ...state.filters,
-          [filterType]: newFilters
-        }
-      };
+      if (filterType === 'statuses') {
+        const currentStatuses = state.filters.statuses;
+        const statusValue = value as OrderStatus;
+        return {
+          filters: {
+            ...state.filters,
+            statuses: checked
+              ? currentStatuses.includes(statusValue)
+                ? currentStatuses
+                : [...currentStatuses, statusValue]
+              : currentStatuses.filter(item => item !== statusValue)
+          }
+        };
+      } else if (filterType === 'paymentMethods') {
+        const currentMethods = state.filters.paymentMethods;
+        const methodValue = value as PaymentMethod;
+        return {
+          filters: {
+            ...state.filters,
+            paymentMethods: checked
+              ? currentMethods.includes(methodValue)
+                ? currentMethods
+                : [...currentMethods, methodValue]
+              : currentMethods.filter(item => item !== methodValue)
+          }
+        };
+      } else {
+        // Handle customerIds as string[]
+        const currentIds = state.filters.customerIds;
+        const stringValue = value as string;
+        return {
+          filters: {
+            ...state.filters,
+            customerIds: checked
+              ? currentIds.includes(stringValue)
+                ? currentIds
+                : [...currentIds, stringValue]
+              : currentIds.filter(item => item !== stringValue)
+          }
+        };
+      }
     });
     // Reset to first page when filters change
     usePaginationStore.getState().setOrderTablePage(1);

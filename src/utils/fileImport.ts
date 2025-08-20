@@ -149,7 +149,7 @@ export const parseExcelFile = (file: File, categories: Category[] = []): Promise
           const obj: ParsedRow = {};
           headers.forEach((header, index) => {
             if (ALL_COLUMNS.includes(header)) {
-              obj[header as keyof ParsedRow] = String(row[index] || '');
+              obj[header as keyof ParsedRow] = String(row[index] ?? '');
             }
           });
           return obj;

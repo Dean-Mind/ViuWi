@@ -16,6 +16,17 @@ import { useAppToast } from '@/hooks/useAppToast';
 import ShoppingCart from './ShoppingCart';
 import ProductSelector from './ProductSelector';
 
+// Generate robust unique ID for order items
+const generateItemId = (): string => {
+  // Use crypto.randomUUID() if available (Node 14.17+/modern browsers)
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `item_${crypto.randomUUID()}`;
+  }
+
+  // Fallback for older environments
+  return `item_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+};
+
 interface CartItem extends OrderItemFormData {
   product?: Product;
   subtotal: number;
@@ -114,11 +125,11 @@ export default function OrderEditForm({ isOpen, onClose, editOrder }: OrderEditF
     }
 
     const updatedItems = cartItems.map(item => {
-      if (item.productId === productId && item.product) {
+      if (item.productId === productId) {
         return {
           ...item,
           quantity: newQuantity,
-          subtotal: newQuantity * item.product.price
+          subtotal: newQuantity * (item.product?.price ?? 0)
         };
       }
       return item;
@@ -170,7 +181,7 @@ export default function OrderEditForm({ isOpen, onClose, editOrder }: OrderEditF
         customerName: selectedCustomer?.name || editOrder.customerName,
         customerPhone: selectedCustomer?.phone || editOrder.customerPhone,
         items: cartItems.map(item => ({
-          id: `${editOrder.id}-item-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
+          id: generateItemId(),
           productId: item.productId,
           productName: item.product?.name || '',
           quantity: item.quantity,

@@ -74,7 +74,7 @@ export default function CustomerForm({ isOpen, onClose, editCustomer }: Customer
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     // Sanitize input data
@@ -150,7 +150,7 @@ export default function CustomerForm({ isOpen, onClose, editCustomer }: Customer
 
         {/* Scrollable Content Area */}
         <div className="max-h-[calc(90vh-180px)] overflow-y-auto no-scrollbar">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="customer-form" onSubmit={handleSubmit} className="space-y-6">
             {/* Customer Name */}
             <div className="form-control w-full">
               <label className="label">
@@ -302,7 +302,8 @@ export default function CustomerForm({ isOpen, onClose, editCustomer }: Customer
             Batal
           </button>
           <button
-            onClick={handleSubmit}
+            type="submit"
+            form="customer-form"
             className="btn btn-primary bg-brand-orange border-brand-orange hover:bg-brand-orange-dark text-white rounded-2xl"
           >
             {editCustomer ? 'Perbarui' : 'Simpan'}

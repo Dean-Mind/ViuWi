@@ -33,20 +33,20 @@ export interface PaginationResult<T> {
  */
 export function usePagination<T>({
   data,
-  pageSize: initialPageSize,
+  pageSize: pageSizeProp,
   initialPage = 1,
   currentPage: controlledCurrentPage,
   onPageChange,
   onPageSizeChange
 }: PaginationConfig<T>): PaginationResult<T> {
   const [internalCurrentPage, setInternalCurrentPage] = useState(initialPage);
-  const [internalPageSize, setInternalPageSize] = useState(initialPageSize);
+  const [internalPageSize, setInternalPageSize] = useState(pageSizeProp);
 
   // Use controlled or internal state
   const isControlled = controlledCurrentPage !== undefined;
   const isPageSizeControlled = onPageSizeChange !== undefined;
   const currentPage = isControlled ? controlledCurrentPage : internalCurrentPage;
-  const pageSize = isPageSizeControlled ? initialPageSize : internalPageSize;
+  const pageSize = Math.max(1, isPageSizeControlled ? pageSizeProp : internalPageSize);
 
   // Calculate pagination values
   const totalItems = data.length;
@@ -105,13 +105,14 @@ export function usePagination<T>({
   }, [hasPreviousPage, goToPage, currentPage]);
 
   const setPageSize = useCallback((newPageSize: number) => {
+    const clamped = Math.max(1, newPageSize);
     if (isPageSizeControlled && onPageSizeChange) {
-      onPageSizeChange(newPageSize);
+      onPageSizeChange(clamped);
     } else {
-      setInternalPageSize(newPageSize);
+      setInternalPageSize(clamped);
       // Recalculate current page to maintain position
       const currentStartItem = (validCurrentPage - 1) * pageSize + 1;
-      const newPage = Math.ceil(currentStartItem / newPageSize);
+      const newPage = Math.ceil(currentStartItem / clamped);
       goToPage(newPage);
     }
   }, [validCurrentPage, pageSize, goToPage, isPageSizeControlled, onPageSizeChange]);
