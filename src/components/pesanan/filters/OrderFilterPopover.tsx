@@ -25,7 +25,7 @@ interface OrderFilterPopoverProps {
   isOpen: boolean;
   onClose: () => void;
   filters: FilterState;
-  onFilterChange: (group: 'statuses' | 'paymentMethods' | 'customerIds', value: string, checked: boolean) => void;
+  onFilterChange: ((filterType: 'statuses', value: OrderStatus, checked: boolean) => void) & ((filterType: 'paymentMethods', value: PaymentMethod, checked: boolean) => void) & ((filterType: 'customerIds', value: string, checked: boolean) => void);
   onDateRangeChange: (from: Date | null, to: Date | null) => void;
   onTotalRangeChange: (min: number, max: number) => void;
   onClearAll: () => void;

@@ -13,7 +13,7 @@ interface CustomerFilterPopoverProps {
   isOpen: boolean;
   onClose: () => void;
   filters: FilterState;
-  onFilterChange: (group: 'customerTypes' | 'cityIds', value: string, checked: boolean) => void;
+  onFilterChange: ((group: 'customerTypes', value: CustomerType, checked: boolean) => void) & ((group: 'cityIds', value: string, checked: boolean) => void);
   onClearAll: () => void;
 }
 

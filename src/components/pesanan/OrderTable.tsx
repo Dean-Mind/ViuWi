@@ -21,7 +21,7 @@ import { useOrderStatusUpdate } from '@/hooks/useOrderStatusUpdate';
 
 interface OrderTableProps {
   onEditOrder: (order: Order) => void;
-  onCancelOrder: (orderId: string) => void;
+  onCancelOrder: (orderId: string) => Promise<void>;
   onViewOrder: (order: Order) => void;
 }
 
@@ -29,7 +29,7 @@ interface OrderRowProps {
   order: Order;
   index: number;
   onEditOrder: (order: Order) => void;
-  onCancelOrder: (orderId: string) => void;
+  onCancelOrder: (orderId: string) => Promise<void>;
   onViewOrder: (order: Order) => void;
   onStatusChange: (orderId: string, status: OrderStatus) => void;
   expandedOrders: Set<string>;

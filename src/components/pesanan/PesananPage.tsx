@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Order, OrderStatus } from '@/data/orderMockData';
 import {
   useOrderStatistics,
-  useUpdateOrderStatus,
   useOrderFilters,
   useSetOrderFilterCheckbox,
   useSetOrderDateRange,
@@ -13,6 +12,8 @@ import {
   useShowOrderFilterPopover,
   useSetShowOrderFilterPopover
 } from '@/stores/orderStore';
+import { useOrderStatusUpdate } from '@/hooks/useOrderStatusUpdate';
+import { useAppToast } from '@/hooks/useAppToast';
 import { formatOrderPrice } from '@/data/orderMockData';
 import OrderTable from './OrderTable';
 import OrderSearchBar from './OrderSearchBar';
@@ -32,7 +33,8 @@ export default function PesananPage() {
 
   // Get real order statistics and update function
   const stats = useOrderStatistics();
-  const updateOrderStatus = useUpdateOrderStatus();
+  const { updateOrderStatus } = useOrderStatusUpdate();
+  const toast = useAppToast();
 
   // Filter state and actions
   const filters = useOrderFilters();
@@ -63,8 +65,16 @@ export default function PesananPage() {
   };
 
   const handleCancelOrder = async (orderId: string) => {
-    // Update order status to cancelled
-    updateOrderStatus(orderId, OrderStatus.CANCELLED);
+    try {
+      // Update order status to cancelled with proper error handling
+      await updateOrderStatus(orderId, OrderStatus.CANCELLED);
+    } catch (error) {
+      // Log error for debugging
+      console.error('Failed to cancel order:', error);
+
+      // Show user-facing error message
+      toast.orderCancelError(orderId);
+    }
   };
 
   const handleViewOrder = (order: Order) => {
