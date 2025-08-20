@@ -96,24 +96,31 @@ export default function OrderEditForm({ isOpen, onClose, editOrder }: OrderEditF
     // Simulate loading for better UX
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
-    
-    if (existingItemIndex >= 0) {
-      // Update existing item
-      const updatedItems = [...cartItems];
-      updatedItems[existingItemIndex].quantity += quantity;
-      updatedItems[existingItemIndex].subtotal = updatedItems[existingItemIndex].quantity * product.price;
-      setCartItems(updatedItems);
-    } else {
-      // Add new item
-      const newItem: CartItem = {
-        productId,
-        quantity,
-        product,
-        subtotal: quantity * product.price
-      };
-      setCartItems([...cartItems, newItem]);
-    }
+    setCartItems(prev => {
+      const existingItemIndex = prev.findIndex(item => item.productId === productId);
+
+      if (existingItemIndex >= 0) {
+        // Update existing item - create new array with updated item
+        return prev.map((item, index) =>
+          index === existingItemIndex
+            ? {
+                ...item,
+                quantity: item.quantity + quantity,
+                subtotal: (item.quantity + quantity) * product.price
+              }
+            : item
+        );
+      } else {
+        // Add new item - return new array with appended item
+        const newItem: CartItem = {
+          productId,
+          quantity,
+          product,
+          subtotal: quantity * product.price
+        };
+        return [...prev, newItem];
+      }
+    });
 
     setAddingProductId(null);
   };
@@ -208,8 +215,8 @@ export default function OrderEditForm({ isOpen, onClose, editOrder }: OrderEditF
         updatedOrderData.productName = item.product?.name || '';
         updatedOrderData.quantity = item.quantity;
         updatedOrderData.unitPrice = item.product?.price || 0;
-        const { items: _items, ...orderDataWithoutItems } = updatedOrderData;
-        Object.assign(updatedOrderData, orderDataWithoutItems);
+        // Explicitly remove the items property to ensure clean single-product payload
+        delete updatedOrderData.items;
       }
 
       updateOrder(editOrder.id, updatedOrderData);
