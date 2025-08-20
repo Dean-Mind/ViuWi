@@ -85,18 +85,26 @@ export const useCustomerStore = create<CustomerState>()((set, get) => ({
   setIsLoading: (loading) => set({ isLoading: loading }),
 
   setFilterCheckbox: (group, value, checked) => {
-    set(state => ({
-      filters: {
-        ...state.filters,
-        [group]: checked
-          ? [...state.filters[group], value]
-          : state.filters[group].filter(item => item !== value)
+    set((state) => {
+      if (group === 'customerTypes') {
+        const current = state.filters.customerTypes;
+        const v = value as CustomerType;
+        const next = checked
+          ? Array.from(new Set([...current, v]))
+          : current.filter(item => item !== v);
+        return { filters: { ...state.filters, customerTypes: next } };
+      } else {
+        const current = state.filters.cityIds;
+        const v = value as string;
+        const next = checked
+          ? Array.from(new Set([...current, v]))
+          : current.filter(item => item !== v);
+        return { filters: { ...state.filters, cityIds: next } };
       }
-    }));
+    });
     // Reset to first page when filters change
     usePaginationStore.getState().setCustomerTablePage(1);
   },
-
   clearAllFilters: () => {
     set(() => ({
       filters: {
