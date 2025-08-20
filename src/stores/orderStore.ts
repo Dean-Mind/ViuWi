@@ -84,7 +84,6 @@ interface OrderState {
   addOrder: (orderData: OrderFormData) => void;
   updateOrder: (id: string, updates: Partial<Order>) => void;
   removeOrder: (id: string) => void;
-  updateOrderStatus: (id: string, status: OrderStatus) => void;
 
   // Order item management
   addOrderItem: (orderId: string, itemData: OrderItemFormData) => void;
@@ -317,16 +316,6 @@ export const useOrderStore = create<OrderState>()((set, get) => {
     set((state) => ({
       orders: state.orders.filter(order => order.id !== id),
       selectedOrders: state.selectedOrders.filter(orderId => orderId !== id)
-    }));
-  },
-  
-  updateOrderStatus: (id, status) => {
-    set((state) => ({
-      orders: state.orders.map(order =>
-        order.id === id
-          ? { ...order, status, updatedAt: new Date() }
-          : order
-      )
     }));
   },
 
@@ -613,7 +602,6 @@ export const useSetShowOrderFilterPopover = () => useOrderStore(state => state.s
 export const useAddOrder = () => useOrderStore(state => state.addOrder);
 export const useUpdateOrder = () => useOrderStore(state => state.updateOrder);
 export const useRemoveOrder = () => useOrderStore(state => state.removeOrder);
-export const useUpdateOrderStatus = () => useOrderStore(state => state.updateOrderStatus);
 
 // Order item management hooks
 export const useAddOrderItem = () => useOrderStore(state => state.addOrderItem);
