@@ -17,8 +17,7 @@ export default function OnboardingSuccessPage({
   const router = useRouter();
   const [countdown, setCountdown] = useState(3);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Auto-redirect logic
   useEffect(() => {
     if (!autoRedirect) return;
@@ -82,16 +81,25 @@ export default function OnboardingSuccessPage({
 
       <div className="space-y-4">
         {autoRedirect && countdown > 0 && !isRedirecting ? (
-          <p className="text-sm md:text-base font-semibold text-base-content">
+          <p
+            className="text-sm md:text-base font-semibold text-base-content"
+            aria-live="polite"
+          >
             Anda akan diarahkan ke dashboard dalam{' '}
             <span className="text-brand-orange font-bold">{countdown}</span> detik...
           </p>
         ) : isRedirecting ? (
-          <p className="text-sm md:text-base font-semibold text-base-content">
+          <p
+            className="text-sm md:text-base font-semibold text-base-content"
+            aria-live="polite"
+          >
             Mengarahkan ke dashboard...
           </p>
         ) : (
-          <p className="text-sm md:text-base font-semibold text-base-content">
+          <p
+            className="text-sm md:text-base font-semibold text-base-content"
+            aria-live="polite"
+          >
             Siap untuk melanjutkan ke dashboard
           </p>
         )}
