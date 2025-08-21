@@ -17,8 +17,7 @@ export default function OnboardingSuccessPage({
   const router = useRouter();
   const [countdown, setCountdown] = useState(3);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Auto-redirect logic
   useEffect(() => {
     if (!autoRedirect) return;
