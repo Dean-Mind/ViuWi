@@ -103,20 +103,12 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
   };
 
   // Step 0 handlers
+  // Step 0 handlers
   const handleBusinessProfileNext = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      // Business profile validation is handled in the component
-      // Just proceed to next step
-      toast.success('Business profile saved successfully');
-      handleNext();
-    } catch (_err) {
-      setError('Failed to save business profile');
-      toast.error('Failed to save business profile. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Business profile validation is handled in the component
+    // Just show success and proceed to next step
+    toast.success('Business profile saved successfully');
+    handleNext();
   };
 
   // Navigation handlers
