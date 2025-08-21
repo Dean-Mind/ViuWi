@@ -141,12 +141,21 @@ export default function BusinessInfoForm() {
             )}>
               {brandSettings.logoBlobUrl || brandSettings.logo ? (
                 <div className="relative w-full h-full">
-                  <Image
-                    src={brandSettings.logoBlobUrl || brandSettings.logo || ''}
-                    alt="Business Logo"
-                    fill
-                    className="object-cover rounded-xl"
-                  />
+                  {brandSettings.logoBlobUrl ? (
+                    <img
+                      src={brandSettings.logoBlobUrl}
+                      alt="Business Logo preview"
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  ) : (
+                    <Image
+                      src={brandSettings.logo || ''}
+                      alt="Business Logo"
+                      fill
+                      className="object-cover rounded-xl"
+                      unoptimized
+                    />
+                  )}
                   <button
                     onClick={handleLogoRemove}
                     className="absolute -top-2 -right-2 btn btn-circle btn-sm bg-error text-white hover:bg-error/80 shadow-lg"

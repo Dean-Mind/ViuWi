@@ -3,16 +3,11 @@
 import { useState, useMemo } from 'react';
 import { BusinessType, BusinessCategory, businessTypeOptions, businessCategoryOptions, indonesianProvinces } from '@/data/businessProfileMockData';
 import { useBusinessProfileStore } from '@/stores/businessProfileStore';
+import { OnboardingStep0Props } from '@/types/onboarding';
 import AuthButton from '../ui/AuthButton';
 import FormLabel from '../ui/FormLabel';
 import Alert from '../ui/Alert';
 import FileUploadArea from './FileUploadArea';
-
-interface OnboardingStep0Props {
-  onNext: () => void;
-  isLoading?: boolean;
-  error?: string;
-}
 
 export default function OnboardingStep0({ 
   onNext,

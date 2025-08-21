@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Upload, X, User, Mail, CheckCircle } from 'lucide-react';
 import { useAccountSettings, useSettingsActions } from '@/stores/settingsStore';
 import EnhancedFormField, { FormFieldRow } from '@/components/ui/EnhancedFormField';
@@ -12,6 +12,7 @@ export default function ProfileForm() {
   const accountSettings = useAccountSettings();
   const { updateAccountSettings } = useSettingsActions();
   const [_avatarFile, setAvatarFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!accountSettings) return null;
 
@@ -31,14 +32,19 @@ export default function ProfileForm() {
     if (file) {
       // Validate file size (2MB max)
       if (file.size > 2 * 1024 * 1024) {
-        alert('File size must be less than 2MB');
+        alert('Ukuran file harus kurang dari 2MB');
         return;
       }
 
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
+        alert('Silakan pilih file gambar');
         return;
+      }
+
+      // Revoke existing blob URL before creating new one
+      if (profile.avatar && profile.avatar.startsWith('blob:')) {
+        URL.revokeObjectURL(profile.avatar);
       }
 
       setAvatarFile(file);
@@ -50,6 +56,11 @@ export default function ProfileForm() {
           avatar: blobUrl
         }
       });
+
+      // Reset file input so same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -57,6 +68,10 @@ export default function ProfileForm() {
     setAvatarFile(null);
     if (profile.avatar && profile.avatar.startsWith('blob:')) {
       URL.revokeObjectURL(profile.avatar);
+    }
+    // Clear file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
     updateAccountSettings({
       profile: {
@@ -84,13 +99,22 @@ export default function ProfileForm() {
           <div className="relative">
             <div className="w-24 h-24 rounded-full border-2 border-base-300 overflow-hidden bg-base-200">
               {profile.avatar ? (
-                <Image
-                  src={profile.avatar}
-                  alt="Profile Picture"
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-cover"
-                />
+                profile.avatar.startsWith('blob:') ? (
+                  <img
+                    src={profile.avatar}
+                    alt="Profile Picture preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={profile.avatar}
+                    alt="Profile Picture"
+                    width={96}
+                    height={96}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                )
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <User className="w-8 h-8 text-base-content/40" />
@@ -111,6 +135,7 @@ export default function ProfileForm() {
           {/* Upload Controls */}
           <div className="flex-1">
             <input
+              ref={fileInputRef}
               type="file"
               accept="image/*"
               onChange={handleAvatarUpload}
@@ -158,14 +183,15 @@ export default function ProfileForm() {
         {/* Email with Verification Status */}
         <FormGroup>
           <div className="form-control w-full">
-        <label className="label">
+        <label className="label" htmlFor="email-input">
           <span className="label-text text-brand-label">
             Email Address <span className="text-error ml-1">*</span>
           </span>
         </label>
-        
+
         <div className="relative">
           <input
+            id="email-input"
             type="email"
             placeholder="Enter your email address"
             value={profile.email}

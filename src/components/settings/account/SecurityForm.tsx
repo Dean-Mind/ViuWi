@@ -7,6 +7,7 @@ import EnhancedFormField from '@/components/ui/EnhancedFormField';
 import FormGroup from '@/components/ui/FormGroup';
 import SettingsCard from '@/components/ui/SettingsCard';
 import { useAppToast } from '@/hooks/useAppToast';
+import { validatePasswordStrength } from '@/utils/validation';
 
 export default function SecurityForm() {
   const accountSettings = useAccountSettings();
@@ -29,19 +30,11 @@ export default function SecurityForm() {
       return;
     }
 
-    if (passwordForm.newPassword.length < 8) {
-      toast.error('Kata sandi harus minimal 8 karakter');
-      return;
-    }
-
-    // Check for password strength
-    const hasUpperCase = /[A-Z]/.test(passwordForm.newPassword);
-    const hasLowerCase = /[a-z]/.test(passwordForm.newPassword);
-    const hasNumbers = /\d/.test(passwordForm.newPassword);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(passwordForm.newPassword);
-
-    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
-      toast.error('Kata sandi harus mengandung huruf besar, huruf kecil, angka, dan karakter khusus');
+    // Use validation utility for password strength check
+    const validation = validatePasswordStrength(passwordForm.newPassword);
+    if (!validation.isValid) {
+      // Show all validation errors
+      validation.errors.forEach(error => toast.error(error));
       return;
     }
 

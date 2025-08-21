@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
 import { TYPOGRAPHY, FORM, cn } from './design-system';
 
 // Shared toggle size classes constant
@@ -31,12 +31,13 @@ export default function Toggle({
   className = '',
   size = 'md'
 }: ToggleProps) {
-  const fieldId = id || `toggle-${label
+  const reactId = useId();
+  const slug = (label ?? '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')}`;
-  
-
+    .replace(/^-|-$/g, '');
+  const fieldId = id ?? `toggle-${slug || reactId}`;
+  const descriptionId = description ? `${fieldId}-desc` : undefined;
 
   return (
     <div className={cn('form-control', className)}>
@@ -47,6 +48,7 @@ export default function Toggle({
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
           disabled={disabled}
+          aria-describedby={descriptionId}
           className={cn(
             'toggle toggle-primary',
             TOGGLE_SIZE_CLASSES[size],
@@ -62,11 +64,14 @@ export default function Toggle({
             {label}
           </span>
           {description && (
-            <p className={cn(
-              TYPOGRAPHY.helpText,
-              'mt-1',
-              disabled ? 'text-base-content/30' : ''
-            )}>
+            <p
+              id={descriptionId}
+              className={cn(
+                TYPOGRAPHY.helpText,
+                'mt-1',
+                disabled ? 'text-base-content/30' : ''
+              )}
+            >
               {description}
             </p>
           )}
@@ -118,6 +123,8 @@ interface SimpleToggleProps {
   disabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
 }
 
 export function SimpleToggle({
@@ -125,9 +132,14 @@ export function SimpleToggle({
   onChange,
   disabled = false,
   size = 'md',
-  className = ''
+  className = '',
+  ariaLabel,
+  ariaLabelledBy
 }: SimpleToggleProps) {
-
+  // Runtime validation for accessible names
+  if (!ariaLabel && !ariaLabelledBy) {
+    console.error('SimpleToggle: Either ariaLabel or ariaLabelledBy must be provided for accessibility');
+  }
 
   return (
     <input
@@ -135,6 +147,8 @@ export function SimpleToggle({
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
       disabled={disabled}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
       className={cn(
         'toggle toggle-primary',
         TOGGLE_SIZE_CLASSES[size],

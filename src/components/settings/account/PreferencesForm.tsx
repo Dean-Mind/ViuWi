@@ -146,8 +146,10 @@ export default function PreferencesForm() {
                     preferences.language === 'id' ? 'id-ID' : 'en-US',
                     {
                       year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit'
+                      month: preferences.dateFormat === 'MM/DD/YYYY' ? '2-digit' :
+                             preferences.dateFormat === 'DD/MM/YYYY' ? '2-digit' : 'numeric',
+                      day: '2-digit',
+                      timeZone: preferences.timezone || undefined
                     }
                   )}
                 </span>
@@ -160,7 +162,8 @@ export default function PreferencesForm() {
                     {
                       hour12: preferences.timeFormat === '12h',
                       hour: '2-digit',
-                      minute: '2-digit'
+                      minute: '2-digit',
+                      timeZone: preferences.timezone || undefined
                     }
                   )}
                 </span>

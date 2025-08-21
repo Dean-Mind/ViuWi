@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { TYPOGRAPHY, FORM, BORDERS, cn } from './design-system';
 
@@ -20,12 +20,12 @@ interface EnhancedFormFieldProps {
   className?: string;
 }
 
-export default function EnhancedFormField({ 
+export default function EnhancedFormField({
   type = 'text',
   label,
-  placeholder = '', 
-  value, 
-  onChange, 
+  placeholder = '',
+  value,
+  onChange,
   error,
   required = false,
   id,
@@ -36,8 +36,10 @@ export default function EnhancedFormField({
   className = ''
 }: EnhancedFormFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const reactId = useId();
   const inputType = type === 'password' && showPassword ? 'text' : type;
-  const fieldId = id || `field-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+  const slug = (label ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const fieldId = id ?? `field-${slug || reactId}`;
 
   // Base input classes with enhanced styling
   const baseInputClasses = cn(

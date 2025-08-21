@@ -121,15 +121,17 @@ export const COMPONENT_CLASSES = {
     COLORS.cardBg,
     BORDERS.radius.lg,
     SHADOWS.card,
+    BORDERS.width.thin,
     COLORS.border,
     'p-6'
   ),
-  
+
   cardHover: cn(
     COLORS.cardBg,
     BORDERS.radius.lg,
     SHADOWS.card,
     'hover:' + SHADOWS.cardHover,
+    BORDERS.width.thin,
     COLORS.border,
     'p-6',
     FORM.transition

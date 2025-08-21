@@ -11,11 +11,20 @@ interface SettingsNavigationProps {
 
 export default function SettingsNavigation({ activeTab, onTabChange }: SettingsNavigationProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div
+      className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      role="tablist"
+      aria-label="Pengaturan"
+    >
       {settingsNavItems.map((item) => (
         <button
+          type="button"
           key={item.id}
           onClick={() => onTabChange(item.id)}
+          role="tab"
+          aria-selected={activeTab === item.id}
+          id={`tab-${item.id}`}
+          aria-controls={`panel-${item.id}`}
           className={`
             p-6 rounded-2xl border-2 transition-all duration-200 text-left bg-base-100
             ${activeTab === item.id

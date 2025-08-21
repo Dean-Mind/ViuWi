@@ -13,18 +13,20 @@ interface FormFieldProps {
   required?: boolean;
   id?: string;
   helpText?: string;
+  ariaLabelledBy?: string;
 }
 
-export default function FormField({ 
-  type, 
+export default function FormField({
+  type,
   label,
-  placeholder, 
-  value, 
-  onChange, 
+  placeholder,
+  value,
+  onChange,
   error,
   required = false,
   id,
-  helpText
+  helpText,
+  ariaLabelledBy
 }: FormFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
   const inputType = type === 'password' && showPassword ? 'text' : type;
@@ -52,6 +54,7 @@ export default function FormField({
           required={required}
           className={inputClasses}
           aria-describedby={error ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined}
+          aria-labelledby={ariaLabelledBy}
         />
         
         {type === 'password' && (

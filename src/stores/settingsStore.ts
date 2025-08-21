@@ -10,7 +10,7 @@ import { BusinessProfile } from '@/data/businessProfileMockData';
 import { mockAccountSettings } from '@/data/settingsMockData';
 import { useBusinessProfileStore } from './businessProfileStore';
 // Add at the top of the file alongside your other imports
-import { isEqual } from 'lodash-es'; // or another deep equality utility
+import isEqual from 'lodash-es/isEqual'; // Direct import for better tree-shaking
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   // Initial state
@@ -55,8 +55,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   resetFormData: () => {
     const { originalBrandSettings, originalAccountSettings } = get();
     set({
-      brandSettings: originalBrandSettings ? { ...originalBrandSettings } : null,
-      accountSettings: originalAccountSettings ? { ...originalAccountSettings } : null,
+      brandSettings: originalBrandSettings ? structuredClone(originalBrandSettings) : null,
+      accountSettings: originalAccountSettings ? structuredClone(originalAccountSettings) : null,
       isFormDirty: false
     });
   },
@@ -75,7 +75,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (businessProfileState.businessProfile) {
         set({
           brandSettings: businessProfileState.businessProfile,
-          originalBrandSettings: { ...businessProfileState.businessProfile }, // Store original for comparison
+          originalBrandSettings: structuredClone(businessProfileState.businessProfile), // Store original for comparison
           isFormDirty: false // Reset dirty state when loading
         });
       } else {
@@ -86,7 +86,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         const updatedBusinessProfileState = useBusinessProfileStore.getState();
         set({
           brandSettings: updatedBusinessProfileState.businessProfile,
-          originalBrandSettings: updatedBusinessProfileState.businessProfile ? { ...updatedBusinessProfileState.businessProfile } : null,
+          originalBrandSettings: updatedBusinessProfileState.businessProfile ? structuredClone(updatedBusinessProfileState.businessProfile) : null,
           isFormDirty: false
         });
       }
@@ -138,7 +138,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       // Update original settings and reset dirty state after successful save
       set({
-        originalBrandSettings: { ...brandSettings },
+        originalBrandSettings: structuredClone(brandSettings),
         isFormDirty: false
       });
 
@@ -159,7 +159,10 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Load mock account settings
-      set({ accountSettings: mockAccountSettings });
+      set({
+        accountSettings: mockAccountSettings,
+        originalAccountSettings: structuredClone(mockAccountSettings)
+      });
     } catch (_error) {
       set({ error: 'Failed to load account settings' });
     } finally {
@@ -174,7 +177,10 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         ...currentSettings,
         ...updates
       };
-      set({ accountSettings: updatedSettings });
+      set({
+        accountSettings: updatedSettings,
+        isFormDirty: true
+      });
     }
   },
 
@@ -187,7 +193,12 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
+      // Update original settings and reset dirty state after successful save
+      set({
+        originalAccountSettings: structuredClone(accountSettings),
+        isFormDirty: false
+      });
 
     } catch (_error) {
       set({ error: 'Failed to save account settings' });
@@ -198,18 +209,26 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
   // Specific preference actions
   updatePreferences: (updates: Partial<UserPreferences>) => {
-    const { accountSettings } = get();
+    const { accountSettings, originalAccountSettings } = get();
     if (accountSettings) {
       const updatedPreferences = {
         ...accountSettings.preferences,
         ...updates
       };
-      
+
+      const updatedAccountSettings = {
+        ...accountSettings,
+        preferences: updatedPreferences
+      };
+
+      // Check if there are actual changes compared to original
+      const hasChanges = originalAccountSettings ?
+        !isEqual(updatedAccountSettings, originalAccountSettings) :
+        true;
+
       set({
-        accountSettings: {
-          ...accountSettings,
-          preferences: updatedPreferences
-        }
+        accountSettings: updatedAccountSettings,
+        isFormDirty: hasChanges
       });
     }
   },

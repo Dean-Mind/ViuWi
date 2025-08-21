@@ -71,7 +71,6 @@ export default function SocialMediaForm() {
       title="Media Sosial & Kehadiran Online"
       description="Tautan media sosial dan website bisnis Anda"
     >
-      <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {socialMediaFields.map((field) => {
           const IconComponent = field.icon;
@@ -79,11 +78,11 @@ export default function SocialMediaForm() {
             <div key={field.key} className="space-y-2">
               <div className="flex items-center gap-2 mb-2">
                 <IconComponent size={18} className="text-brand-orange" />
-                <label className="label-text text-brand-label font-medium">
+                <label id={`${field.key}-label`} className="label-text text-brand-label font-medium">
                   {field.label}
                 </label>
               </div>
-              
+
               <FormField
                 type="text"
                 label=""
@@ -91,6 +90,7 @@ export default function SocialMediaForm() {
                 value={brandSettings.socialMedia[field.key] || ''}
                 onChange={(value) => handleSocialMediaChange(field.key, value)}
                 helpText={field.description}
+                ariaLabelledBy={`${field.key}-label`}
               />
             </div>
           );
@@ -149,7 +149,6 @@ export default function SocialMediaForm() {
             </p>
           )}
         </div>
-      </div>
       </div>
     </SettingsCard>
   );
