@@ -33,7 +33,7 @@ ViuWi follows a clear user journey flow with dedicated routes for each stage of 
   - Form validation and error handling
 - **Navigation**:
   - After successful login → `/dashboard` (or `/onboarding` for first-time users)
-  - After successful registration → `/auth/verify-email`
+  - After successful registration → `/auth/verify-email?email={userEmail}` (email passed via URL)
 
 ### 🚀 Onboarding (`/onboarding`)
 - **Purpose**: 4-step guided setup for new users
@@ -93,7 +93,8 @@ Landing (/) → Auth (/auth) → Onboarding (/onboarding) → Dashboard (/dashbo
 1. User visits landing page
 2. Clicks "Get Started" or "Sign In"
 3. Completes authentication process
-4. Redirected to onboarding (first-time) or dashboard (returning)
+4. For registration: Email context passed via URL to verification page
+5. Redirected to onboarding (first-time) or dashboard (returning)
 
 ### State Management
 - **Auth Store**: Manages user authentication state

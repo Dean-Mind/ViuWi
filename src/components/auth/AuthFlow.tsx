@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { LoginData, RegisterData, ForgotPasswordData, ResetPasswordData } from '@/types/auth';
 import { mockAuthAPI } from '@/data/authMockData';
 import { useAuthActions } from '@/stores/authStore';
@@ -22,6 +22,8 @@ interface AuthFlowProps {
 
 export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlowProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const emailFromQuery = searchParams.get('email') || '';
   const { login } = useAuthActions();
   const [currentPage] = useState<AuthPage>(initialPage);
   const [userEmail, setUserEmail] = useState('');
@@ -62,8 +64,8 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
       const result = await mockAuthAPI.register(data);
       if (result.success) {
         setUserEmail(data.email);
-        // Navigate to email verification page
-        router.push('/auth/verify-email');
+        // Navigate to email verification page with email context
+        router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
       } else {
         setError(result.error || 'Registration failed');
       }
@@ -105,9 +107,10 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
 
   const handleResendVerification = async () => {
     setIsLoading(true);
-    
+
     try {
-      await mockAuthAPI.resendVerification(userEmail);
+      const emailToUse = emailFromQuery || userEmail;
+      await mockAuthAPI.resendVerification(emailToUse);
       console.log('Verification email resent');
     } catch (_err) {
       console.error('Failed to resend verification email');
@@ -160,7 +163,7 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
       case 'verify-email':
         return (
           <EmailVerificationPage
-            email={userEmail}
+            email={emailFromQuery || userEmail}
             onResendEmail={handleResendVerification}
             onBackToLogin={() => router.push('/auth/login')}
             isResending={isLoading}
