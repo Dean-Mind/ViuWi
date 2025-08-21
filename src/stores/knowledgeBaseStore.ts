@@ -59,19 +59,20 @@ interface KnowledgeBaseState {
 }
 
 // Deep merge utility that preserves nested defaults
-function deepMergeWithDefaults<T extends Record<string, any>>(
-  defaults: T,
-  override: Partial<T>
-): T {
+function deepMergeWithDefaults(
+  defaults: KnowledgeBaseData,
+  override: Partial<KnowledgeBaseData>
+): KnowledgeBaseData {
   const result = { ...defaults };
 
   for (const key in override) {
     if (override.hasOwnProperty(key)) {
-      const overrideValue = override[key] as any;
-      const defaultValue = defaults[key] as any;
+      const overrideValue = override[key as keyof KnowledgeBaseData];
+      const defaultValue = defaults[key as keyof KnowledgeBaseData];
 
       if (
         overrideValue !== null &&
+        overrideValue !== undefined &&
         typeof overrideValue === 'object' &&
         !Array.isArray(overrideValue) &&
         !(overrideValue instanceof Date) &&
@@ -81,10 +82,13 @@ function deepMergeWithDefaults<T extends Record<string, any>>(
         !(defaultValue instanceof Date)
       ) {
         // Recursively merge nested objects
-        (result as any)[key] = deepMergeWithDefaults(defaultValue, overrideValue);
+        (result as Record<string, unknown>)[key] = {
+          ...defaultValue,
+          ...overrideValue
+        };
       } else if (overrideValue !== undefined) {
         // Use override value if it's defined
-        (result as any)[key] = overrideValue;
+        (result as Record<string, unknown>)[key] = overrideValue;
       }
       // Keep default value if override is undefined
     }
