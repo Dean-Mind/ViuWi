@@ -8,9 +8,21 @@ interface FileUploadAreaProps {
   onFileSelect: (files: FileList) => void;
   supportedFormats: string[];
   isLoading?: boolean;
+  accept?: string;
+  maxFileSize?: string;
+  multiple?: boolean;
+  buttonText?: string;
 }
 
-export default function FileUploadArea({ onFileSelect, supportedFormats, isLoading }: FileUploadAreaProps) {
+export default function FileUploadArea({
+  onFileSelect,
+  supportedFormats,
+  isLoading,
+  accept,
+  maxFileSize,
+  multiple = false,
+  buttonText
+}: FileUploadAreaProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Convert display formats (["PDF", "DOC", "DOCX"]) to accept format (".pdf,.doc,.docx")
@@ -35,23 +47,24 @@ export default function FileUploadArea({ onFileSelect, supportedFormats, isLoadi
         
         <p className="text-brand-body text-base-content">
           Format yang didukung: {supportedFormats.join(', ')}
+          {maxFileSize && ` (Maks. ${maxFileSize})`}
         </p>
-        
-        <AuthButton 
+
+        <AuthButton
           onClick={handleClick}
           loading={isLoading}
           className="w-auto px-8"
         >
-          Unggah Dokumen
+          {buttonText || 'Unggah Dokumen'}
         </AuthButton>
-        
+
         <input
           ref={fileInputRef}
           type="file"
           onChange={handleFileSelect}
-          accept={formatToAccept(supportedFormats)}
+          accept={accept || formatToAccept(supportedFormats)}
           className="hidden"
-          multiple
+          multiple={multiple}
         />
       </div>
     </div>

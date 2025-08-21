@@ -9,6 +9,7 @@ import CSHandoverPage from '@/components/cshandover/CSHandoverPage';
 import ProductCatalogPage from '@/components/productCatalog/ProductCatalogPage';
 import CustomerManagementPage from '@/components/customerManagement/CustomerManagementPage';
 import PesananPage from '@/components/pesanan/PesananPage';
+import SettingsPage from '@/components/settings/SettingsPage';
 
 export default function Dashboard(props: DashboardProps) {
   const [activeNavItem, setActiveNavItem] = useState<NavigationItem>(props.activeNavItem);
@@ -92,8 +93,9 @@ export default function Dashboard(props: DashboardProps) {
               }}
               onProfileAction={(action) => {
                 console.log('Profile action:', action);
-                // In a real app, this would handle profile actions
-                if (action === 'logout') {
+                if (action === 'settings') {
+                  setActiveNavItem(NavigationItem.SETTINGS);
+                } else if (action === 'logout') {
                   // Handle logout
                 }
               }}
@@ -142,6 +144,8 @@ export default function Dashboard(props: DashboardProps) {
               <CustomerManagementPage />
             ) : activeNavItem === NavigationItem.PESANAN ? (
               <PesananPage />
+            ) : activeNavItem === NavigationItem.SETTINGS ? (
+              <SettingsPage />
             ) : (
               <div className="h-full">
                 <div className="bg-base-100 rounded-3xl shadow-sm h-full flex items-center justify-center">

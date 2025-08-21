@@ -4,17 +4,19 @@ import { useState } from 'react';
 import { OnboardingFlowProps, FeatureOption } from '@/types/onboarding';
 import { mockOnboardingData } from '@/data/onboardingMockData';
 import ProgressIndicator from './ProgressIndicator';
+import OnboardingStep0 from './OnboardingStep0';
 import OnboardingStep1 from './OnboardingStep1';
 import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
 import { useAppToast } from '@/hooks/useAppToast';
 
-export default function OnboardingFlow({ initialStep = 1, onComplete }: OnboardingFlowProps) {
+export default function OnboardingFlow({ initialStep = 0, onComplete }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(initialStep);
-  const [features, setFeatures] = useState<FeatureOption[]>(mockOnboardingData.features);
+  const [features, setFeatures] = useState<FeatureOption[]>(mockOnboardingData.features as FeatureOption[]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const toast = useAppToast();
+
 
   // Step 1 handlers
   const handleDocumentUpload = async (files: FileList) => {
@@ -69,9 +71,13 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
 
   // Step 2 handlers
   const handleFeatureToggle = (featureId: string, enabled: boolean) => {
-    setFeatures(prev => prev.map(feature => 
-      feature.id === featureId ? { ...feature, enabled } : feature
-    ));
+    setFeatures(prev => prev.map(feature => {
+      // Prevent toggling basic features and coming soon features
+      if (feature.isBasic || feature.isComingSoon) {
+        return feature;
+      }
+      return feature.id === featureId ? { ...feature, enabled } : feature;
+    }));
   };
 
   const handleFeatureExpand = (featureId: string) => {
@@ -96,6 +102,23 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
     }
   };
 
+  // Step 0 handlers
+  const handleBusinessProfileNext = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      // Business profile validation is handled in the component
+      // Just proceed to next step
+      toast.success('Business profile saved successfully');
+      handleNext();
+    } catch (_err) {
+      setError('Failed to save business profile');
+      toast.error('Failed to save business profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Navigation handlers
   const handleNext = () => {
     setCurrentStep(prev => Math.min(prev + 1, 3));
@@ -103,12 +126,20 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
   };
 
   const handleBack = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep(prev => Math.max(prev - 1, 0));
     setError('');
   };
 
   const renderCurrentStep = () => {
     switch (currentStep) {
+      case 0:
+        return (
+          <OnboardingStep0
+            onNext={handleBusinessProfileNext}
+            isLoading={isLoading}
+            error={error}
+          />
+        );
       case 1:
         return (
           <OnboardingStep1
@@ -147,7 +178,7 @@ export default function OnboardingFlow({ initialStep = 1, onComplete }: Onboardi
 
   return (
     <div className="space-y-8">
-      <ProgressIndicator currentStep={currentStep} totalSteps={3} />
+      <ProgressIndicator currentStep={currentStep} totalSteps={4} />
       {renderCurrentStep()}
     </div>
   );

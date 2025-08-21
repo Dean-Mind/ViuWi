@@ -1,5 +1,7 @@
 // Mock data for onboarding flow
 export const mockOnboardingData = {
+  // Step 0 - Business Profile Setup (handled by businessProfileMockData.ts)
+
   // Step 1 - Knowledge Base
   knowledgeBaseOptions: {
     documentUpload: {
@@ -20,6 +22,7 @@ export const mockOnboardingData = {
   
   // Step 2 - Feature Selection
   features: [
+    // Basic Features (Always Enabled)
     {
       id: "cs_handover",
       title: "CS Handover (Fallback ke Admin)",
@@ -30,21 +33,137 @@ export const mockOnboardingData = {
         "Sistem hybrid: bot dulu → CS jika perlu"
       ],
       enabled: true,
-      expanded: true
+      expanded: true,
+      isBasic: true,
+      category: "basic"
     },
+    {
+      id: "customer_management",
+      title: "Manajemen Pelanggan",
+      description: "Kelola data pelanggan, riwayat chat, dan informasi kontak secara terpusat.",
+      benefits: [
+        "Database pelanggan terintegrasi",
+        "Riwayat percakapan tersimpan",
+        "Segmentasi pelanggan otomatis",
+        "Analisis perilaku pelanggan"
+      ],
+      enabled: true,
+      expanded: false,
+      isBasic: true,
+      category: "basic"
+    },
+
+    // Optional Features (User Selectable)
     {
       id: "product_catalog",
       title: "Katalog Produk / Layanan",
       description: "Tampilkan produk atau layanan dengan foto dan deskripsi langsung di chat.",
+      benefits: [
+        "Showcase produk interaktif",
+        "Informasi lengkap dengan gambar",
+        "Update katalog real-time",
+        "Integrasi dengan inventory"
+      ],
       enabled: false,
-      expanded: false
+      expanded: false,
+      isBasic: false,
+      category: "optional"
+    },
+    {
+      id: "order_management",
+      title: "Kelola Pesanan",
+      description: "Kelola pesanan pelanggan, status pengiriman, dan riwayat transaksi secara terpusat.",
+      benefits: [
+        "Tracking pesanan real-time",
+        "Update status otomatis",
+        "Riwayat transaksi lengkap",
+        "Notifikasi pengiriman"
+      ],
+      enabled: false,
+      expanded: false,
+      isBasic: false,
+      category: "optional"
+    },
+    {
+      id: "payment_system",
+      title: "Sistem Pembayaran",
+      description: "Integrasi pembayaran digital untuk transaksi langsung di chat.",
+      benefits: [
+        "Pembayaran seamless di chat",
+        "Multiple payment gateway",
+        "Invoice otomatis",
+        "Tracking transaksi real-time"
+      ],
+      enabled: false,
+      expanded: false,
+      isBasic: false,
+      category: "optional"
+    },
+
+    // Future Development (Coming Soon)
+    {
+      id: "dynamic_forms",
+      title: "Formulir Dinamis",
+      description: "Buat formulir otomatis dan percakapan untuk survey, pendaftaran, dan lainnya.",
+      benefits: [
+        "Otomatisasi pengumpulan data",
+        "Survey kepuasan pelanggan",
+        "Formulir pendaftaran layanan",
+        "Kustomisasi pertanyaan sesuai kebutuhan"
+      ],
+      enabled: false,
+      expanded: false,
+      isBasic: false,
+      isComingSoon: true,
+      category: "future"
+    },
+    {
+      id: "feedback_rating",
+      title: "Feedback & Rating System",
+      description: "Kumpulkan penilaian user setelah layanan selesai. Penting untuk evaluasi.",
+      benefits: [
+        "Tingkatkan kualitas layanan",
+        "Dapatkan insight dari pelanggan",
+        "Rating otomatis setelah chat selesai",
+        "Laporan feedback terstruktur"
+      ],
+      enabled: false,
+      expanded: false,
+      isBasic: false,
+      isComingSoon: true,
+      category: "future"
     },
     {
       id: "booking_system",
-      title: "Booking Jadwal / Waiting List", 
+      title: "Booking Jadwal / Waiting List",
       description: "Izinkan user memilih slot layanan secara otomatis. Cocok untuk salon, klinik, konsultasi.",
+      benefits: [
+        "Penjadwalan otomatis",
+        "Manajemen antrian digital",
+        "Reminder appointment",
+        "Integrasi kalender"
+      ],
       enabled: false,
-      expanded: false
+      expanded: false,
+      isBasic: false,
+      isComingSoon: true,
+      category: "future"
+    },
+    {
+      id: "reports_analytics",
+      title: "Laporan & Analitik",
+      description: "Lihat data interaksi, pertanyaan populer, performa fitur, dan feedback.",
+      benefits: [
+        "Dashboard analitik lengkap",
+        "Insight perilaku pelanggan",
+        "Laporan performa chatbot",
+        "Trend dan pattern analysis"
+      ],
+      enabled: false,
+      expanded: false,
+      isBasic: false,
+      isComingSoon: true,
+      category: "future"
     },
     {
       id: "payment_integration",
