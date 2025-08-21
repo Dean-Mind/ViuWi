@@ -97,6 +97,7 @@ NEXT_TELEMETRY_DISABLED = "1"    # Disable telemetry
 #### Install Phase
 - Uses `--frozen-lockfile` for consistency
 - Uses `--prefer-offline` for speed
+- Uses explicit `--store-dir=/app/.pnpm-store` for cache consistency
 - Implements comprehensive caching strategy
 
 #### Build Phase

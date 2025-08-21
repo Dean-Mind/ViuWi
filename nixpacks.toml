@@ -66,13 +66,6 @@ cacheDirectories = [
   "node_modules/.cache/@swc"       # SWC compiler cache
 ]
 
-# Only include package files for optimal Docker layer caching
-onlyIncludeFiles = [
-  "package.json",
-  "pnpm-lock.yaml",
-  "pnpm-workspace.yaml"
-]
-
 # -----------------------------------------------------------------------------
 # BUILD PHASE: Build the Next.js application
 # -----------------------------------------------------------------------------
@@ -86,7 +79,7 @@ cmds = [
 cacheDirectories = [
   ".next/cache",                   # Next.js build cache
   "node_modules/.cache",           # Node.js cache
-  ".pnpm-store",                   # pnpm store
+  "/app/.pnpm-store",              # Consolidated pnpm package store (absolute path)
   "node_modules/.cache/webpack",   # Webpack cache
   "node_modules/.cache/@swc",      # SWC cache
   "node_modules/.cache/terser-webpack-plugin"  # Terser cache
