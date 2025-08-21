@@ -31,8 +31,8 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <main className="flex-1">
         <div className="flex min-h-[calc(100vh-4rem)]">
           {/* Form Content - 65% */}
-          <div className="w-full lg:w-[65%] flex flex-col justify-center px-6 py-6 sm:py-8 lg:py-12 lg:px-8 relative">
-            <div className="mx-auto w-full max-w-md sm:max-w-lg lg:max-w-4xl xl:max-w-5xl">
+          <div className="w-full lg:w-[65%] flex flex-col justify-center px-6 py-6 sm:py-8 lg:py-12 lg:px-12 xl:px-16 relative">
+            <div className="mx-auto w-full max-w-md sm:max-w-lg lg:max-w-2xl xl:max-w-3xl">
               {children}
             </div>
           </div>

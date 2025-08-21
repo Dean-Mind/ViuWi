@@ -9,6 +9,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import ChatPanel from './ChatPanel';
 import CSHandoverPage from '@/components/cshandover/CSHandoverPage';
+import KnowledgeBasePage from '@/components/knowledgeBase/KnowledgeBasePage';
 import ProductCatalogPage from '@/components/productCatalog/ProductCatalogPage';
 import CustomerManagementPage from '@/components/customerManagement/CustomerManagementPage';
 import PesananPage from '@/components/pesanan/PesananPage';
@@ -138,6 +139,8 @@ export default function Dashboard(props: DashboardProps) {
               <DashboardContent />
             ) : activeNavItem === NavigationItem.CS_HANDOVER ? (
               <CSHandoverPage />
+            ) : activeNavItem === NavigationItem.KNOWLEDGE_BASE ? (
+              <KnowledgeBasePage />
             ) : activeNavItem === NavigationItem.KATALOG_PRODUK ? (
               <ProductCatalogPage />
             ) : activeNavItem === NavigationItem.PELANGGAN ? (

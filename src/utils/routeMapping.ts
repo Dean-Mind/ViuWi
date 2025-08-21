@@ -4,6 +4,7 @@ import { NavigationItem } from '@/data/dashboardMockData';
 export const ROUTE_MAP: Record<NavigationItem, string> = {
   [NavigationItem.DASHBOARD]: '/dashboard',
   [NavigationItem.CS_HANDOVER]: '/cshandover',
+  [NavigationItem.KNOWLEDGE_BASE]: '/knowledgebase',
   [NavigationItem.KATALOG_PRODUK]: '/katalogproduk',
   [NavigationItem.PELANGGAN]: '/pelanggan',
   [NavigationItem.PESANAN]: '/pesanan',
@@ -19,6 +20,7 @@ export const ROUTE_MAP: Record<NavigationItem, string> = {
 export const PATH_TO_NAV_ITEM: Record<string, NavigationItem> = {
   '/dashboard': NavigationItem.DASHBOARD,
   '/cshandover': NavigationItem.CS_HANDOVER,
+  '/knowledgebase': NavigationItem.KNOWLEDGE_BASE,
   '/katalogproduk': NavigationItem.KATALOG_PRODUK,
   '/pelanggan': NavigationItem.PELANGGAN,
   '/pesanan': NavigationItem.PESANAN,

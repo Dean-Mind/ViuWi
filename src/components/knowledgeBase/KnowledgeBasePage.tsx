@@ -1,0 +1,143 @@
+'use client';
+
+import React, { useEffect } from 'react';
+import {
+  useKnowledgeBaseData,
+  useLoadKnowledgeBaseFromStorage,
+  useGenerateAIGuidelines
+} from '@/stores/knowledgeBaseStore';
+import DocumentsSection from './DocumentsSection';
+import TextContentSection from './TextContentSection';
+import URLContentSection from './URLContentSection';
+import AIGuidelinesSection from './AIGuidelinesSection';
+
+export default function KnowledgeBasePage() {
+  const knowledgeBaseData = useKnowledgeBaseData();
+  const loadFromStorage = useLoadKnowledgeBaseFromStorage();
+  const generateAIGuidelines = useGenerateAIGuidelines();
+
+  // Load data from storage on component mount
+  useEffect(() => {
+    loadFromStorage();
+  }, [loadFromStorage]);
+
+  // Calculate statistics
+  const stats = {
+    documentsCount: knowledgeBaseData.documents.files.length,
+    hasTextContent: knowledgeBaseData.textContent.content.length > 0,
+    hasUrlContent: knowledgeBaseData.urlContent.url.length > 0,
+    hasAIGuidelines: knowledgeBaseData.aiGuidelines.content.length > 0,
+  };
+
+  const handleGenerateGuidelines = async () => {
+    await generateAIGuidelines();
+  };
+
+  return (
+    <div className="h-full overflow-y-auto no-scrollbar">
+      <div className="bg-base-100 rounded-3xl shadow-sm min-h-full flex flex-col">
+        <div className="p-6 space-y-6 flex-1">
+          {/* Header */}
+          <div>
+            <h1 className="text-3xl font-bold text-brand-orange">Knowledge Base</h1>
+            <p className="text-base-content/70 mt-1">
+              Kelola basis pengetahuan dan AI guidelines untuk chatbot Anda
+            </p>
+          </div>
+
+          {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-base-200 rounded-2xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-base-content/70">Dokumen</p>
+                      <p className="text-2xl font-bold text-base-content">{stats.documentsCount}</p>
+                    </div>
+                    <div className="text-brand-orange">
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-base-200 rounded-2xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-base-content/70">Konten Teks</p>
+                      <p className="text-2xl font-bold text-base-content">
+                        {stats.hasTextContent ? '✓' : '✗'}
+                      </p>
+                    </div>
+                    <div className="text-brand-orange">
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-base-200 rounded-2xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-base-content/70">Website URL</p>
+                      <p className="text-2xl font-bold text-base-content">
+                        {stats.hasUrlContent ? '✓' : '✗'}
+                      </p>
+                    </div>
+                    <div className="text-brand-orange">
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-base-200 rounded-2xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-base-content/70">AI Guidelines</p>
+                      <p className="text-2xl font-bold text-base-content">
+                        {stats.hasAIGuidelines ? '✓' : '✗'}
+                      </p>
+                    </div>
+                    <div className="text-brand-orange">
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Generate AI Guidelines Button */}
+              {(stats.documentsCount > 0 || stats.hasTextContent || stats.hasUrlContent) && !stats.hasAIGuidelines && (
+                <div className="flex justify-center">
+                  <button
+                    onClick={handleGenerateGuidelines}
+                    className="btn bg-brand-orange hover:bg-brand-orange-light text-white rounded-2xl px-8"
+                  >
+                    🤖 Generate AI Guidelines
+                  </button>
+                </div>
+              )}
+
+              {/* Main Content Sections */}
+              <div className="space-y-6">
+                {/* Documents Section */}
+                <DocumentsSection />
+
+                {/* Text Content Section */}
+                <TextContentSection />
+
+                {/* URL Content Section */}
+                <URLContentSection />
+
+                {/* AI Guidelines Section */}
+                <AIGuidelinesSection />
+              </div>
+        </div>
+      </div>
+    </div>
+  );
+}

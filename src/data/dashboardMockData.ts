@@ -5,6 +5,7 @@ import { ReactNode } from 'react';
 export enum NavigationItem {
   DASHBOARD = 'dashboard',
   CS_HANDOVER = 'cshandover',
+  KNOWLEDGE_BASE = 'knowledge_base',
   KATALOG_PRODUK = 'katalog_produk',
   PELANGGAN = 'pelanggan',
   PESANAN = 'pesanan',

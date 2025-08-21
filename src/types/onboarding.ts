@@ -10,6 +10,7 @@ export interface OnboardingStep1Props {
   onTextSubmit: (text: string) => Promise<void>;
   onWebsiteLinkSubmit: (url: string) => Promise<void>;
   onNext: () => void;
+  onBack: () => void;
   isLoading?: boolean;
   error?: string;
 }

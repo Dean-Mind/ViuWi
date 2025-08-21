@@ -2,13 +2,14 @@ import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 
 // Feature keys that can be toggled
-export type FeatureKey = 'katalogProduk' | 'pesanan' | 'pembayaran';
+export type FeatureKey = 'katalogProduk' | 'pesanan' | 'pembayaran' | 'knowledgeBase';
 
 // Feature state interface
 interface FeatureState {
   katalogProduk: boolean;
   pesanan: boolean;
   pembayaran: boolean;
+  knowledgeBase: boolean;
 }
 
 // Store state interface
@@ -34,6 +35,7 @@ const defaultFeatures: FeatureState = {
   katalogProduk: true,
   pesanan: true,
   pembayaran: true,
+  knowledgeBase: true,
 };
 
 // Local storage key
@@ -94,6 +96,7 @@ export const useFeatureToggleStore = create<FeatureToggleState>()((set, get) => 
           katalogProduk: parsedFeatures.katalogProduk ?? defaultFeatures.katalogProduk,
           pesanan: parsedFeatures.pesanan ?? defaultFeatures.pesanan,
           pembayaran: parsedFeatures.pembayaran ?? defaultFeatures.pembayaran,
+          knowledgeBase: parsedFeatures.knowledgeBase ?? defaultFeatures.knowledgeBase,
         };
 
         set({ features: validatedFeatures });

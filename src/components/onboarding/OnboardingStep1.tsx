@@ -8,13 +8,14 @@ import AuthButton from '../ui/AuthButton';
 import FormLabel from '../ui/FormLabel';
 import Alert from '../ui/Alert';
 
-export default function OnboardingStep1({ 
-  onDocumentUpload, 
-  onTextSubmit, 
-  onWebsiteLinkSubmit, 
+export default function OnboardingStep1({
+  onDocumentUpload,
+  onTextSubmit,
+  onWebsiteLinkSubmit,
   onNext,
+  onBack,
   isLoading,
-  error 
+  error
 }: OnboardingStep1Props) {
   const [textInput, setTextInput] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -158,14 +159,24 @@ export default function OnboardingStep1({
         </Alert>
       )}
 
-      {/* Next Button */}
-      <AuthButton
-        onClick={handleNext}
-        disabled={!canProceed}
-        loading={isLoading}
-      >
-        Simpan
-      </AuthButton>
+      {/* Navigation Buttons */}
+      <div className="flex gap-4">
+        <AuthButton
+          variant="secondary"
+          onClick={onBack}
+          className="flex-1"
+        >
+          Kembali
+        </AuthButton>
+        <AuthButton
+          onClick={handleNext}
+          disabled={!canProceed}
+          loading={isLoading}
+          className="flex-1"
+        >
+          Simpan
+        </AuthButton>
+      </div>
     </div>
   );
 }

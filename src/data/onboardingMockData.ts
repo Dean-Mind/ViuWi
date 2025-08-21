@@ -52,6 +52,21 @@ export const mockOnboardingData = {
       isBasic: true,
       category: "basic"
     },
+    {
+      id: "knowledge_base_management",
+      title: "Manajemen Knowledge Base",
+      description: "Kelola basis pengetahuan untuk chatbot AI Anda dengan dokumen, teks, dan konten website.",
+      benefits: [
+        "Upload multiple dokumen (PDF, DOC, DOCX)",
+        "Input teks manual untuk informasi bisnis",
+        "Ekstrak konten dari website/FAQ",
+        "Generate dan edit AI Guidelines"
+      ],
+      enabled: true,
+      expanded: false,
+      isBasic: true,
+      category: "basic"
+    },
 
     // Optional Features (User Selectable)
     {

@@ -18,20 +18,18 @@ export default function OnboardingSuccessPage({
   const [countdown, setCountdown] = useState(3);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Auto-redirect logic
+  // Auto-redirect countdown logic
   useEffect(() => {
     if (!autoRedirect) return;
 
     timerRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          // Clear timer and redirect
+          // Clear timer
           if (timerRef.current) {
             clearInterval(timerRef.current);
             timerRef.current = null;
           }
-          setIsRedirecting(true);
-          router.push('/dashboard');
           return 0;
         }
         return prev - 1;
@@ -45,7 +43,15 @@ export default function OnboardingSuccessPage({
         timerRef.current = null;
       }
     };
-  }, [autoRedirect, router]);
+  }, [autoRedirect]);
+
+  // Handle redirect when countdown reaches 0
+  useEffect(() => {
+    if (countdown === 0 && autoRedirect && !isRedirecting) {
+      setIsRedirecting(true);
+      router.push('/dashboard');
+    }
+  }, [countdown, autoRedirect, isRedirecting, router]);
 
   // Manual continue handler
   const handleContinue = () => {
