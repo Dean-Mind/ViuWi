@@ -2,6 +2,9 @@
  * Validation utilities for form inputs with Indonesian error messages
  */
 
+// Shared regex patterns for consistent validation
+const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+
 export interface SanitizedInput {
   fullName: string;
   email: string;
@@ -77,7 +80,7 @@ export function validatePassword(password: string): { isValid: boolean; error?: 
   }
 
   // Check for special character
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  if (!SPECIAL_CHAR_REGEX.test(password)) {
     return { isValid: false, error: 'Kata sandi harus mengandung karakter khusus' };
   }
 
@@ -117,7 +120,7 @@ export function validatePasswordStrength(password: string): { isValid: boolean; 
   }
 
   // Check for special character
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+  if (!SPECIAL_CHAR_REGEX.test(password)) {
     errors.push('Kata sandi harus mengandung karakter khusus');
   }
 

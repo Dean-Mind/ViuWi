@@ -16,6 +16,41 @@ import {
 } from '@/data/settingsMockData';
 import { UserPreferences } from '@/types/settings';
 
+function formatDatePreview(
+  date: Date,
+  format: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD',
+  locale: string,
+  timeZone?: string
+): string {
+  const partsArr = new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone,
+  }).formatToParts(date);
+  const parts = Object.fromEntries(
+    partsArr
+      .filter(p => p.type !== 'literal')
+      .map(p => [p.type, p.value])
+  ) as Record<'year' | 'month' | 'day', string>;
+
+  switch (format) {
+    case 'MM/DD/YYYY':
+      return `${parts.month}/${parts.day}/${parts.year}`;
+    case 'DD/MM/YYYY':
+      return `${parts.day}/${parts.month}/${parts.year}`;
+    case 'YYYY-MM-DD':
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    default:
+      return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone,
+      }).format(date);
+  }
+}
+
 export default function PreferencesForm() {
   const accountSettings = useAccountSettings();
   const { updatePreferences } = useSettingsActions();
@@ -142,15 +177,11 @@ export default function PreferencesForm() {
               <div>
                 <span className="text-base-content/60">Tanggal Saat Ini:</span>
                 <span className="ml-2 text-base-content font-medium">
-                  {new Date().toLocaleDateString(
+                  {formatDatePreview(
+                    new Date(),
+                    preferences.dateFormat,
                     preferences.language === 'id' ? 'id-ID' : 'en-US',
-                    {
-                      year: 'numeric',
-                      month: preferences.dateFormat === 'MM/DD/YYYY' ? '2-digit' :
-                             preferences.dateFormat === 'DD/MM/YYYY' ? '2-digit' : 'numeric',
-                      day: '2-digit',
-                      timeZone: preferences.timezone || undefined
-                    }
+                    preferences.timezone || undefined
                   )}
                 </span>
               </div>
