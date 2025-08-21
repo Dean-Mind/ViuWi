@@ -133,13 +133,14 @@ Trends are calculated by comparing current values with previous period data:
 
 ```typescript
 function calculateTrend(current: number, previous: number) {
+  if (previous === 0) {
+    return current > 0
+      ? { value: 100, isPositive: true }
+      : { value: 0, isPositive: true };
+  }
   const change = ((current - previous) / previous) * 100;
-  return {
-    value: Math.abs(Math.round(change * 10) / 10),
-    isPositive: change >= 0
-  };
+  return { value: Math.abs(Math.round(change * 10) / 10), isPositive: change >= 0 };
 }
-```
 
 ## Navigation Integration
 
