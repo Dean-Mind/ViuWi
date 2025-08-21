@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 import { User } from '@/types/auth'
 
 interface AuthState {
@@ -76,23 +77,23 @@ export const useAuthStore = create<AuthState>()((set, _get) => ({
   },
 }))
 
-// Selectors for better performance
-export const useAuth = () => useAuthStore((state) => ({
+// Selectors for better performance with useShallow to prevent unnecessary re-renders
+export const useAuth = () => useAuthStore(useShallow((state) => ({
   user: state.user,
   isAuthenticated: state.isAuthenticated,
   isVerified: state.user?.isVerified ?? false,
-}))
+})))
 
-export const useAuthActions = () => useAuthStore((state) => ({
+export const useAuthActions = () => useAuthStore(useShallow((state) => ({
   login: state.login,
   logout: state.logout,
   setUser: state.setUser,
   setLoading: state.setLoading,
   setError: state.setError,
   clearError: state.clearError,
-}))
+})))
 
-export const useAuthStatus = () => useAuthStore((state) => ({
+export const useAuthStatus = () => useAuthStore(useShallow((state) => ({
   isLoading: state.isLoading,
   error: state.error,
-}))
+})))
