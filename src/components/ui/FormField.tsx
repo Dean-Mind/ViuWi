@@ -13,29 +13,33 @@ interface FormFieldProps {
   required?: boolean;
   id?: string;
   helpText?: string;
+  ariaLabelledBy?: string;
 }
 
-export default function FormField({ 
-  type, 
+export default function FormField({
+  type,
   label,
-  placeholder, 
-  value, 
-  onChange, 
+  placeholder,
+  value,
+  onChange,
   error,
   required = false,
   id,
-  helpText
+  helpText,
+  ariaLabelledBy
 }: FormFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
   const inputType = type === 'password' && showPassword ? 'text' : type;
   const fieldId = id || `field-${label.toLowerCase().replace(/\s+/g, '-')}`;
+  const labelId = `${fieldId}-label`;
+  const mergedAriaLabelledBy = ariaLabelledBy ? `${labelId} ${ariaLabelledBy}` : labelId;
 
   // DaisyUI form-control structure with semantic classes and Apple-style rounded corners
   const inputClasses = `input input-bordered w-full rounded-2xl ${error ? 'input-error' : ''}`;
 
   return (
     <div className="form-control w-full">
-      <label className="label" htmlFor={fieldId}>
+      <label className="label" htmlFor={fieldId} id={labelId}>
         <span className="label-text text-brand-label">
           {label}
           {required && <span className="text-error ml-1" aria-label="required">*</span>}
@@ -52,6 +56,7 @@ export default function FormField({
           required={required}
           className={inputClasses}
           aria-describedby={error ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined}
+          aria-labelledby={mergedAriaLabelledBy}
         />
         
         {type === 'password' && (

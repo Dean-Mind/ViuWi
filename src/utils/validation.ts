@@ -2,6 +2,9 @@
  * Validation utilities for form inputs with Indonesian error messages
  */
 
+// Shared regex patterns for consistent validation
+const SPECIAL_CHAR_REGEX = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+
 export interface SanitizedInput {
   fullName: string;
   email: string;
@@ -77,11 +80,51 @@ export function validatePassword(password: string): { isValid: boolean; error?: 
   }
 
   // Check for special character
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  if (!SPECIAL_CHAR_REGEX.test(password)) {
     return { isValid: false, error: 'Kata sandi harus mengandung karakter khusus' };
   }
 
   return { isValid: true };
+}
+
+/**
+ * Enhanced password strength validation for SecurityForm
+ * Returns detailed validation results with all errors
+ */
+export function validatePasswordStrength(password: string): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (!password) {
+    errors.push('Kata sandi diperlukan');
+    return { isValid: false, errors };
+  }
+
+  // Check minimum length (8 characters as per SecurityForm requirement)
+  if (password.length < 8) {
+    errors.push('Kata sandi harus minimal 8 karakter');
+  }
+
+  // Check for uppercase letter
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Kata sandi harus mengandung huruf besar');
+  }
+
+  // Check for lowercase letter
+  if (!/[a-z]/.test(password)) {
+    errors.push('Kata sandi harus mengandung huruf kecil');
+  }
+
+  // Check for digit
+  if (!/\d/.test(password)) {
+    errors.push('Kata sandi harus mengandung angka');
+  }
+
+  // Check for special character
+  if (!SPECIAL_CHAR_REGEX.test(password)) {
+    errors.push('Kata sandi harus mengandung karakter khusus');
+  }
+
+  return { isValid: errors.length === 0, errors };
 }
 
 /**

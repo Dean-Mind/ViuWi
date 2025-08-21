@@ -1,4 +1,10 @@
 // Props types for onboarding components
+export interface OnboardingStep0Props {
+  onNext: () => void;
+  isLoading?: boolean;
+  error?: string;
+}
+
 export interface OnboardingStep1Props {
   onDocumentUpload: (files: FileList) => void;
   onTextSubmit: (text: string) => Promise<void>;
@@ -31,9 +37,12 @@ export interface FeatureOption {
   benefits?: string[];
   enabled: boolean;
   expanded: boolean;
+  isBasic?: boolean;
+  isComingSoon?: boolean;
+  category?: 'basic' | 'optional' | 'future';
 }
 
 export interface OnboardingFlowProps {
-  initialStep?: number;
+  initialStep?: number; // 0-3, default 0
   onComplete: () => void;
 }

@@ -10,8 +10,9 @@ export default function ProgressIndicator({ currentStep, totalSteps }: ProgressI
     <div className="flex items-center justify-center mb-8">
       {Array.from({ length: totalSteps }, (_, index) => {
         const stepNumber = index + 1;
-        const isActive = stepNumber <= currentStep;
-        const isCompleted = stepNumber < currentStep;
+        const stepIndex = index; // 0-based index for comparison with currentStep
+        const isActive = stepIndex <= currentStep;
+        const isCompleted = stepIndex < currentStep;
         
         return (
           <div key={stepNumber} className="flex items-center">

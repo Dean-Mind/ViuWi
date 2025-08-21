@@ -1,13 +1,68 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import AuthButton from '../ui/AuthButton';
 import ThumbsUpStarIcon from '../icons/ThumbsUpStarIcon';
 
 interface OnboardingSuccessPageProps {
   onContinue?: () => void;
+  autoRedirect?: boolean;
 }
 
-export default function OnboardingSuccessPage({ onContinue }: OnboardingSuccessPageProps) {
+export default function OnboardingSuccessPage({
+  onContinue,
+  autoRedirect = true
+}: OnboardingSuccessPageProps) {
+  const router = useRouter();
+  const [countdown, setCountdown] = useState(3);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Auto-redirect logic
+  useEffect(() => {
+    if (!autoRedirect) return;
+
+    timerRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          // Clear timer and redirect
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+          }
+          setIsRedirecting(true);
+          router.push('/dashboard');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    // Cleanup function
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [autoRedirect, router]);
+
+  // Manual continue handler
+  const handleContinue = () => {
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    setIsRedirecting(true);
+
+    if (onContinue) {
+      onContinue();
+    } else {
+      router.push('/dashboard');
+    }
+  };
   return (
     <div className="text-center space-y-8">
       <div className="flex justify-center">
@@ -25,17 +80,39 @@ export default function OnboardingSuccessPage({ onContinue }: OnboardingSuccessP
       </div>
 
       <div className="space-y-4">
-        <p className="text-sm md:text-base font-semibold text-base-content">
-          Anda akan diarahkan ke dashboard dalam beberapa detik...
-        </p>
-        
-        {onContinue && (
-          <div className="pt-4">
-            <AuthButton onClick={onContinue}>
-              Lanjut ke Dashboard
-            </AuthButton>
-          </div>
+        {autoRedirect && countdown > 0 && !isRedirecting ? (
+          <p
+            className="text-sm md:text-base font-semibold text-base-content"
+            aria-live="polite"
+          >
+            Anda akan diarahkan ke dashboard dalam{' '}
+            <span className="text-brand-orange font-bold">{countdown}</span> detik...
+          </p>
+        ) : isRedirecting ? (
+          <p
+            className="text-sm md:text-base font-semibold text-base-content"
+            aria-live="polite"
+          >
+            Mengarahkan ke dashboard...
+          </p>
+        ) : (
+          <p
+            className="text-sm md:text-base font-semibold text-base-content"
+            aria-live="polite"
+          >
+            Siap untuk melanjutkan ke dashboard
+          </p>
         )}
+
+        <div className="pt-4">
+          <AuthButton
+            onClick={handleContinue}
+            loading={isRedirecting}
+            disabled={isRedirecting}
+          >
+            {isRedirecting ? 'Mengarahkan...' : 'Lanjut ke Dashboard'}
+          </AuthButton>
+        </div>
       </div>
     </div>
   );
