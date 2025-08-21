@@ -53,7 +53,7 @@ export const mockOnboardingData = {
       category: "basic"
     },
     {
-      id: "knowledge_base_management",
+      id: "knowledgeBase",
       title: "Manajemen Knowledge Base",
       description: "Kelola basis pengetahuan untuk chatbot AI Anda dengan dokumen, teks, dan konten website.",
       benefits: [

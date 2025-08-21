@@ -256,6 +256,13 @@ export const useKnowledgeBaseStore = create<KnowledgeBaseState>()((set, get) => 
   },
 
   updateAIGuidelines: (content: string) => {
+    const state = get();
+
+    // Check if the store is locked before updating
+    if (!state.data.aiGuidelines.isUnlocked) {
+      return;
+    }
+
     set(state => ({
       data: {
         ...state.data,
@@ -274,8 +281,13 @@ export const useKnowledgeBaseStore = create<KnowledgeBaseState>()((set, get) => 
   },
 
   resetData: () => {
-    set({ data: defaultData });
-    localStorage.removeItem(STORAGE_KEY);
+    // Use a fresh copy of defaultData to avoid shared references
+    set({ data: structuredClone(defaultData) });
+
+    // Guard against SSR where localStorage is not available
+    if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
+      localStorage.removeItem(STORAGE_KEY);
+    }
   },
 
   // Private method for saving to localStorage

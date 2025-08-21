@@ -6,13 +6,38 @@ import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
 import TextContentModal from './TextContentModal';
 
+// Centralized preview length constant
+const PREVIEW_MAX_LENGTH = 200;
+
 export default function TextContentSection() {
   const textContent = useTextContent();
   const [showModal, setShowModal] = useState(false);
 
-  const truncateText = (text: string, maxLength: number = 200) => {
+  // Null-safe truncateText function
+  const truncateText = (text: string | undefined, maxLength: number = PREVIEW_MAX_LENGTH): string => {
+    if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  };
+
+  // Defensive date formatting with fallback
+  const formatLastUpdated = (date: Date | null | undefined): string | null => {
+    if (!date) return null;
+
+    try {
+      // Handle both Date objects and date strings
+      const dateObj = date instanceof Date ? date : new Date(date);
+
+      // Check if date is valid
+      if (isNaN(dateObj.getTime())) return null;
+
+      return formatDistanceToNow(dateObj, {
+        addSuffix: true,
+        locale: id
+      });
+    } catch {
+      return null;
+    }
   };
 
   return (
@@ -36,12 +61,12 @@ export default function TextContentSection() {
               onClick={() => setShowModal(true)}
               className="btn bg-brand-orange hover:bg-brand-orange-light text-white rounded-2xl px-4"
             >
-              {textContent.content ? 'Edit' : 'Tambah'}
+              {textContent?.content ? 'Edit' : 'Tambah'}
             </button>
           </div>
 
           {/* Text Content Display */}
-          {textContent.content ? (
+          {textContent?.content ? (
             <div className="space-y-4">
               <div className="p-4 bg-base-200 rounded-2xl">
                 <div className="prose prose-sm max-w-none">
@@ -49,8 +74,8 @@ export default function TextContentSection() {
                     {truncateText(textContent.content)}
                   </p>
                 </div>
-                
-                {textContent.content.length > 200 && (
+
+                {(textContent.content?.length || 0) > PREVIEW_MAX_LENGTH && (
                   <button
                     onClick={() => setShowModal(true)}
                     className="text-brand-orange hover:text-brand-orange-light text-sm font-medium mt-2"
@@ -62,15 +87,13 @@ export default function TextContentSection() {
 
               {/* Content Stats */}
               <div className="flex items-center justify-between text-sm text-base-content/60">
-                <span>{textContent.content.length} karakter</span>
-                {textContent.lastUpdated && (
-                  <span>
-                    Last updated: {formatDistanceToNow(textContent.lastUpdated, { 
-                      addSuffix: true, 
-                      locale: id 
-                    })}
-                  </span>
-                )}
+                <span>{textContent.content?.length || 0} karakter</span>
+                {(() => {
+                  const formattedDate = formatLastUpdated(textContent?.lastUpdated);
+                  return formattedDate ? (
+                    <span>Last updated: {formattedDate}</span>
+                  ) : null;
+                })()}
               </div>
             </div>
           ) : (

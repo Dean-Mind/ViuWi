@@ -20,6 +20,16 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
   const supportedFormats = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
   const maxFileSize = 10 * 1024 * 1024; // 10MB
 
+  const allowedExtensions = new Set(['.pdf', '.doc', '.docx']);
+  const isSupportedFile = (file: File) => {
+    if (supportedFormats.includes(file.type)) return true;
+    const lower = file.name.toLowerCase();
+    for (const ext of allowedExtensions) {
+      if (lower.endsWith(ext)) return true;
+    }
+    return false;
+  };
+
   const handleFileSelect = (files: FileList | null) => {
     if (!files) return;
 
@@ -27,7 +37,7 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
     const errors: string[] = [];
 
     Array.from(files).forEach(file => {
-      if (!supportedFormats.includes(file.type)) {
+      if (!isSupportedFile(file)) {
         errors.push(`${file.name}: Format tidak didukung`);
         return;
       }
@@ -57,7 +67,7 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       const documentFiles: DocumentFile[] = files.map(file => ({
-        id: `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `doc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         name: file.name,
         size: file.size,
         type: file.type,

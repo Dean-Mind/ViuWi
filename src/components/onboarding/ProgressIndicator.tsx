@@ -14,8 +14,8 @@ export default function ProgressIndicator({ currentStep, totalSteps, onStepClick
         const stepIndex = index; // 0-based index for comparison with currentStep
         const isActive = stepIndex <= currentStep;
         const isCompleted = stepIndex < currentStep;
-        
-        const isClickable = isCompleted && onStepClick;
+
+        const isClickable = Boolean(onStepClick) && isCompleted;
 
         return (
           <div key={stepNumber} className="flex items-center">
@@ -32,7 +32,7 @@ export default function ProgressIndicator({ currentStep, totalSteps, onStepClick
                 }
                 transition-colors duration-200
               `}
-              onClick={isClickable ? () => onStepClick(stepIndex) : undefined}
+              onClick={isClickable ? () => onStepClick?.(stepIndex) : undefined}
             >
               {stepNumber}
             </div>

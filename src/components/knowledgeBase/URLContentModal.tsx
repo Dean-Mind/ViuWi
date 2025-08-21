@@ -29,9 +29,9 @@ export default function URLContentModal({ isOpen, onClose }: URLContentModalProp
 
   const isValidUrl = (string: string) => {
     try {
-      // Normalize the input string
-      const normalizedUrl = string.trim().toLowerCase();
-      const url = new URL(normalizedUrl);
+      // Only trim the input string to preserve case-sensitive paths
+      const trimmedUrl = string.trim();
+      const url = new URL(trimmedUrl);
 
       // Only allow http: and https: protocols
       return url.protocol === 'http:' || url.protocol === 'https:';
@@ -136,6 +136,8 @@ export default function URLContentModal({ isOpen, onClose }: URLContentModalProp
                 onChange={(e) => setUrl(e.target.value)}
                 className="input input-bordered flex-1 rounded-2xl"
                 placeholder="https://www.example.com/faq"
+                pattern="https?://.*"
+                aria-invalid={url.trim() ? !isValidUrl(url) : undefined}
                 disabled={isExtracting}
               />
               <button
