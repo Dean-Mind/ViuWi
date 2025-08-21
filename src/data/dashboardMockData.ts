@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 
 export enum NavigationItem {
   DASHBOARD = 'dashboard',
-  CS_HANDOVER = 'cs_handover',
+  CS_HANDOVER = 'cshandover',
   KATALOG_PRODUK = 'katalog_produk',
   PELANGGAN = 'pelanggan',
   PESANAN = 'pesanan',
@@ -77,7 +77,7 @@ export const mockRootProps = {
     avatar: "/images/user-avatar.png" as const
   },
   isLive: true as const,
-  language: "English" as const,
+  language: "en" as const,
   hasNotifications: true as const,
   isChatOpen: false as const,
   activeNavItem: NavigationItem.DASHBOARD as const

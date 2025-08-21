@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { NavigationItem, DashboardProps } from '@/data/dashboardMockData';
+import { getNavigationInfo } from '@/utils/routeMapping';
+import { useInitializeFeatures } from '@/stores/featureToggleStore';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ChatPanel from './ChatPanel';
@@ -9,13 +12,25 @@ import CSHandoverPage from '@/components/cshandover/CSHandoverPage';
 import ProductCatalogPage from '@/components/productCatalog/ProductCatalogPage';
 import CustomerManagementPage from '@/components/customerManagement/CustomerManagementPage';
 import PesananPage from '@/components/pesanan/PesananPage';
+import PembayaranPage from '@/components/pembayaran/PembayaranPage';
 import SettingsPage from '@/components/settings/SettingsPage';
+import BookingJadwalPage from '@/components/bookingJadwal/BookingJadwalPage';
+import FormulirPage from '@/components/formulir/FormulirPage';
+import LaporanAnalitikPage from '@/components/laporanAnalitik/LaporanAnalitikPage';
+import DashboardContent from './DashboardContent';
 
 export default function Dashboard(props: DashboardProps) {
+  const router = useRouter();
+  const initializeFeatures = useInitializeFeatures();
   const [activeNavItem, setActiveNavItem] = useState<NavigationItem>(props.activeNavItem);
   const [isChatOpen, setIsChatOpen] = useState(props.isChatOpen);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isLive, setIsLive] = useState(props.isLive);
+
+  // Initialize feature toggles on mount
+  useEffect(() => {
+    initializeFeatures();
+  }, [initializeFeatures]);
 
   // Load collapsed state from localStorage on mount
   useEffect(() => {
@@ -31,13 +46,19 @@ export default function Dashboard(props: DashboardProps) {
   }, [isCollapsed]);
 
   const handleNavItemClick = (item: NavigationItem) => {
-    if (item === NavigationItem.GET_HELP) {
-      // Open WhatsApp in new tab for Bantuan with security protection
-      const newWin = window.open('https://wa.me/prasetya', '_blank', 'noopener,noreferrer');
+    const navigationInfo = getNavigationInfo(item);
+
+    if (navigationInfo.isExternal && navigationInfo.externalUrl) {
+      // Open external link in new tab with security protection
+      const newWin = window.open(navigationInfo.externalUrl, '_blank', 'noopener,noreferrer');
       if (newWin) newWin.opener = null;
       return;
     }
-    setActiveNavItem(item);
+
+    if (navigationInfo.shouldNavigate && navigationInfo.route) {
+      // Navigate to the route using Next.js router
+      router.push(navigationInfo.route);
+    }
   };
 
   const handleChatToggle = () => {
@@ -114,28 +135,7 @@ export default function Dashboard(props: DashboardProps) {
           {/* Main Content */}
           <div className="flex-1 min-h-0">
             {activeNavItem === NavigationItem.DASHBOARD ? (
-              <div className="h-full">
-                <div className="bg-base-100 rounded-3xl shadow-sm h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold text-base-content mb-4">
-                      Welcome to ViuWi Dashboard
-                    </h2>
-                    <p className="text-base-content/70">
-                      Your central hub for managing all ViuWi operations
-                    </p>
-                    <div className="mt-6 grid grid-cols-2 gap-4 max-w-md mx-auto">
-                      <div className="bg-primary/10 p-4 rounded-lg">
-                        <div className="text-primary font-semibold">Quick Stats</div>
-                        <div className="text-sm text-base-content/70">Overview ready</div>
-                      </div>
-                      <div className="bg-secondary/10 p-4 rounded-lg">
-                        <div className="text-secondary font-semibold">Recent Activity</div>
-                        <div className="text-sm text-base-content/70">Updates available</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <DashboardContent />
             ) : activeNavItem === NavigationItem.CS_HANDOVER ? (
               <CSHandoverPage />
             ) : activeNavItem === NavigationItem.KATALOG_PRODUK ? (
@@ -144,6 +144,14 @@ export default function Dashboard(props: DashboardProps) {
               <CustomerManagementPage />
             ) : activeNavItem === NavigationItem.PESANAN ? (
               <PesananPage />
+            ) : activeNavItem === NavigationItem.PEMBAYARAN ? (
+              <PembayaranPage />
+            ) : activeNavItem === NavigationItem.BOOKING_JADWAL ? (
+              <BookingJadwalPage />
+            ) : activeNavItem === NavigationItem.FORMULIR ? (
+              <FormulirPage />
+            ) : activeNavItem === NavigationItem.LAPORAN_ANALITIK ? (
+              <LaporanAnalitikPage />
             ) : activeNavItem === NavigationItem.SETTINGS ? (
               <SettingsPage />
             ) : (
@@ -172,7 +180,10 @@ export default function Dashboard(props: DashboardProps) {
               onClose={() => setIsChatOpen(false)}
               onNavigateToCSHandover={() => {
                 setIsChatOpen(false);
-                setActiveNavItem(NavigationItem.CS_HANDOVER);
+                const navigationInfo = getNavigationInfo(NavigationItem.CS_HANDOVER);
+                if (navigationInfo.shouldNavigate && navigationInfo.route) {
+                  router.push(navigationInfo.route);
+                }
               }}
             />
           )}

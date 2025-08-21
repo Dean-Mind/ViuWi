@@ -10,6 +10,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/cs-handover/:path*',
+        destination: '/cshandover/:path*',
+        permanent: true,
+      },
+      {
+        source: '/katalog-produk/:path*',
+        destination: '/katalogproduk/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
