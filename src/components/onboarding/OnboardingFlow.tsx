@@ -9,13 +9,42 @@ import OnboardingStep1 from './OnboardingStep1';
 import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
 import { useAppToast } from '@/hooks/useAppToast';
+import {
+  useSetDocuments,
+  useSetTextContent,
+  useSetUrlContent,
+  useSetUrlExtractionStatus,
+  DocumentFile
+} from '@/stores/knowledgeBaseStore';
+
+/**
+ * Generate a robust unique ID for documents
+ * Uses crypto.randomUUID() when available, falls back to timestamp + random string + index
+ */
+const generateDocumentId = (index?: number): string => {
+  // Use crypto.randomUUID() if available (Node 14.17+/modern browsers)
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `doc_${crypto.randomUUID()}`;
+  }
+
+  // Fallback for older environments with index to ensure uniqueness
+  const indexSuffix = typeof index === 'number' ? `_${index}` : '';
+  return `doc_${Date.now()}_${Math.random().toString(36).slice(2, 11)}${indexSuffix}`;
+};
 
 export default function OnboardingFlow({ initialStep = 0, onComplete }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(initialStep);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set([0])); // Step 0 is completed by default
   const [features, setFeatures] = useState<FeatureOption[]>(mockOnboardingData.features as FeatureOption[]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const toast = useAppToast();
+
+  // Knowledge base store actions
+  const setDocuments = useSetDocuments();
+  const setTextContent = useSetTextContent();
+  const setUrlContent = useSetUrlContent();
+  const setUrlExtractionStatus = useSetUrlExtractionStatus();
 
 
   // Step 1 handlers
@@ -23,9 +52,20 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
     setIsLoading(true);
     setError('');
     try {
-      // Simulate upload
+      // Simulate upload and convert FileList to DocumentFile array
       await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Documents uploaded:', files);
+
+      const documentFiles: DocumentFile[] = Array.from(files).map((file, index) => ({
+        id: generateDocumentId(index),
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date(),
+      }));
+
+      // Save to knowledge base store
+      setDocuments(documentFiles);
+
       toast.success(`Successfully uploaded ${files.length} document${files.length > 1 ? 's' : ''}`);
     } catch (_err) {
       setError('Failed to upload documents');
@@ -41,7 +81,10 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
     try {
       // Simulate text processing
       await new Promise(resolve => setTimeout(resolve, 500));
-      console.log('Text submitted:', text);
+
+      // Save to knowledge base store
+      setTextContent(text);
+
       toast.success('Content processed successfully');
     } catch (err) {
       setError('Failed to process text');
@@ -56,12 +99,22 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
     setIsLoading(true);
     setError('');
     try {
+      // Set extraction status to extracting
+      setUrlExtractionStatus('extracting');
+
       // Simulate content extraction
       await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Website content extracted:', url);
+
+      // Simulate extracted content
+      const extractedContent = `Extracted content from ${url}. This would contain the actual website content in a real implementation.`;
+
+      // Save to knowledge base store
+      setUrlContent(url, extractedContent);
+
       toast.success('Website content extracted successfully');
     } catch (err) {
       setError('Failed to extract website content');
+      setUrlExtractionStatus('error');
       toast.error('Failed to extract website content. Please try again.');
       throw err; // Re-throw to allow child component to handle
     } finally {
@@ -113,13 +166,29 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
 
   // Navigation handlers
   const handleNext = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 3));
+    setCurrentStep(prev => {
+      const nextStep = Math.min(prev + 1, 3);
+      // Mark current step as completed when moving to next step
+      setCompletedSteps(completed => new Set(completed).add(prev));
+      return nextStep;
+    });
     setError('');
   };
 
   const handleBack = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
     setError('');
+  };
+
+  const handleStepNavigation = (targetStep: number) => {
+    // Allow navigation to completed steps or previous steps
+    if (targetStep < currentStep || completedSteps.has(targetStep)) {
+      setCurrentStep(targetStep);
+      setError('');
+    } else {
+      // Set error message for attempting to skip to uncompleted step
+      setError('Please complete the current step before proceeding to the next one.');
+    }
   };
 
   const renderCurrentStep = () => {
@@ -139,6 +208,7 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
             onTextSubmit={handleTextSubmit}
             onWebsiteLinkSubmit={handleWebsiteLinkSubmit}
             onNext={handleNext}
+            onBack={handleBack}
             isLoading={isLoading}
             error={error}
           />
@@ -170,7 +240,11 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
 
   return (
     <div className="space-y-8">
-      <ProgressIndicator currentStep={currentStep} totalSteps={4} />
+      <ProgressIndicator
+        currentStep={currentStep}
+        totalSteps={4}
+        onStepClick={handleStepNavigation}
+      />
       {renderCurrentStep()}
     </div>
   );

@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation';
 import { NavigationItem, DashboardProps } from '@/data/dashboardMockData';
 import { getNavigationInfo } from '@/utils/routeMapping';
 import { useInitializeFeatures } from '@/stores/featureToggleStore';
+import { useAuthActions } from '@/stores/authStore';
+import { getPostLogoutRoute } from '@/utils/userJourney';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ChatPanel from './ChatPanel';
 import CSHandoverPage from '@/components/cshandover/CSHandoverPage';
+import KnowledgeBasePage from '@/components/knowledgeBase/KnowledgeBasePage';
 import ProductCatalogPage from '@/components/productCatalog/ProductCatalogPage';
 import CustomerManagementPage from '@/components/customerManagement/CustomerManagementPage';
 import PesananPage from '@/components/pesanan/PesananPage';
@@ -21,6 +24,7 @@ import DashboardContent from './DashboardContent';
 
 export default function Dashboard(props: DashboardProps) {
   const router = useRouter();
+  const { logout } = useAuthActions();
   const initializeFeatures = useInitializeFeatures();
   const [activeNavItem, setActiveNavItem] = useState<NavigationItem>(props.activeNavItem);
   const [isChatOpen, setIsChatOpen] = useState(props.isChatOpen);
@@ -118,6 +122,8 @@ export default function Dashboard(props: DashboardProps) {
                   setActiveNavItem(NavigationItem.SETTINGS);
                 } else if (action === 'logout') {
                   // Handle logout
+                  logout();
+                  router.push(getPostLogoutRoute());
                 }
               }}
               onLiveToggle={(newLiveStatus) => {
@@ -138,6 +144,8 @@ export default function Dashboard(props: DashboardProps) {
               <DashboardContent />
             ) : activeNavItem === NavigationItem.CS_HANDOVER ? (
               <CSHandoverPage />
+            ) : activeNavItem === NavigationItem.KNOWLEDGE_BASE ? (
+              <KnowledgeBasePage />
             ) : activeNavItem === NavigationItem.KATALOG_PRODUK ? (
               <ProductCatalogPage />
             ) : activeNavItem === NavigationItem.PELANGGAN ? (

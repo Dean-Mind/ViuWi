@@ -3,9 +3,10 @@
 interface ProgressIndicatorProps {
   currentStep: number;
   totalSteps: number;
+  onStepClick?: (step: number) => void;
 }
 
-export default function ProgressIndicator({ currentStep, totalSteps }: ProgressIndicatorProps) {
+export default function ProgressIndicator({ currentStep, totalSteps, onStepClick }: ProgressIndicatorProps) {
   return (
     <div className="flex items-center justify-center mb-8">
       {Array.from({ length: totalSteps }, (_, index) => {
@@ -13,7 +14,9 @@ export default function ProgressIndicator({ currentStep, totalSteps }: ProgressI
         const stepIndex = index; // 0-based index for comparison with currentStep
         const isActive = stepIndex <= currentStep;
         const isCompleted = stepIndex < currentStep;
-        
+
+        const isClickable = Boolean(onStepClick) && isCompleted;
+
         return (
           <div key={stepNumber} className="flex items-center">
             <div
@@ -23,8 +26,13 @@ export default function ProgressIndicator({ currentStep, totalSteps }: ProgressI
                   ? 'bg-brand-orange text-white'
                   : 'bg-base-300 text-base-content'
                 }
+                ${isClickable
+                  ? 'cursor-pointer hover:bg-brand-orange-light hover:text-white'
+                  : ''
+                }
                 transition-colors duration-200
               `}
+              onClick={isClickable ? () => onStepClick?.(stepIndex) : undefined}
             >
               {stepNumber}
             </div>
