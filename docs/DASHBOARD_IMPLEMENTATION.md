@@ -149,10 +149,9 @@ function calculateTrend(current: number, previous: number) {
 Dashboard cards navigate to their respective feature pages:
 - Orders → `/pesanan`
 - Customers → `/pelanggan`
-- Products → `/katalog-produk`
+- Products → `/katalogproduk`
 - CS Activity → `/cshandover`
 - Payments → `/pembayaran`
-
 ### Quick Actions
 
 Quick actions provide shortcuts to common tasks:
