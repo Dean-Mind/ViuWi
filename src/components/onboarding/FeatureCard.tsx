@@ -42,6 +42,7 @@ export default function FeatureCard({ feature, onToggle, onExpand }: FeatureCard
           ) : (
             // Regular checkbox for optional features
             <button
+              type="button"
               onClick={() => onToggle(feature.id, !feature.enabled)}
               className={`
                 w-6 h-6 border-2 rounded-md flex items-center justify-center transition-colors duration-200
@@ -52,6 +53,7 @@ export default function FeatureCard({ feature, onToggle, onExpand }: FeatureCard
                 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-1
               `}
               aria-label={`${feature.enabled ? 'Disable' : 'Enable'} ${feature.title}`}
+              aria-pressed={feature.enabled}
             >
               {feature.enabled && (
                 <CheckmarkIcon width={16} height={16} className="text-brand-orange" />
