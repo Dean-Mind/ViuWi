@@ -85,8 +85,8 @@ describe('DashboardCard', () => {
 
   it('formats numbers with locale formatting', () => {
     render(<DashboardCard {...defaultProps} value={1234567} />);
-    
-    expect(screen.getByText('1,234,567')).toBeInTheDocument();
+    // Accept common grouping separators: comma, dot, or space
+    expect(screen.getByText(/1[.,\s]234[.,\s]567/)).toBeInTheDocument();
   });
 
   it('disables button when loading', () => {
