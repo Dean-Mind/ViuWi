@@ -24,7 +24,7 @@ export const mockOnboardingData = {
   features: [
     // Basic Features (Always Enabled)
     {
-      id: "cs_handover",
+      id: "cshandover",
       title: "CS Handover (Fallback ke Admin)",
       description: "Chatbot otomatis alihkan ke CS manusia jika tidak bisa menjawab.",
       benefits: [

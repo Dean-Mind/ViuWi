@@ -20,6 +20,7 @@
 
 /* CS Handover messaging theme updates */
 @plugin "daisyui/theme" {
+  /* biome-ignore lint/suspicious/noQuotesInJsxAttributes: DaisyUI theme name field */
   name: "cshandover";
   default: true;
   prefersdark: false;

@@ -80,8 +80,8 @@ export function useDashboardStats() {
     const previousData = getMockPreviousData();
     // Calculate CS activity metrics
     const totalConversations = conversations.length;
-    const activeConversations = conversations.filter(conv => 
-      conv.status === 'active' || !conv.status
+    const activeConversations = conversations.filter(conv =>
+      conv.status === 'active'
     ).length;
     const totalUnread = unreadConversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
     const botHandledCount = botConversations.length;

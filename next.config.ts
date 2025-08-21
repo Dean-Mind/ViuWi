@@ -13,13 +13,13 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: '/cs-handover',
-        destination: '/cshandover',
+        source: '/cs-handover/:path*',
+        destination: '/cshandover/:path*',
         permanent: true,
       },
       {
-        source: '/katalog-produk',
-        destination: '/katalogproduk',
+        source: '/katalog-produk/:path*',
+        destination: '/katalogproduk/:path*',
         permanent: true,
       },
     ];

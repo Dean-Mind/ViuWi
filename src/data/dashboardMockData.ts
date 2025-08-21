@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 
 export enum NavigationItem {
   DASHBOARD = 'dashboard',
-  CS_HANDOVER = 'cs_handover',
+  CS_HANDOVER = 'cshandover',
   KATALOG_PRODUK = 'katalog_produk',
   PELANGGAN = 'pelanggan',
   PESANAN = 'pesanan',

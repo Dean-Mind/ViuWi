@@ -8,6 +8,56 @@ import {
   mockPaymentSettings
 } from '@/data/paymentProviderMockData';
 
+// Storage key constant to avoid duplication
+const STORAGE_KEY = 'viuwi_payment_settings';
+
+/**
+ * Helper function to safely access localStorage with SSR guards
+ */
+function safeLocalStorageGet(key: string): string | null {
+  if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+    return null;
+  }
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    console.error('Failed to read from localStorage:', error);
+    return null;
+  }
+}
+
+/**
+ * Helper function to safely write to localStorage with SSR guards
+ */
+function safeLocalStorageSet(key: string, value: string): boolean {
+  if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+    return false;
+  }
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    console.error('Failed to write to localStorage:', error);
+    return false;
+  }
+}
+
+/**
+ * Helper function to safely remove from localStorage with SSR guards
+ */
+function safeLocalStorageRemove(key: string): boolean {
+  if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+    return false;
+  }
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch (error) {
+    console.error('Failed to remove from localStorage:', error);
+    return false;
+  }
+}
+
 /**
  * Helper function to rehydrate date fields from localStorage
  * Converts string dates back to Date objects while preserving existing Date objects
@@ -150,11 +200,7 @@ export const usePaymentStore = create<PaymentState>()((set, get) => ({
         providers
       };
 
-      try {
-        localStorage.setItem('viuwi_payment_settings', JSON.stringify(settings));
-      } catch (err) {
-        console.error('Failed to save payment settings', err);
-      }
+      safeLocalStorageSet(STORAGE_KEY, JSON.stringify(settings));
 
       set({
         providers,
@@ -197,7 +243,7 @@ export const usePaymentStore = create<PaymentState>()((set, get) => ({
         selectedProviderId: providerId,
         providers
       };
-      localStorage.setItem('viuwi_payment_settings', JSON.stringify(settings));
+      safeLocalStorageSet(STORAGE_KEY, JSON.stringify(settings));
 
       set({
         providers,
@@ -221,13 +267,7 @@ export const usePaymentStore = create<PaymentState>()((set, get) => ({
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Guard against SSR where localStorage is not available
-      if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
-        set({ isLoading: false, error: null });
-        return;
-      }
-
-      const saved = localStorage.getItem('viuwi_payment_settings');
+      const saved = safeLocalStorageGet(STORAGE_KEY);
       if (saved) {
         try {
           const settings: PaymentSettings = JSON.parse(saved);
@@ -260,7 +300,7 @@ export const usePaymentStore = create<PaymentState>()((set, get) => ({
           });
 
           // Remove corrupted data to prevent repeated failures
-          localStorage.removeItem('viuwi_payment_settings');
+          safeLocalStorageRemove(STORAGE_KEY);
         }
       }
     } catch (error) {
