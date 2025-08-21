@@ -2,6 +2,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Order, OrderStatus } from '@/data/orderMockData';
+import { useFeature } from '@/stores/featureToggleStore';
+import { PageFeatureSwitcher } from '@/components/ui/FeatureSwitcher';
+import FeatureDisabledState from '@/components/ui/FeatureDisabledState';
 import {
   useOrderStatistics,
   useOrderFilters,
@@ -25,6 +28,7 @@ import PlusIcon from '@/components/icons/PlusIcon';
 import { Filter } from 'lucide-react';
 
 export default function PesananPage() {
+  const isFeatureEnabled = useFeature('pesanan');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [showOrderDetail, setShowOrderDetail] = useState(false);
@@ -115,9 +119,18 @@ export default function PesananPage() {
                 Kelola semua pesanan pelanggan Anda
               </p>
             </div>
+
+            {/* Feature Switcher */}
+            <PageFeatureSwitcher
+              featureKey="pesanan"
+              featureName="Pesanan"
+            />
           </div>
 
-          {/* Stats Cards */}
+          {/* Feature Content */}
+          {isFeatureEnabled ? (
+            <>
+              {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Row 1: Total, Pending, Confirmed, Processing */}
             <div className="bg-base-200 rounded-2xl p-4">
@@ -301,15 +314,33 @@ export default function PesananPage() {
             </div>
           </div>
 
-          {/* Orders Table */}
-          <OrderTable
-            onEditOrder={handleEditOrder}
-            onCancelOrder={handleCancelOrder}
-            onViewOrder={handleViewOrder}
-          />
+              {/* Orders Table */}
+              <OrderTable
+                onEditOrder={handleEditOrder}
+                onCancelOrder={handleCancelOrder}
+                onViewOrder={handleViewOrder}
+              />
+            </>
+          ) : (
+            <FeatureDisabledState
+              featureKey="pesanan"
+              featureName="Pesanan"
+              description="Aktifkan fitur ini untuk mengelola pesanan pelanggan dan melacak status pesanan."
+              benefits={[
+                "Buat dan kelola pesanan pelanggan",
+                "Pantau status dan pemenuhan pesanan",
+                "Buat invoice dan kwitansi",
+                "Pantau analitik dan tren pesanan",
+                "Tangani pembatalan dan refund pesanan"
+              ]}
+            />
+          )}
         </div>
 
-        {/* Multi-Product Order Form */}
+        {/* Modals - Always render but only functional when feature is enabled */}
+        {isFeatureEnabled && (
+          <>
+            {/* Multi-Product Order Form */}
         <MultiProductOrderForm
           isOpen={showMultiProductForm}
           onClose={() => setShowMultiProductForm(false)}
@@ -323,12 +354,14 @@ export default function PesananPage() {
           onEdit={handleEditFromDetail}
         />
 
-        {/* Order Edit Form */}
-        <OrderEditForm
-          isOpen={showOrderForm}
-          onClose={handleCloseEditForm}
-          editOrder={selectedOrder}
-        />
+            {/* Order Edit Form */}
+            <OrderEditForm
+              isOpen={showOrderForm}
+              onClose={handleCloseEditForm}
+              editOrder={selectedOrder}
+            />
+          </>
+        )}
       </div>
     </div>
   );

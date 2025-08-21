@@ -4,7 +4,7 @@ import React from 'react';
 import Dashboard from '@/components/dashboard/Dashboard';
 import { useDashboardPage } from '@/hooks/useDashboardPage';
 
-export default function CustomerManagementPage() {
+export default function PembayaranPage() {
   const { mockRootProps } = useDashboardPage();
 
   return (

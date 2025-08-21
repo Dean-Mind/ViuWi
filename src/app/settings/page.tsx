@@ -4,10 +4,10 @@ import React from 'react';
 import Dashboard from '@/components/dashboard/Dashboard';
 import { useActiveNavItem } from '@/hooks/useActiveNavItem';
 
-export default function ProductCatalogPreviewPage() {
+export default function SettingsPage() {
   const activeNavItem = useActiveNavItem();
 
-  const mockRootPropsForProductCatalog = {
+  const mockRootPropsForSettings = {
     user: {
       name: "Opsfood",
       phone: "+62 812-3456-7890",
@@ -22,7 +22,7 @@ export default function ProductCatalogPreviewPage() {
 
   return (
     <div className="min-h-screen">
-      <Dashboard {...mockRootPropsForProductCatalog} />
+      <Dashboard {...mockRootPropsForSettings} />
     </div>
   );
 }

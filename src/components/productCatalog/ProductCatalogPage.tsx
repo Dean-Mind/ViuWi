@@ -2,6 +2,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Product, ProductStatus } from '@/data/productCatalogMockData';
+import { useFeature } from '@/stores/featureToggleStore';
+import { PageFeatureSwitcher } from '@/components/ui/FeatureSwitcher';
+import FeatureDisabledState from '@/components/ui/FeatureDisabledState';
 import {
   useShowUploadModal,
   useShowAddProductForm,
@@ -42,6 +45,7 @@ const generateProductId = (): string => {
 };
 
 export default function ProductCatalogPage() {
+  const isFeatureEnabled = useFeature('katalogProduk');
   const showUploadModal = useShowUploadModal();
   const showAddProductForm = useShowAddProductForm();
   const setShowUploadModal = useSetShowUploadModal();
@@ -145,9 +149,18 @@ export default function ProductCatalogPage() {
                 Kelola katalog produk dan inventori Anda
               </p>
             </div>
+
+            {/* Feature Switcher */}
+            <PageFeatureSwitcher
+              featureKey="katalogProduk"
+              featureName="Katalog Produk"
+            />
           </div>
 
-          {/* Stats Cards */}
+          {/* Feature Content */}
+          {isFeatureEnabled ? (
+            <>
+              {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-base-200 rounded-2xl p-4">
               <div className="flex items-center justify-between">
@@ -273,15 +286,32 @@ export default function ProductCatalogPage() {
             </div>
           </div>
 
-          {/* Product Table */}
-          <ProductTable
-            onEditProduct={handleEditProduct}
-            onDeleteProduct={handleDeleteProduct}
-            onViewProduct={handleViewProduct}
-          />
+              {/* Product Table */}
+              <ProductTable
+                onEditProduct={handleEditProduct}
+                onDeleteProduct={handleDeleteProduct}
+                onViewProduct={handleViewProduct}
+              />
+            </>
+          ) : (
+            <FeatureDisabledState
+              featureKey="katalogProduk"
+              featureName="Katalog Produk"
+              description="Aktifkan fitur ini untuk mengelola katalog produk dan inventori Anda."
+              benefits={[
+                "Kelola inventori dan stok produk",
+                "Atur produk berdasarkan kategori",
+                "Atur harga dan detail produk",
+                "Upload gambar dan deskripsi produk",
+                "Pantau performa dan analitik produk"
+              ]}
+            />
+          )}
         </div>
 
-        {/* Modals */}
+        {/* Modals - Always render but only functional when feature is enabled */}
+        {isFeatureEnabled && (
+          <>
         <FileUploadModal
           isOpen={showUploadModal}
           onClose={() => setShowUploadModal(false)}
@@ -294,12 +324,14 @@ export default function ProductCatalogPage() {
           editProduct={editProduct}
         />
 
-        <ProductDetailModal
-          isOpen={showDetailModal}
-          onClose={handleCloseDetailModal}
-          product={selectedProduct}
-          onEdit={handleEditFromDetail}
-        />
+            <ProductDetailModal
+              isOpen={showDetailModal}
+              onClose={handleCloseDetailModal}
+              product={selectedProduct}
+              onEdit={handleEditFromDetail}
+            />
+          </>
+        )}
       </div>
     </div>
   );
