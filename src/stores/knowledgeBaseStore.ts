@@ -58,6 +58,41 @@ interface KnowledgeBaseState {
   loadFromStorage: () => void;
 }
 
+// Deep merge utility that preserves nested defaults
+function deepMergeWithDefaults<T extends Record<string, any>>(
+  defaults: T,
+  override: Partial<T>
+): T {
+  const result = { ...defaults };
+
+  for (const key in override) {
+    if (override.hasOwnProperty(key)) {
+      const overrideValue = override[key] as any;
+      const defaultValue = defaults[key] as any;
+
+      if (
+        overrideValue !== null &&
+        typeof overrideValue === 'object' &&
+        !Array.isArray(overrideValue) &&
+        !(overrideValue instanceof Date) &&
+        defaultValue !== null &&
+        typeof defaultValue === 'object' &&
+        !Array.isArray(defaultValue) &&
+        !(defaultValue instanceof Date)
+      ) {
+        // Recursively merge nested objects
+        (result as any)[key] = deepMergeWithDefaults(defaultValue, overrideValue);
+      } else if (overrideValue !== undefined) {
+        // Use override value if it's defined
+        (result as any)[key] = overrideValue;
+      }
+      // Keep default value if override is undefined
+    }
+  }
+
+  return result;
+}
+
 // Default state
 const defaultData: KnowledgeBaseData = {
   documents: {
@@ -329,7 +364,7 @@ export const useKnowledgeBaseStore = create<KnowledgeBaseState>()((set, get) => 
             }));
           }
           
-          set({ data: { ...defaultData, ...parsedData } });
+          set({ data: deepMergeWithDefaults(defaultData, parsedData) });
         }
       }
     } catch (error) {

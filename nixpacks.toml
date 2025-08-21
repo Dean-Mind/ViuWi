@@ -15,6 +15,13 @@ CI = "true"
 # pnpm configuration for optimal caching
 NPM_CONFIG_PRODUCTION = "false"  # Ensure dev deps are installed for build
 PNPM_HOME = "/app/.pnpm"
+PNPM_STORE_DIR = "/app/.pnpm-store"  # Pinned store directory for consistent caching
+
+# Network resilience configuration for pnpm
+PNPM_FETCH_RETRIES = "5"  # Retry failed downloads 5 times
+PNPM_FETCH_RETRY_FACTOR = "2"  # Exponential backoff factor
+PNPM_FETCH_RETRY_MINTIMEOUT = "10000"  # Minimum retry timeout (10 seconds)
+PNPM_FETCH_RETRY_MAXTIMEOUT = "60000"  # Maximum retry timeout (60 seconds)
 
 # Next.js optimizations
 NEXT_TELEMETRY_DISABLED = "1"  # Disable telemetry for faster builds
@@ -37,9 +44,8 @@ nixPkgs = [
   "git"            # Git for potential dependency resolution
 ]
 
-# Cache pnpm global directories
+# Cache pnpm store directory
 cacheDirectories = [
-  "/app/.pnpm",
   "/app/.pnpm-store"
 ]
 
@@ -49,15 +55,13 @@ cacheDirectories = [
 [phases.install]
 # Use frozen lockfile for consistent builds and prefer offline for speed
 cmds = [
-  "pnpm install --frozen-lockfile --prefer-offline"
+  "pnpm install --frozen-lockfile --prefer-offline --store-dir=/app/.pnpm-store"
 ]
 
 # Comprehensive caching for faster subsequent builds
 cacheDirectories = [
   "node_modules/.cache",           # General Node.js cache
-  ".pnpm-store",                   # pnpm package store
-  "/app/.pnpm",                    # pnpm home directory
-  "~/.cache/pnpm",                 # Global pnpm cache
+  "/app/.pnpm-store",              # Consolidated pnpm package store (absolute path)
   "node_modules/.cache/webpack",   # Webpack cache
   "node_modules/.cache/@swc"       # SWC compiler cache
 ]

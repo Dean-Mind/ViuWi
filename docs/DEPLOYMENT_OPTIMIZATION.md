@@ -7,10 +7,10 @@ This document explains the nixpacks.toml configuration implemented to resolve de
 ## Problem Analysis
 
 ### Original Issues
-1. **Build Failures**: Nixpacks builds failing during dependency download
-2. **Network Timeouts**: Nix cache connectivity issues
-3. **Slow Builds**: Using default Node.js 18 with suboptimal caching
-4. **Resource Inefficiency**: No build optimization or caching strategy
+1. **Build failures**: Nixpacks builds fail during dependency downloads.
+2. **Network timeouts**: Connectivity issues with the Nix cache.
+3. **Slow builds**: Default Node.js 18 image with suboptimal caching.
+4. **Resource inefficiency**: No build optimization or caching strategy implemented.
 
 ### Root Causes
 - Default Nixpacks configuration not optimized for Next.js 15 + React 19
@@ -40,6 +40,8 @@ NEXT_TELEMETRY_DISABLED = "1"         # Faster builds
 | Build Time | 5-10 min | 2-4 min | 50-60% faster |
 | Cache Hit Rate | ~20% | ~80% | 4x improvement |
 | Success Rate | 60% | 99%+ | Reliable builds |
+
+*Performance metrics are indicative and will vary based on project size, codebase complexity, CI provider configuration, and network conditions. Results based on testing with a typical Next.js project using the baseline configuration described in this document.*
 
 ### Caching Strategy
 
@@ -77,6 +79,11 @@ NODE_ENV = "production"           # Production mode
 CI = "true"                       # CI environment
 NPM_CONFIG_PRODUCTION = "false"   # Install dev deps for build
 PNPM_HOME = "/app/.pnpm"         # pnpm configuration
+PNPM_STORE_DIR = "/app/.pnpm-store"  # Pinned store directory for consistent caching
+PNPM_FETCH_RETRIES = "5"         # Retry failed downloads 5 times
+PNPM_FETCH_RETRY_FACTOR = "2"    # Exponential backoff factor
+PNPM_FETCH_RETRY_MINTIMEOUT = "10000"  # Minimum retry timeout (10 seconds)
+PNPM_FETCH_RETRY_MAXTIMEOUT = "60000"  # Maximum retry timeout (60 seconds)
 NEXT_TELEMETRY_DISABLED = "1"    # Disable telemetry
 ```
 
