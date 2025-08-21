@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { LoginData, RegisterData, ForgotPasswordData, ResetPasswordData } from '@/types/auth';
 import { mockAuthAPI } from '@/data/authMockData';
-// import { useAuthActions, useAuthStatus } from '@/stores/authStore';
+import { useAuthActions } from '@/stores/authStore';
 import { AuthErrorBoundary } from '@/components/providers/ErrorBoundary';
 import AuthLayout from '../ui/AuthLayout';
 import LoginForm from './LoginForm';
@@ -20,7 +21,9 @@ interface AuthFlowProps {
 }
 
 export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlowProps) {
-  const [currentPage, setCurrentPage] = useState<AuthPage>(initialPage);
+  const router = useRouter();
+  const { login } = useAuthActions();
+  const [currentPage] = useState<AuthPage>(initialPage);
   const [userEmail, setUserEmail] = useState('');
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
   const [resetPasswordSuccess, setResetPasswordSuccess] = useState(false);
@@ -34,8 +37,13 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
     try {
       const result = await mockAuthAPI.login(data);
       if (result.success && result.user) {
-        console.log('Login successful:', result.user);
-        // Handle successful login (redirect, etc.)
+        // Update auth store
+        login(result.user, result.token);
+
+        // Navigate to dashboard (or onboarding for first-time users)
+        // For now, we'll go directly to dashboard
+        // TODO: Add logic to check if user needs onboarding
+        router.push('/dashboard');
       } else {
         setError(result.error || 'Login failed');
       }
@@ -54,7 +62,8 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
       const result = await mockAuthAPI.register(data);
       if (result.success) {
         setUserEmail(data.email);
-        setCurrentPage('verify-email');
+        // Navigate to email verification page
+        router.push('/auth/verify-email');
       } else {
         setError(result.error || 'Registration failed');
       }
@@ -129,19 +138,19 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
         return (
           <LoginForm
             onSubmit={handleLogin}
-            onForgotPassword={() => setCurrentPage('forgot-password')}
-            onSignUp={() => setCurrentPage('register')}
+            onForgotPassword={() => router.push('/auth/forgot-password')}
+            onSignUp={() => router.push('/auth/register')}
             onGoogleAuth={handleGoogleAuth}
             isLoading={isLoading}
             error={error}
           />
         );
-      
+
       case 'register':
         return (
           <RegisterForm
             onSubmit={handleRegister}
-            onSignIn={() => setCurrentPage('login')}
+            onSignIn={() => router.push('/auth/login')}
             onGoogleAuth={handleGoogleAuth}
             isLoading={isLoading}
             error={error}
@@ -153,17 +162,17 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
           <EmailVerificationPage
             email={userEmail}
             onResendEmail={handleResendVerification}
-            onBackToLogin={() => setCurrentPage('login')}
+            onBackToLogin={() => router.push('/auth/login')}
             isResending={isLoading}
           />
         );
-      
+
       case 'forgot-password':
         return (
           <ForgotPasswordForm
             onSubmit={handleForgotPassword}
             onBackToLogin={() => {
-              setCurrentPage('login');
+              router.push('/auth/login');
               setForgotPasswordSuccess(false);
             }}
             isLoading={isLoading}
@@ -178,7 +187,7 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
             token={resetToken || ''}
             onSubmit={handleResetPassword}
             onBackToLogin={() => {
-              setCurrentPage('login');
+              router.push('/auth/login');
               setResetPasswordSuccess(false);
             }}
             isLoading={isLoading}

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { NavigationItem, DashboardProps } from '@/data/dashboardMockData';
 import { getNavigationInfo } from '@/utils/routeMapping';
 import { useInitializeFeatures } from '@/stores/featureToggleStore';
+import { useAuthActions } from '@/stores/authStore';
+import { getPostLogoutRoute } from '@/utils/userJourney';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ChatPanel from './ChatPanel';
@@ -22,6 +24,7 @@ import DashboardContent from './DashboardContent';
 
 export default function Dashboard(props: DashboardProps) {
   const router = useRouter();
+  const { logout } = useAuthActions();
   const initializeFeatures = useInitializeFeatures();
   const [activeNavItem, setActiveNavItem] = useState<NavigationItem>(props.activeNavItem);
   const [isChatOpen, setIsChatOpen] = useState(props.isChatOpen);
@@ -119,6 +122,8 @@ export default function Dashboard(props: DashboardProps) {
                   setActiveNavItem(NavigationItem.SETTINGS);
                 } else if (action === 'logout') {
                   // Handle logout
+                  logout();
+                  router.push(getPostLogoutRoute());
                 }
               }}
               onLiveToggle={(newLiveStatus) => {

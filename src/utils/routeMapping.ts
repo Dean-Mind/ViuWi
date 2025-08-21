@@ -115,11 +115,35 @@ export function isValidRoute(pathname: string): boolean {
 }
 
 /**
- * Get the default route (dashboard)
- * @returns The default route path
+ * Get the default route for authenticated users (dashboard)
+ * @returns The default route path for authenticated users
  */
 export function getDefaultRoute(): string {
   return ROUTE_MAP[NavigationItem.DASHBOARD];
+}
+
+/**
+ * Get the landing page route
+ * @returns The landing page route path
+ */
+export function getLandingRoute(): string {
+  return '/';
+}
+
+/**
+ * Get the authentication route
+ * @returns The authentication route path
+ */
+export function getAuthRoute(): string {
+  return '/auth/login';
+}
+
+/**
+ * Get the onboarding route
+ * @returns The onboarding route path
+ */
+export function getOnboardingRoute(): string {
+  return '/onboarding';
 }
 
 /**
