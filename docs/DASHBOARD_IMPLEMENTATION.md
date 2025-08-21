@@ -8,7 +8,7 @@ The ViuWi Dashboard is a comprehensive business intelligence center that provide
 
 ### Component Structure
 
-```
+```text
 src/components/dashboard/
 ├── Dashboard.tsx              # Main dashboard container
 ├── DashboardContent.tsx       # Dashboard content with all sections
@@ -148,7 +148,7 @@ function calculateTrend(current: number, previous: number) {
 Dashboard cards navigate to their respective feature pages:
 - Orders → `/pesanan`
 - Customers → `/pelanggan`
-- Products → `/katalog-produk`
+- Products → `/katalogproduk`
 - CS Activity → `/cshandover`
 - Payments → `/pembayaran`
 

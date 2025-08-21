@@ -105,7 +105,10 @@ export const getProviderById = (id: string): PaymentProvider | undefined => {
 };
 
 export const getActiveProvider = (): PaymentProvider | undefined => {
-  return mockPaymentProviders.find(provider => provider.isActive && provider.status === PaymentProviderStatus.AVAILABLE);
+  return mockPaymentProviders.find(provider =>
+    provider.isActive &&
+    (provider.status === PaymentProviderStatus.AVAILABLE || provider.status === PaymentProviderStatus.CONFIGURED)
+  );
 };
 
 export const getAvailableProviders = (): PaymentProvider[] => {

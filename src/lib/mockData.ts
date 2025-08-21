@@ -61,7 +61,7 @@ export const DEFAULT_MOCK_USER = {
  */
 export const DEFAULT_MOCK_APP_STATE = {
   isLive: true,
-  language: "English",
+  language: "en",
   hasNotifications: true,
   isChatOpen: false
 } as const;

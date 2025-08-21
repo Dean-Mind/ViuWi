@@ -10,6 +10,7 @@ export const DASHBOARD_LABELS = {
   lastUpdated: "Terakhir diperbarui",
   refresh: "Perbarui",
   refreshing: "Memperbarui...",
+  autoRefresh: "Perbarui Otomatis",
 
   // Sections
   keyMetrics: "Metrik Utama",

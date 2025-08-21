@@ -14,7 +14,7 @@ export default function ProductCatalogPreviewPage() {
       avatar: "/images/user-avatar.png" as const
     },
     isLive: true as const,
-    language: "English" as const,
+    language: "en" as const,
     hasNotifications: true as const,
     isChatOpen: false as const,
     activeNavItem

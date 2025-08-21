@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDashboardStats, useDashboardActivity, useDashboardQuickActions, useDashboardLoading } from '@/hooks/useDashboardData';
 import DashboardCard, { DashboardIcons } from './DashboardCard';
@@ -19,6 +19,7 @@ export default function DashboardContent() {
   // Refresh state
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   // Manual refresh handler
   const handleRefresh = useCallback(async () => {
@@ -33,6 +34,17 @@ export default function DashboardContent() {
       setIsRefreshing(false);
     }
   }, [refreshPaymentData]);
+
+  // Auto-refresh effect
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      handleRefresh();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, handleRefresh]);
 
   // Navigation handlers
   const handleNavigateToOrders = () => router.push('/pesanan');
@@ -73,6 +85,19 @@ export default function DashboardContent() {
               <div className="text-xs text-base-content/60">
                 {DASHBOARD_LABELS.lastUpdated}: {formatTime(lastRefresh)}
               </div>
+
+              {/* Auto-refresh checkbox */}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                  className="checkbox checkbox-sm"
+                />
+                <span className="text-xs text-base-content/70">
+                  {DASHBOARD_LABELS.autoRefresh || 'Auto-refresh'}
+                </span>
+              </label>
 
               <button
                 onClick={handleRefresh}
@@ -137,14 +162,14 @@ export default function DashboardContent() {
                 onClick={handleNavigateToCustomers}
                 trend={{
                   value: dashboardStats.customers.activeTrend.value,
-                  label: "vs last week",
+                  label: DASHBOARD_LABELS.vsLastWeek,
                   isPositive: dashboardStats.customers.activeTrend.isPositive
                 }}
               />
 
               {/* Total Products */}
               <DashboardCard
-                title="Total Products"
+                title={DASHBOARD_LABELS.totalProducts}
                 value={dashboardStats.products.total}
                 icon={DashboardIcons.products}
                 iconColor="accent"
@@ -152,7 +177,7 @@ export default function DashboardContent() {
                 onClick={handleNavigateToProducts}
                 trend={{
                   value: dashboardStats.products.totalTrend.value,
-                  label: "vs last week",
+                  label: DASHBOARD_LABELS.vsLastWeek,
                   isPositive: dashboardStats.products.totalTrend.isPositive
                 }}
               />
@@ -165,7 +190,7 @@ export default function DashboardContent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Pending Orders */}
               <DashboardCard
-                title="Pending"
+                title={DASHBOARD_LABELS.pending}
                 value={dashboardStats.orders.pending}
                 icon={DashboardIcons.pending}
                 iconColor="warning"
@@ -173,14 +198,14 @@ export default function DashboardContent() {
                 onClick={handleNavigateToOrders}
                 trend={{
                   value: dashboardStats.orders.pendingTrend.value,
-                  label: "vs last week",
+                  label: DASHBOARD_LABELS.vsLastWeek,
                   isPositive: dashboardStats.orders.pendingTrend.isPositive
                 }}
               />
 
               {/* Confirmed Orders */}
               <DashboardCard
-                title="Confirmed"
+                title={DASHBOARD_LABELS.confirmed}
                 value={dashboardStats.orders.confirmed}
                 icon={DashboardIcons.confirmed}
                 iconColor="info"
@@ -190,7 +215,7 @@ export default function DashboardContent() {
 
               {/* Shipped Orders */}
               <DashboardCard
-                title="Shipped"
+                title={DASHBOARD_LABELS.shipped}
                 value={dashboardStats.orders.shipped}
                 icon={DashboardIcons.shipped}
                 iconColor="accent"
@@ -200,7 +225,7 @@ export default function DashboardContent() {
 
               {/* Delivered Orders */}
               <DashboardCard
-                title="Delivered"
+                title={DASHBOARD_LABELS.delivered}
                 value={dashboardStats.orders.delivered}
                 icon={DashboardIcons.delivered}
                 iconColor="success"
@@ -216,7 +241,7 @@ export default function DashboardContent() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* New Customers */}
               <DashboardCard
-                title="New Customers"
+                title={DASHBOARD_LABELS.newCustomers}
                 value={dashboardStats.customers.new}
                 icon={DashboardIcons.newCustomers}
                 iconColor="info"
@@ -224,14 +249,14 @@ export default function DashboardContent() {
                 onClick={handleNavigateToCustomers}
                 trend={{
                   value: dashboardStats.customers.newTrend.value,
-                  label: "vs last week",
+                  label: DASHBOARD_LABELS.vsLastWeek,
                   isPositive: dashboardStats.customers.newTrend.isPositive
                 }}
               />
 
               {/* Resellers */}
               <DashboardCard
-                title="Resellers"
+                title={DASHBOARD_LABELS.resellers}
                 value={dashboardStats.customers.resellers}
                 icon={DashboardIcons.resellers}
                 iconColor="warning"
@@ -241,7 +266,7 @@ export default function DashboardContent() {
 
               {/* Out of Stock */}
               <DashboardCard
-                title="Out of Stock"
+                title={DASHBOARD_LABELS.outOfStock}
                 value={dashboardStats.products.outOfStock}
                 icon={DashboardIcons.outOfStock}
                 iconColor="error"
@@ -251,7 +276,7 @@ export default function DashboardContent() {
 
               {/* Active Conversations */}
               <DashboardCard
-                title="Active Chats"
+                title={DASHBOARD_LABELS.activeChats}
                 value={dashboardStats.conversations.active}
                 icon={DashboardIcons.conversations}
                 iconColor="primary"
@@ -269,7 +294,7 @@ export default function DashboardContent() {
               <div className="bg-base-200 rounded-2xl p-4">
                 <h4 className="font-medium text-base-content mb-3 flex items-center gap-2">
                   {DashboardIcons.orders}
-                  Recent Orders
+                  {DASHBOARD_LABELS.recentOrders}
                 </h4>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {dashboardActivity.recentOrders.slice(0, 5).map((order) => (
@@ -302,7 +327,7 @@ export default function DashboardContent() {
               <div className="bg-base-200 rounded-2xl p-4">
                 <h4 className="font-medium text-base-content mb-3 flex items-center gap-2">
                   {DashboardIcons.customers}
-                  Recent Customers
+                  {DASHBOARD_LABELS.recentCustomers}
                 </h4>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {dashboardActivity.recentCustomers.slice(0, 5).map((customer) => (
@@ -383,26 +408,26 @@ export default function DashboardContent() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Payment Status */}
               <DashboardCard
-                title="Payment Health"
+                title={DASHBOARD_LABELS.paymentHealth}
                 value={`${dashboardStats.system.paymentHealth}%`}
                 icon={DashboardIcons.system}
                 iconColor={dashboardStats.system.isPaymentConfigured ? "success" : "warning"}
                 valueColor={dashboardStats.system.isPaymentConfigured ? "success" : "warning"}
                 onClick={handleNavigateToPayments}
               />
-              
+
               {/* Feature Status */}
               <DashboardCard
-                title="Features Active"
+                title={DASHBOARD_LABELS.featuresActive}
                 value="8/9"
                 icon={DashboardIcons.system}
                 iconColor="info"
                 valueColor="info"
               />
-              
+
               {/* Overall Health */}
               <DashboardCard
-                title="System Health"
+                title={DASHBOARD_LABELS.systemHealth}
                 value="Healthy"
                 icon={DashboardIcons.system}
                 iconColor="success"

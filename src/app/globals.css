@@ -20,7 +20,7 @@
 
 /* CS Handover messaging theme updates */
 @plugin "daisyui/theme" {
-  name: "cs-handover";
+  name: "cshandover";
   default: true;
   prefersdark: false;
   color-scheme: light;

@@ -113,7 +113,7 @@ export default function Header({
               <li>
                 <button
                   onClick={() => {
-                    onLanguageChange?.('English');
+                    onLanguageChange?.('en');
                     toast.info('Language changed to English');
                     closeAllDropdowns();
                   }}
@@ -126,7 +126,7 @@ export default function Header({
               <li>
                 <button
                   onClick={() => {
-                    onLanguageChange?.('Bahasa Indonesia');
+                    onLanguageChange?.('id');
                     toast.info('Language changed to Bahasa Indonesia');
                     closeAllDropdowns();
                   }}

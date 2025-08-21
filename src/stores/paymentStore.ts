@@ -8,6 +8,22 @@ import {
   mockPaymentSettings
 } from '@/data/paymentProviderMockData';
 
+/**
+ * Helper function to rehydrate date fields from localStorage
+ * Converts string dates back to Date objects while preserving existing Date objects
+ */
+function rehydrateDates(providers: PaymentProvider[]): PaymentProvider[] {
+  return providers.map(provider => ({
+    ...provider,
+    createdAt: provider.createdAt instanceof Date
+      ? provider.createdAt
+      : new Date(provider.createdAt || Date.now()),
+    updatedAt: provider.updatedAt instanceof Date
+      ? provider.updatedAt
+      : new Date(provider.updatedAt || Date.now())
+  }));
+}
+
 interface PaymentState {
   // State
   providers: PaymentProvider[];
@@ -133,10 +149,16 @@ export const usePaymentStore = create<PaymentState>()((set, get) => ({
         selectedProviderId: providerId,
         providers
       };
-      localStorage.setItem('viuwi_payment_settings', JSON.stringify(settings));
+
+      try {
+        localStorage.setItem('viuwi_payment_settings', JSON.stringify(settings));
+      } catch (err) {
+        console.error('Failed to save payment settings', err);
+      }
 
       set({
         providers,
+        selectedProviderId: providerId,
         apiKeyInput: trimmedKey,
         isFormDirty: false
       });
@@ -199,6 +221,12 @@ export const usePaymentStore = create<PaymentState>()((set, get) => ({
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
 
+      // Guard against SSR where localStorage is not available
+      if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+        set({ isLoading: false, error: null });
+        return;
+      }
+
       const saved = localStorage.getItem('viuwi_payment_settings');
       if (saved) {
         try {
@@ -209,10 +237,14 @@ export const usePaymentStore = create<PaymentState>()((set, get) => ({
             throw new Error('Invalid settings format');
           }
 
-          const selectedProvider = settings.providers?.find(p => p.id === settings.selectedProviderId);
+          // Rehydrate date fields and find selected provider
+          const rehydratedProviders = Array.isArray(settings.providers)
+            ? rehydrateDates(settings.providers)
+            : mockPaymentProviders;
+          const selectedProvider = rehydratedProviders.find(p => p.id === settings.selectedProviderId);
 
           set({
-            providers: Array.isArray(settings.providers) ? settings.providers : mockPaymentProviders,
+            providers: rehydratedProviders,
             selectedProviderId: settings.selectedProviderId || null,
             apiKeyInput: selectedProvider?.apiKey || ''
           });

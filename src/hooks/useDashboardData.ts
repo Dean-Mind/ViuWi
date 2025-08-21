@@ -23,6 +23,7 @@ import {
   usePaymentProviders,
   useSelectedProvider
 } from '@/stores/paymentStore';
+import { PaymentProviderStatus } from '@/data/paymentProviderMockData';
 import { formatOrderPrice } from '@/data/orderMockData';
 import { sortByPriority } from '@/types/priority';
 
@@ -87,8 +88,8 @@ export function useDashboardStats() {
     const csHandledCount = csConversations.length;
 
     // Calculate system health metrics
-    const configuredProviders = paymentProviders.filter(provider => 
-      provider.apiKey && provider.status === 'configured'
+    const configuredProviders = paymentProviders.filter(provider =>
+      provider.apiKey && provider.status === PaymentProviderStatus.CONFIGURED
     ).length;
     const totalProviders = paymentProviders.length;
     const paymentHealthPercentage = totalProviders > 0 ? 

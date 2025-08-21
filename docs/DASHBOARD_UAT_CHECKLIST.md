@@ -74,7 +74,7 @@ This document provides a comprehensive checklist for user acceptance testing of 
 - [ ] Clicking Total Orders navigates to /pesanan
 - [ ] Clicking Total Revenue navigates to /pesanan
 - [ ] Clicking Active Customers navigates to /pelanggan
-- [ ] Clicking Total Products navigates to /katalog-produk
+- [ ] Clicking Total Products navigates to /katalogproduk
 - [ ] Clicking Active Chats navigates to /cshandover
 - [ ] Clicking Payment Health navigates to /pembayaran
 

@@ -79,10 +79,16 @@ export const useFeatureToggleStore = create<FeatureToggleState>()((set, get) => 
       // Simulate async operation (in case we want to load from API later)
       await new Promise(resolve => setTimeout(resolve, 100));
 
+      // Guard against SSR where localStorage is not available
+      if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+        set({ isLoading: false, error: null });
+        return;
+      }
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsedFeatures: FeatureState = JSON.parse(saved);
-        
+
         // Validate the loaded data has all required keys
         const validatedFeatures: FeatureState = {
           katalogProduk: parsedFeatures.katalogProduk ?? defaultFeatures.katalogProduk,
@@ -111,9 +117,16 @@ export const useFeatureToggleStore = create<FeatureToggleState>()((set, get) => 
       // Simulate async operation (in case we want to save to API later)
       await new Promise(resolve => setTimeout(resolve, 50));
 
+      // Guard against SSR where localStorage is not available
+      if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
+        // Clear any previous errors but don't attempt to save
+        set({ error: null });
+        return;
+      }
+
       const { features } = get();
       localStorage.setItem(STORAGE_KEY, JSON.stringify(features));
-      
+
       // Clear any previous errors on successful save
       set({ error: null });
     } catch (error) {
