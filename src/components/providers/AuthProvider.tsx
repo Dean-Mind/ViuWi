@@ -6,7 +6,7 @@ import { useAuthActions } from '@/stores/authStore'
 import { User } from '@/types/auth'
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { initializeAuth, login, logout } = useAuthActions()
+  const { initializeAuth, login, logout, checkOnboardingStatus } = useAuthActions()
   const supabase = createClient()
 
   useEffect(() => {
@@ -24,6 +24,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             isVerified: session.user.email_confirmed_at !== null,
           }
           login(user, session)
+          // Check onboarding status after login
+          setTimeout(() => checkOnboardingStatus(), 100)
         } else if (event === 'SIGNED_OUT') {
           logout()
         }

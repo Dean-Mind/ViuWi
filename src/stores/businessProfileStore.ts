@@ -9,17 +9,23 @@ import {
   OperatingHours
 } from '@/data/businessProfileMockData';
 import { isValidTimeRange } from '@/utils/timeFormatting';
+import { supabaseBusinessProfileAPI } from '@/services/supabaseBusinessProfile';
 
 interface BusinessProfileState {
   // State
   businessProfile: BusinessProfile | null;
   isLoading: boolean;
   error: string | null;
-  
+
   // Form state for onboarding
   formData: Partial<BusinessProfileFormData>;
   isFormDirty: boolean;
-  
+
+  // Supabase-specific state
+  isSaving: boolean;
+  uploadProgress: number;
+  lastSaved: Date | null;
+
   // Actions
   setBusinessProfile: (profile: BusinessProfile) => void;
   updateBusinessProfile: (updates: Partial<BusinessProfile>) => void;
@@ -27,12 +33,22 @@ interface BusinessProfileState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
-  
+
   // Form actions
   updateFormData: (updates: Partial<BusinessProfileFormData>) => void;
   resetFormData: () => void;
   setFormDirty: (dirty: boolean) => void;
-  
+
+  // Supabase actions
+  saveToSupabase: (formData: BusinessProfileFormData, userId: string) => Promise<void>;
+  loadFromSupabase: (userId: string, populateForm?: boolean) => Promise<void>;
+  uploadLogoToSupabase: (file: File, userId: string) => Promise<string>;
+
+  // Form population actions
+  populateFormFromProfile: (profile: BusinessProfile) => void;
+  loadAndPopulateForm: (userId: string) => Promise<void>;
+  syncFormWithProfile: () => void;
+
   // Utility actions
   initializeWithMockData: () => void;
   validateBusinessProfile: (profile: Partial<BusinessProfileFormData>) => string[];
@@ -76,6 +92,11 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
   formData: getDefaultFormData(),
   isFormDirty: false,
 
+  // Supabase-specific state
+  isSaving: false,
+  uploadProgress: 0,
+  lastSaved: null,
+
   // Basic actions
   setBusinessProfile: (profile: BusinessProfile) => {
     set({ 
@@ -99,58 +120,11 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
 
   createBusinessProfile: async (formData: BusinessProfileFormData) => {
     set({ isLoading: true, error: null });
-    
+
     try {
-      // Validate form data
-      const errors = get().validateBusinessProfile(formData);
-      if (errors.length > 0) {
-        throw new Error(errors.join(', '));
-      }
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Clean up existing blob URL before creating new one
-      const currentProfile = get().businessProfile;
-      if (currentProfile?.logoBlobUrl) {
-        URL.revokeObjectURL(currentProfile.logoBlobUrl);
-      }
-
-      // Create blob URL for new logo if provided
-      const logoBlobUrl = formData.logo ? URL.createObjectURL(formData.logo) : undefined;
-
-      // Create new business profile
-      const newProfile: BusinessProfile = {
-        id: `business_${Date.now()}`,
-        businessName: formData.businessName,
-        businessType: formData.businessType,
-        businessCategory: formData.businessCategory,
-        description: formData.description || undefined,
-        logo: formData.logo ? formData.logo.name : undefined, // Store original filename
-        logoBlobUrl, // Store blob URL separately
-        businessPhone: formData.businessPhone,
-        businessEmail: formData.businessEmail || undefined,
-        address: formData.address,
-        city: formData.city,
-        province: formData.province,
-        postalCode: formData.postalCode || undefined,
-        country: formData.country,
-        operatingHours: formData.operatingHours,
-        timezone: formData.timezone,
-        socialMedia: formData.socialMedia,
-        registrationNumber: formData.registrationNumber || undefined,
-        taxId: formData.taxId || undefined,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      set({
-        businessProfile: newProfile,
-        isLoading: false,
-        error: null,
-        isFormDirty: false
-      });
-
+      // For backward compatibility, we'll need the userId to be passed from the component
+      // This is a temporary implementation - the component should call saveToSupabase directly
+      throw new Error('Please use saveToSupabase method with userId parameter');
     } catch (error) {
       set({
         isLoading: false,
@@ -199,6 +173,203 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
 
   setFormDirty: (dirty: boolean) => {
     set({ isFormDirty: dirty });
+  },
+
+  // Supabase actions
+  saveToSupabase: async (formData: BusinessProfileFormData, userId: string) => {
+    set({ isSaving: true, error: null });
+
+    try {
+      // Validate form data
+      const errors = get().validateBusinessProfile(formData);
+      if (errors.length > 0) {
+        throw new Error(errors.join(', '));
+      }
+
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+
+      let logoUrl: string | null = null;
+
+      // Upload logo if provided
+      if (formData.logo) {
+        set({ uploadProgress: 0 });
+        const uploadResult = await supabaseBusinessProfileAPI.uploadLogo(formData.logo, userId);
+
+        if (!uploadResult.success || !uploadResult.data) {
+          throw new Error(uploadResult.error || 'Failed to upload logo');
+        }
+
+        logoUrl = uploadResult.data.publicUrl;
+        set({ uploadProgress: 100 });
+      }
+
+      // Check if profile exists in database (not just in store state)
+      let existingProfile = get().businessProfile;
+
+      // If not in store, check database
+      if (!existingProfile) {
+        const dbResult = await supabaseBusinessProfileAPI.getBusinessProfile(userId);
+        if (dbResult.success && dbResult.data) {
+          existingProfile = dbResult.data;
+          // Update store with loaded profile
+          set({ businessProfile: existingProfile });
+        }
+      }
+
+      let result;
+
+      if (existingProfile) {
+        // Update existing profile
+        console.log('Updating existing business profile:', existingProfile.id);
+        result = await supabaseBusinessProfileAPI.updateBusinessProfile(existingProfile.id, formData);
+
+        // Update logo URL if uploaded
+        if (logoUrl) {
+          await supabaseBusinessProfileAPI.updateLogoUrl(existingProfile.id, logoUrl);
+        }
+      } else {
+        // Create new profile
+        console.log('Creating new business profile for user:', userId);
+        result = await supabaseBusinessProfileAPI.createBusinessProfile(userId, formData);
+
+        // Update logo URL if uploaded
+        if (logoUrl && result.data) {
+          await supabaseBusinessProfileAPI.updateLogoUrl(result.data.id, logoUrl);
+          result.data.logoBlobUrl = logoUrl;
+        }
+      }
+
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Failed to save business profile');
+      }
+
+      set({
+        businessProfile: result.data,
+        isSaving: false,
+        error: null,
+        isFormDirty: false,
+        lastSaved: new Date(),
+        uploadProgress: 0
+      });
+
+      // Note: Onboarding completion will be handled by the OnboardingFlow component
+      // when all steps are completed, not just when business profile is saved
+
+    } catch (error) {
+      set({
+        isSaving: false,
+        error: error instanceof Error ? error.message : 'Failed to save business profile',
+        uploadProgress: 0
+      });
+      throw error;
+    }
+  },
+
+  loadFromSupabase: async (userId: string, populateForm = false) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+
+      const result = await supabaseBusinessProfileAPI.getBusinessProfile(userId);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to load business profile');
+      }
+
+      set({
+        businessProfile: result.data,
+        isLoading: false,
+        error: null
+      });
+
+      // Populate form if requested and data exists
+      if (populateForm && result.data) {
+        get().populateFormFromProfile(result.data);
+      }
+
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Failed to load business profile'
+      });
+      throw error;
+    }
+  },
+
+  uploadLogoToSupabase: async (file: File, userId: string) => {
+    set({ uploadProgress: 0, error: null });
+
+    try {
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+
+      const result = await supabaseBusinessProfileAPI.uploadLogo(file, userId);
+
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Failed to upload logo');
+      }
+
+      set({ uploadProgress: 100 });
+      return result.data.publicUrl;
+
+    } catch (error) {
+      set({
+        uploadProgress: 0,
+        error: error instanceof Error ? error.message : 'Failed to upload logo'
+      });
+      throw error;
+    }
+  },
+
+  // Form population actions
+  populateFormFromProfile: (profile: BusinessProfile) => {
+    const formData: Partial<BusinessProfileFormData> = {
+      businessName: profile.businessName,
+      businessType: profile.businessType,
+      businessCategory: profile.businessCategory,
+      description: profile.description,
+      logo: null, // File object can't be reconstructed from URL
+      existingLogoUrl: profile.logo, // Store existing logo URL for display
+      businessPhone: profile.businessPhone,
+      businessEmail: profile.businessEmail,
+      address: profile.address,
+      city: profile.city,
+      province: profile.province,
+      postalCode: profile.postalCode,
+      country: profile.country,
+      operatingHours: profile.operatingHours,
+      timezone: profile.timezone,
+      socialMedia: profile.socialMedia,
+      registrationNumber: profile.registrationNumber,
+      taxId: profile.taxId
+    };
+
+    set({
+      formData,
+      isFormDirty: false // Data is from database, so not dirty
+    });
+  },
+
+  loadAndPopulateForm: async (userId: string) => {
+    try {
+      await get().loadFromSupabase(userId, true);
+    } catch (error) {
+      console.error('Error loading and populating form:', error);
+      throw error;
+    }
+  },
+
+  syncFormWithProfile: () => {
+    const { businessProfile } = get();
+    if (businessProfile) {
+      get().populateFormFromProfile(businessProfile);
+    }
   },
 
   // Utility actions

@@ -2,6 +2,18 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Prerequisites
+
+Before running the application, ensure you have the following environment variables configured:
+
+#### Supabase Edge Functions Environment Variables
+
+The following environment variables must be set in your Supabase project dashboard for the edge functions to work properly:
+
+- `N8N_WEBHOOK_BASE_URL` - Base URL for n8n webhook integration (e.g., `https://n8ncloud.com/webhook`)
+
+### Development Server
+
 First, run the development server:
 
 ```bash
@@ -29,7 +41,26 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deployment
+
+### Supabase Edge Functions
+
+To deploy the Supabase edge functions, use the provided deployment script:
+
+```bash
+./scripts/deploy-edge-functions.sh
+```
+
+**Important**: After deployment, make sure to set the required environment variables in your Supabase project dashboard:
+
+1. Go to your Supabase project dashboard
+2. Navigate to Settings > Edge Functions
+3. Set the following environment variables:
+   - `LLAMA_CLOUD_API_KEY` - Your LlamaIndex Cloud API key
+   - `SUPABASE_SERVICE_ROLE_KEY` - Your service role key
+   - `N8N_WEBHOOK_BASE_URL` - Your n8n webhook base URL (e.g., `https://n8ncloud.com/webhook`)
+
+### Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
