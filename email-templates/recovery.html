@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Kata Sandi Anda - ViuWi</title>
+    <style>
+        @media only screen and (max-width: 600px) {
+            .container { width: 100% !important; }
+            .content { padding: 20px !important; }
+            .button { width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Nunito Sans', Arial, sans-serif; background-color: #f8fafc; line-height: 1.6;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f8fafc;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <!-- Main Container -->
+                <table class="container" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 40px 40px 20px 40px; text-align: center; border-bottom: 3px solid #FF002E;">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 700; color: #FF002E; font-family: 'Nunito Sans', Arial, sans-serif;">ViuWi</h1>
+                            <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b; font-weight: 500;">Automasi bisnis dengan ViuWi</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td class="content" style="padding: 40px;">
+                            <h2 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">Reset Kata Sandi Anda 🔑</h2>
+                            
+                            <p style="margin: 0 0 20px 0; font-size: 16px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Halo,</p>
+                            
+                            <p style="margin: 0 0 20px 0; font-size: 16px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Kami menerima permintaan untuk mereset kata sandi akun ViuWi Anda. Jika Anda yang membuat permintaan ini, klik tombol di bawah untuk membuat kata sandi baru:</p>
+                            
+                            <!-- CTA Button -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 32px auto;">
+                                <tr>
+                                    <td style="border-radius: 24px; background-color: #FF002E;">
+                                        <a href="{{ .ConfirmationURL }}" class="button" style="display: inline-block; padding: 16px 32px; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 24px; font-family: 'Nunito Sans', Arial, sans-serif; min-width: 200px; text-align: center;">Reset Kata Sandi</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin: 32px 0 20px 0; font-size: 14px; color: #64748b; font-family: 'Nunito Sans', Arial, sans-serif;">Jika tombol tidak berfungsi, Anda dapat menyalin dan menempel tautan ini ke browser Anda:</p>
+                            <p style="margin: 0 0 32px 0; font-size: 14px; color: #FF002E; word-break: break-all; font-family: 'Nunito Sans', Arial, sans-serif;">{{ .ConfirmationURL }}</p>
+                            
+                            <!-- Security Notice -->
+                            <div style="background-color: #fef7f0; border-radius: 24px; padding: 24px; margin: 32px 0; border-left: 4px solid #FF002E;">
+                                <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">🛡️ Informasi Keamanan</h3>
+                                <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">• Tautan reset ini akan kedaluwarsa dalam 1 jam</p>
+                                <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">• Tautan ini hanya dapat digunakan sekali</p>
+                                <p style="margin: 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">• Pilih kata sandi yang kuat dan unik untuk akun Anda</p>
+                            </div>
+                            
+                            <!-- Didn't Request Notice -->
+                            <div style="background-color: #fef2f2; border-radius: 24px; padding: 24px; margin: 32px 0; border-left: 4px solid #ef4444;">
+                                <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">⚠️ Tidak Meminta Ini?</h3>
+                                <p style="margin: 0 0 12px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Jika Anda tidak meminta reset kata sandi, akun Anda mungkin berisiko. Silakan:</p>
+                                <ul style="margin: 0; padding-left: 20px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">
+                                    <li style="margin-bottom: 4px;">Abaikan email ini (tautan akan kedaluwarsa)</li>
+                                    <li style="margin-bottom: 4px;">Periksa akun Anda untuk aktivitas mencurigakan</li>
+                                    <li style="margin-bottom: 0;">Hubungi tim dukungan kami jika Anda khawatir</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Account Protection Tips -->
+                            <div style="background-color: #f1f5f9; border-radius: 24px; padding: 24px; margin: 32px 0;">
+                                <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">💡 Jaga Keamanan Akun ViuWi Anda:</h3>
+                                <ul style="margin: 0; padding-left: 20px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">
+                                    <li style="margin-bottom: 8px;">Gunakan kata sandi unik yang tidak Anda gunakan di tempat lain</li>
+                                    <li style="margin-bottom: 8px;">Sertakan huruf besar, huruf kecil, angka, dan simbol</li>
+                                    <li style="margin-bottom: 8px;">Pertimbangkan menggunakan pengelola kata sandi</li>
+                                    <li style="margin-bottom: 0;">Jangan pernah bagikan kredensial login Anda</li>
+                                </ul>
+                            </div>
+                            
+                            <p style="margin: 0; font-size: 16px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Tim Keamanan ViuWi</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px 40px; background-color: #f8fafc; border-radius: 0 0 24px 24px; border-top: 1px solid #e2e8f0;">
+                            <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b; text-align: center; font-family: 'Nunito Sans', Arial, sans-serif;">Reset kata sandi ini diminta untuk {{ .Email }}</p>
+                            <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b; text-align: center; font-family: 'Nunito Sans', Arial, sans-serif;">Jika Anda memiliki pertanyaan, silakan hubungi tim dukungan kami.</p>
+                            <p style="margin: 0; font-size: 12px; color: #64748b; text-align: center; font-family: 'Nunito Sans', Arial, sans-serif;">
+                                © 2025 ViuWi. All rights reserved. | 
+                                <a href="{{ .SiteURL }}" style="color: #FF002E; text-decoration: none;">Kunjungi ViuWi</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

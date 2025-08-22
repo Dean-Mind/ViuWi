@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anda Diundang ke ViuWi</title>
+    <style>
+        @media only screen and (max-width: 600px) {
+            .container { width: 100% !important; }
+            .content { padding: 20px !important; }
+            .button { width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Nunito Sans', Arial, sans-serif; background-color: #f8fafc; line-height: 1.6;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f8fafc;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <!-- Main Container -->
+                <table class="container" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 24px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 40px 40px 20px 40px; text-align: center; border-bottom: 3px solid #FF002E;">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 700; color: #FF002E; font-family: 'Nunito Sans', Arial, sans-serif;">ViuWi</h1>
+                            <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b; font-weight: 500;">Automasi bisnis dengan ViuWi</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td class="content" style="padding: 40px;">
+                            <h2 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">Anda Diundang untuk Bergabung dengan ViuWi! 🎉</h2>
+                            
+                            <p style="margin: 0 0 20px 0; font-size: 16px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Halo,</p>
+                            
+                            <p style="margin: 0 0 20px 0; font-size: 16px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Kabar baik! Anda telah diundang untuk bergabung dengan workspace ViuWi dan berkolaborasi dengan tim Anda dalam otomasi dan manajemen bisnis.</p>
+                            
+                            <!-- Invitation Details -->
+                            <div style="background-color: #fef7f0; border-radius: 24px; padding: 24px; margin: 32px 0; border-left: 4px solid #FF002E;">
+                                <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">📋 Detail Undangan</h3>
+                                <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;"><strong>Diundang oleh:</strong> {{ .InvitedByEmail }}</p>
+                                <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;"><strong>Email Anda:</strong> {{ .Email }}</p>
+                                <p style="margin: 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;"><strong>Peran:</strong> Anggota Tim</p>
+                            </div>
+                            
+                            <!-- CTA Button -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 32px auto;">
+                                <tr>
+                                    <td style="border-radius: 24px; background-color: #FF002E;">
+                                        <a href="{{ .ConfirmationURL }}" class="button" style="display: inline-block; padding: 16px 32px; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 24px; font-family: 'Nunito Sans', Arial, sans-serif; min-width: 200px; text-align: center;">Terima Undangan</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin: 32px 0 20px 0; font-size: 14px; color: #64748b; font-family: 'Nunito Sans', Arial, sans-serif;">Jika tombol tidak berfungsi, Anda dapat menyalin dan menempel link ini ke browser Anda:</p>
+                            <p style="margin: 0 0 32px 0; font-size: 14px; color: #FF002E; word-break: break-all; font-family: 'Nunito Sans', Arial, sans-serif;">{{ .ConfirmationURL }}</p>
+                            
+                            <!-- What You'll Get Access To -->
+                            <div style="background-color: #f1f5f9; border-radius: 24px; padding: 24px; margin: 32px 0;">
+                                <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">🚀 Apa yang akan Anda dapatkan:</h3>
+                                <ul style="margin: 0; padding-left: 20px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">
+                                    <li style="margin-bottom: 8px;">📊 <strong>Dashboard Real-time:</strong> Analitik bisnis dan insights</li>
+                                    <li style="margin-bottom: 8px;">👥 <strong>Manajemen Customer:</strong> Tools CRM dan data customer</li>
+                                    <li style="margin-bottom: 8px;">📦 <strong>Katalog Produk:</strong> Manajemen inventory dan produk</li>
+                                    <li style="margin-bottom: 8px;">📋 <strong>Manajemen Order:</strong> Tracking dan proses pesanan</li>
+                                    <li style="margin-bottom: 8px;">💬 <strong>Customer Service:</strong> Handover CS dan knowledge base</li>
+                                    <li style="margin-bottom: 0;">💳 <strong>Proses Pembayaran:</strong> Konfigurasi dan tracking pembayaran</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Getting Started -->
+                            <div style="background-color: #f0f9ff; border-radius: 24px; padding: 24px; margin: 32px 0; border-left: 4px solid #0ea5e9;">
+                                <h3 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">🎯 Memulai</h3>
+                                <p style="margin: 0 0 12px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Setelah Anda menerima undangan, Anda akan dipandu melalui:</p>
+                                <ul style="margin: 0; padding-left: 20px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">
+                                    <li style="margin-bottom: 4px;">Setup akun dan profil Anda</li>
+                                    <li style="margin-bottom: 4px;">Eksplorasi dashboard dan fitur utama</li>
+                                    <li style="margin-bottom: 4px;">Memahami peran dan izin Anda</li>
+                                    <li style="margin-bottom: 0;">Terhubung dengan anggota tim Anda</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Security Notice -->
+                            <div style="background-color: #fef7f0; border-radius: 24px; padding: 24px; margin: 32px 0; border-left: 4px solid #FF002E;">
+                                <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">🔒 Keamanan & Privasi</h3>
+                                <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">• Link undangan ini akan kedaluwarsa dalam 7 hari</p>
+                                <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">• Data Anda dilindungi dengan keamanan tingkat enterprise</p>
+                                <p style="margin: 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">• Anda dapat meninggalkan workspace kapan saja</p>
+                            </div>
+                            
+                            <p style="margin: 24px 0 0 0; font-size: 16px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Kami senang Anda bergabung dengan tim!</p>
+                            <p style="margin: 8px 0 0 0; font-size: 16px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;">Tim ViuWi</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px 40px; background-color: #f8fafc; border-radius: 0 0 24px 24px; border-top: 1px solid #e2e8f0;">
+                            <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b; text-align: center; font-family: 'Nunito Sans', Arial, sans-serif;">Undangan ini dikirim ke {{ .Email }}</p>
+                            <p style="margin: 0 0 12px 0; font-size: 12px; color: #64748b; text-align: center; font-family: 'Nunito Sans', Arial, sans-serif;">Jika Anda tidak ingin bergabung dengan workspace ini, Anda dapat mengabaikan email ini.</p>
+                            <p style="margin: 0; font-size: 12px; color: #64748b; text-align: center; font-family: 'Nunito Sans', Arial, sans-serif;">
+                                © 2025 ViuWi. All rights reserved. | 
+                                <a href="{{ .SiteURL }}" style="color: #FF002E; text-decoration: none;">Kunjungi ViuWi</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

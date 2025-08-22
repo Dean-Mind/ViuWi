@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LoginData, RegisterData, ForgotPasswordData, ResetPasswordData } from '@/types/auth';
-import { mockAuthAPI } from '@/data/authMockData';
+import { supabaseAuthAPI } from '@/services/supabaseAuth';
 import { useAuthActions } from '@/stores/authStore';
 import { AuthErrorBoundary } from '@/components/providers/ErrorBoundary';
 import AuthLayout from '../ui/AuthLayout';
@@ -37,10 +37,10 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
     setError('');
 
     try {
-      const result = await mockAuthAPI.login(data);
+      const result = await supabaseAuthAPI.login(data);
       if (result.success && result.user) {
         // Update auth store
-        login(result.user, result.token);
+        login(result.user, result.session);
 
         // Navigate to dashboard (or onboarding for first-time users)
         // For now, we'll go directly to dashboard
@@ -61,7 +61,7 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
     setError('');
 
     try {
-      const result = await mockAuthAPI.register(data);
+      const result = await supabaseAuthAPI.register(data);
       if (result.success) {
         setUserEmail(data.email);
         // Navigate to email verification page with email context
@@ -79,9 +79,9 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
   const handleForgotPassword = async (data: ForgotPasswordData) => {
     setIsLoading(true);
     setError('');
-    
+
     try {
-      await mockAuthAPI.forgotPassword(data.email);
+      await supabaseAuthAPI.forgotPassword(data.email);
       setUserEmail(data.email);
       setForgotPasswordSuccess(true);
     } catch (_err) {
@@ -94,9 +94,9 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
   const handleResetPassword = async (data: ResetPasswordData) => {
     setIsLoading(true);
     setError('');
-    
+
     try {
-      await mockAuthAPI.resetPassword(data.token, data.newPassword);
+      await supabaseAuthAPI.resetPassword(data.token, data.newPassword);
       setResetPasswordSuccess(true);
     } catch (_err) {
       setError('An error occurred while resetting password');
@@ -110,7 +110,7 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
 
     try {
       const emailToUse = emailFromQuery || userEmail;
-      await mockAuthAPI.resendVerification(emailToUse);
+      await supabaseAuthAPI.resendVerification(emailToUse);
       console.log('Verification email resent');
     } catch (_err) {
       console.error('Failed to resend verification email');
@@ -122,12 +122,15 @@ export default function AuthFlow({ initialPage = 'login', resetToken }: AuthFlow
   const handleGoogleAuth = async () => {
     setIsLoading(true);
     setError('');
-    
+
     try {
-      // Simulate Google OAuth flow
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Google authentication initiated');
-      // In real implementation, this would redirect to Google OAuth
+      const result = await supabaseAuthAPI.googleAuth();
+      if (result.success) {
+        console.log('Google authentication initiated');
+        // OAuth redirect will be handled by Supabase
+      } else {
+        setError(result.error || 'Google authentication failed');
+      }
     } catch (_err) {
       setError('Google authentication failed');
     } finally {

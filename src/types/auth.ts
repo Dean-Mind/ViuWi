@@ -48,6 +48,7 @@ export interface AuthResult {
   success: boolean;
   user?: User;
   token?: string;
+  session?: SupabaseSession;
   error?: string;
 }
 
@@ -56,6 +57,26 @@ export interface User {
   email: string;
   fullName: string;
   isVerified: boolean;
+  avatarUrl?: string; // Add for future profile features
+  createdAt?: string; // Add for user analytics
+}
+
+// Supabase-specific types
+export interface SupabaseUser {
+  id: string
+  email?: string
+  user_metadata?: {
+    full_name?: string
+    avatar_url?: string
+  }
+  email_confirmed_at?: string | null
+}
+
+export interface SupabaseSession {
+  access_token: string
+  refresh_token: string
+  expires_at?: number
+  user: SupabaseUser
 }
 
 // Root component props for auth flow
