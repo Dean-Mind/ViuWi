@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito_Sans, Inter, Montserrat } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ErrorBoundary } from "@/components/providers/ErrorBoundary";
+import AuthProvider from "@/components/providers/AuthProvider";
 import ToastProvider from "@/components/ui/ToastProvider";
 import "./globals.css";
 
@@ -48,7 +49,9 @@ export default function RootLayout({
         <ErrorBoundary>
           <ThemeProvider>
             <ToastProvider>
-              {children}
+              <AuthProvider>
+                {children}
+              </AuthProvider>
             </ToastProvider>
           </ThemeProvider>
         </ErrorBoundary>
