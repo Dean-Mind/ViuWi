@@ -38,7 +38,7 @@
                             <!-- Invitation Details -->
                             <div style="background-color: #fef7f0; border-radius: 24px; padding: 24px; margin: 32px 0; border-left: 4px solid #FF002E;">
                                 <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #1e293b; font-family: 'Nunito Sans', Arial, sans-serif;">📋 Detail Undangan</h3>
-                                <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;"><strong>Diundang oleh:</strong> {{ .InvitedByEmail }}</p>
+                                <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;"><strong>Diundang oleh:</strong> {{ index .Data "invited_by" }}</p>
                                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;"><strong>Email Anda:</strong> {{ .Email }}</p>
                                 <p style="margin: 0; font-size: 14px; color: #475569; font-family: 'Nunito Sans', Arial, sans-serif;"><strong>Peran:</strong> Anggota Tim</p>
                             </div>

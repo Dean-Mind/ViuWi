@@ -94,7 +94,7 @@ export const useAuthStore = create<AuthState>()((set, _get) => ({
           id: session.user.id,
           email: session.user.email!,
           fullName: session.user.user_metadata?.full_name || session.user.email!,
-          isVerified: session.user.email_confirmed_at !== null,
+          isVerified: !!session.user.email_confirmed_at,
         }
 
         set({

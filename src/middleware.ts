@@ -19,11 +19,16 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options: _options }) =>
+            request.cookies.set(name, value)
+          )
           response = NextResponse.next({
-            request,
+            request: {
+              headers: request.headers,
+            },
           })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+          cookiesToSet.forEach(({ name, value, options: _options }) =>
+            response.cookies.set(name, value, _options)
           )
         },
       },
@@ -35,13 +40,26 @@ export async function middleware(request: NextRequest) {
   // Protect dashboard routes
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     if (!user) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
+      const redirectResponse = NextResponse.redirect(new URL('/auth/login', request.url))
+      // Copy cookies to redirect response
+      request.cookies.getAll().forEach(cookie => {
+        redirectResponse.cookies.set(cookie.name, cookie.value)
+      })
+      return redirectResponse
     }
   }
 
-  // Redirect authenticated users away from auth pages
+  // Redirect authenticated users away from auth pages (except logout and callback)
   if (request.nextUrl.pathname.startsWith('/auth') && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    const pathname = request.nextUrl.pathname
+    if (!pathname.includes('/logout') && !pathname.includes('/callback')) {
+      const redirectResponse = NextResponse.redirect(new URL('/dashboard', request.url))
+      // Copy cookies to redirect response
+      request.cookies.getAll().forEach(cookie => {
+        redirectResponse.cookies.set(cookie.name, cookie.value)
+      })
+      return redirectResponse
+    }
   }
 
   return response

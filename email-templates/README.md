@@ -61,9 +61,10 @@ Ensure your Supabase project has the following variables configured:
 {{ .ConfirmationURL }}  - Auto-generated confirmation/action URL
 {{ .Email }}            - User's email address
 {{ .SiteURL }}          - Your application's URL
-{{ .InvitedByEmail }}   - Email of user who sent invitation (invite template)
-{{ .NewEmail }}         - New email address (email change template)
-{{ .RequestedAt }}      - Timestamp of request (email change template)
+{{ .NewEmail }}         - New email address (email change template only)
+{{ .Token }}            - Raw token for custom implementations
+{{ .TokenHash }}        - Hashed token (preferred for security)
+{{ .Data }}             - Custom data object (use {{ index .Data "key" }} syntax)
 ```
 
 ## 📋 Template-Specific Configuration
@@ -88,13 +89,14 @@ Ensure your Supabase project has the following variables configured:
 
 ### Invite Template
 - **Supabase Setting**: User invitation
-- **Variables Used**: `{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ .InvitedByEmail }}`, `{{ .SiteURL }}`
+- **Variables Used**: `{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ index .Data "invited_by" }}`, `{{ .SiteURL }}`
 - **Redirect**: Should redirect to registration/onboarding flow
 - **Language**: Bahasa Indonesia - "Anda Diundang ke ViuWi"
+- **Note**: Use `{{ index .Data "invited_by" }}` for inviter email (requires data in inviteUserByEmail call)
 
 ### Email Change Template
 - **Supabase Setting**: Email change confirmation
-- **Variables Used**: `{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ .NewEmail }}`, `{{ .RequestedAt }}`, `{{ .SiteURL }}`
+- **Variables Used**: `{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ .NewEmail }}`, `{{ .SiteURL }}`
 - **Redirect**: Should redirect to account settings
 - **Language**: Bahasa Indonesia - "Konfirmasi Perubahan Email"
 

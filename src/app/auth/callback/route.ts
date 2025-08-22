@@ -16,18 +16,24 @@ function normalizeNext(next: string | null): string {
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const token = searchParams.get('token')
+  // Prefer token_hash with fallback to token
+  const token = searchParams.get('token_hash') || searchParams.get('token')
   const type = searchParams.get('type')
   const rawNext = searchParams.get('next')
   const next = normalizeNext(rawNext)
 
+  // Single Supabase client creation
+  const supabase = await createClient()
+
   if (code) {
-    const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+    if (error) {
+      console.error('Code exchange error:', error)
+      return NextResponse.redirect(`${origin}/auth/auth-code-error`)
     }
+    
+    return NextResponse.redirect(`${origin}${next}`)
   }
 
   // Handle password reset tokens
@@ -37,15 +43,17 @@ export async function GET(request: Request) {
 
   // Handle email confirmation tokens
   if (token && type === 'signup') {
-    const supabase = await createClient()
     const { error } = await supabase.auth.verifyOtp({
       token_hash: token,
       type: 'signup'
     })
 
-    if (!error) {
-      return NextResponse.redirect(`${origin}/dashboard`)
+    if (error) {
+      console.error('Token verification error:', error)
+      return NextResponse.redirect(`${origin}/auth/auth-code-error`)
     }
+    
+    return NextResponse.redirect(`${origin}/dashboard`)
   }
 
   // Return to error page if something went wrong
