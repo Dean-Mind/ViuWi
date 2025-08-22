@@ -69,7 +69,18 @@ export const useAuthStore = create<AuthState>()((set, _get) => ({
   },
 
   setSession: (session: SupabaseSession | null) => {
-    set({ session })
+    const user = session?.user ? {
+      id: session.user.id,
+      email: session.user.email!,
+      fullName: session.user.user_metadata?.full_name || session.user.email!,
+      isVerified: !!session.user.email_confirmed_at,
+    } : null
+
+    set({ 
+      session,
+      user,
+      isAuthenticated: !!session
+    })
   },
 
   setLoading: (isLoading: boolean) => {

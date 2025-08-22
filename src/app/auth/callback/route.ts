@@ -38,7 +38,7 @@ export async function GET(request: Request) {
 
   // Handle password reset tokens
   if (token && type === 'recovery') {
-    return NextResponse.redirect(`${origin}/auth/reset-password?token=${token}`)
+    return NextResponse.redirect(`${origin}/auth/reset-password?token=${encodeURIComponent(token)}`)
   }
 
   // Handle email confirmation tokens
