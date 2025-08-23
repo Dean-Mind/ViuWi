@@ -534,7 +534,7 @@ export default function OnboardingStep1Enhanced({
           <input
             type="url"
             className="input input-bordered w-full text-brand-body rounded-2xl"
-            placeholder="https://www.namadomainanda.com/faq"
+            placeholder="https://www.namadomainanda.com"
             value={websiteUrl}
             onChange={(e) => setWebsiteUrl(e.target.value)}
             disabled={isLoading}

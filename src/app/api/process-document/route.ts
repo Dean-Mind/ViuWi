@@ -231,7 +231,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Processin
     }
 
     // Extract and combine content from all documents
-    const combinedContent = documents.map(doc => doc.getText()).join('\n\n')
+    const combinedContent = documents.map((doc: { getText: () => string }) => doc.getText()).join('\n\n')
 
     // Check if content is empty or contains only whitespace
     if (combinedContent.trim().length === 0) {

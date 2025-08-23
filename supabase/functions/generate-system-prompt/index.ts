@@ -205,7 +205,7 @@ serve(async (req) => {
     
     console.log(`Prepared context with ${contextData.totalEntries} knowledge base entries (${contextData.completedEntries} completed, ${contextData.pendingEntries} pending)`)
 
-    // Call n8n webhook for system prompt generation with HMAC authentication
+    // Call n8n webhook for system prompt generation (no authentication)
     const n8nWebhookUrl = `${n8nWebhookBaseUrl}/system-prompt`
     console.log(`Calling n8n webhook at: ${n8nWebhookUrl}`)
 
@@ -214,38 +214,11 @@ serve(async (req) => {
       content: JSON.stringify(contextData, null, 2)
     })
 
-    // Generate HMAC signature for authentication
-    const webhookSecret = Deno.env.get('N8N_WEBHOOK_SECRET')
-    if (!webhookSecret) {
-      console.error('N8N_WEBHOOK_SECRET environment variable is not set')
-      return json({ success: false, error: 'Server configuration error: N8N_WEBHOOK_SECRET not configured' }, 500)
-    }
-
-    const timestamp = Math.floor(Date.now() / 1000).toString()
-    const signaturePayload = requestBody + '|' + timestamp
-
-    // Create HMAC-SHA256 signature
-    const encoder = new TextEncoder()
-    const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(webhookSecret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['sign']
-    )
-    const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(signaturePayload))
-    const signatureHex = Array.from(new Uint8Array(signature))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('')
-
     const n8nResponse = await fetch(n8nWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'ViuWi-System-Prompt/1.0',
-        'X-Timestamp': timestamp,
-        'X-Signature': signatureHex,
-        'Authorization': `Bearer ${webhookSecret.substring(0, 8)}...` // Trimmed secret for identification
+        'User-Agent': 'ViuWi-System-Prompt/1.0'
       },
       body: requestBody
     })

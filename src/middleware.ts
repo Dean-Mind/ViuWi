@@ -2,6 +2,9 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { validateSupabaseEnvVars } from './lib/supabase/env'
 
+// Force Node.js runtime to resolve Supabase Edge Runtime compatibility issues
+export const runtime = 'nodejs'
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
