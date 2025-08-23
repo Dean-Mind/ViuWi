@@ -6,11 +6,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 Before running the application, ensure you have the following environment variables configured:
 
-#### Supabase Edge Functions Environment Variables
+#### Environment Variables
 
-The following environment variables must be set in your Supabase project dashboard for the edge functions to work properly:
+Configure environment variables in the right runtime:
 
-- `N8N_WEBHOOK_BASE_URL` - Base URL for n8n webhook integration (e.g., `https://n8ncloud.com/webhook`)
+- Next.js Server (Vercel project settings → Environment Variables or `.env.local` for dev)
+  - `LLAMA_CLOUD_API_KEY` – LlamaParse API key used by the Next.js API route (`/api/process-document`).
+
+- Supabase Edge Functions (Supabase Dashboard → Settings → Edge Functions)
+  - `SUPABASE_SERVICE_ROLE_KEY` – Service-role key for server-side operations inside Edge Functions. Do not expose to the client or Next.js browser runtime.
+  - `N8N_WEBHOOK_BASE_URL` – Base URL for n8n webhook integration (e.g., `https://n8ncloud.com/webhook`).
 
 ### Development Server
 
