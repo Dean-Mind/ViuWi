@@ -21,10 +21,47 @@ if ! supabase projects list &> /dev/null; then
     exit 1
 fi
 
-# Project reference
-PROJECT_REF="yvtxhcbtuhprupyfryry"
+# Determine PROJECT_REF from multiple sources
+# Priority: CLI argument > environment variable > supabase link > error
+PROJECT_REF=""
 
-echo "📋 Project Reference: $PROJECT_REF"
+if [ -n "$1" ]; then
+    PROJECT_REF="$1"
+    echo "📋 Using PROJECT_REF from command line argument: $PROJECT_REF"
+elif [ -n "$PROJECT_REF" ]; then
+    echo "📋 Using PROJECT_REF from environment variable: $PROJECT_REF"
+else
+    # Try to get from supabase link
+    LINKED_REF=$(supabase link 2>/dev/null | grep 'Project ref:' | awk '{print $3}' | tr -d '\n')
+    if [ -n "$LINKED_REF" ]; then
+        PROJECT_REF="$LINKED_REF"
+        echo "📋 Using PROJECT_REF from supabase link: $PROJECT_REF"
+    else
+        echo "❌ PROJECT_REF not found. Please provide it via:"
+        echo "   1. Command line argument: $0 <project-ref>"
+        echo "   2. Environment variable: export PROJECT_REF=<project-ref>"
+        echo "   3. Or run 'supabase link' to link to a project"
+        echo ""
+        echo "💡 You can find your project ref in the Supabase Dashboard URL:"
+        echo "   https://supabase.com/dashboard/project/<project-ref>"
+        exit 1
+    fi
+fi
+
+# Validate PROJECT_REF format (basic check)
+if [[ ! "$PROJECT_REF" =~ ^[a-z0-9]{20}$ ]]; then
+    echo "⚠️  Warning: PROJECT_REF format looks unusual: $PROJECT_REF"
+    echo "   Expected format: 20 lowercase alphanumeric characters"
+    echo ""
+    read -p "Continue anyway? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Deployment cancelled."
+        exit 1
+    fi
+fi
+
+echo "🎯 Deploying to project: $PROJECT_REF"
 echo ""
 
 # Deploy URL processing function

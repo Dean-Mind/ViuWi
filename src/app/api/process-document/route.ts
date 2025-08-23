@@ -7,7 +7,6 @@ import { tmpdir } from 'os'
 
 interface DocumentProcessRequest {
   documentId: string
-  userId: string
 }
 
 interface ProcessingResult {
@@ -31,20 +30,39 @@ interface ProcessingResult {
  */
 export async function POST(request: NextRequest): Promise<NextResponse<ProcessingResult>> {
   try {
-    // Parse request body
-    const { documentId, userId }: DocumentProcessRequest = await request.json()
-
-    if (!documentId || !userId) {
+    // Validate authentication first
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({
         success: false,
-        error: 'Missing required parameters: documentId and userId'
+        error: 'Missing or invalid Authorization header'
+      }, { status: 401 })
+    }
+
+    // Initialize Supabase client for authentication
+    const supabase = await createClient()
+
+    // Verify the user token and get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid or expired authentication token'
+      }, { status: 401 })
+    }
+
+    // Parse request body
+    const { documentId }: DocumentProcessRequest = await request.json()
+
+    if (!documentId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing required parameter: documentId'
       }, { status: 400 })
     }
 
-    console.log(`Processing document ${documentId} for user ${userId}`)
-
-    // Initialize Supabase client with service role for server-side operations
-    const supabase = await createClient()
+    console.log(`Processing document ${documentId} for authenticated user ${user.id}`)
 
     // Get document details with entry information
     const { data: document, error: docError } = await supabase
@@ -54,7 +72,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Processin
         knowledge_base_entries!inner(*)
       `)
       .eq('id', documentId)
-      .eq('knowledge_base_entries.user_id', userId)
+      .eq('knowledge_base_entries.user_id', user.id)
       .single()
 
     if (docError || !document) {
@@ -149,8 +167,13 @@ export async function POST(request: NextRequest): Promise<NextResponse<Processin
     let documents
     try {
       // Save file to temporary location
-      await fs.writeFile(tempFilePath, fileBytes)
-      console.log(`Saved temporary file: ${tempFilePath}`)
+      try {
+        await fs.writeFile(tempFilePath, fileBytes)
+        console.log(`Saved temporary file: ${tempFilePath}`)
+      } catch (writeError) {
+        console.error('Failed to write temporary file:', writeError)
+        throw new Error(`Failed to write temporary file: ${writeError instanceof Error ? writeError.message : 'Unknown error'}`)
+      }
 
       // Process document with LlamaParse using file path string
       documents = await reader.loadData(tempFilePath)
@@ -159,7 +182,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<Processin
       // Clean up temporary file
       await fs.unlink(tempFilePath)
       console.log(`Cleaned up temporary file: ${tempFilePath}`)
-
     } catch (parseError) {
       console.error('LlamaParse processing failed:', parseError)
 
@@ -188,7 +210,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Processin
 
     if (!documents || documents.length === 0) {
       console.error('No content extracted from document')
-      
+
       await supabase
         .from('knowledge_base_entries')
         .update({
@@ -206,8 +228,29 @@ export async function POST(request: NextRequest): Promise<NextResponse<Processin
 
     // Extract and combine content from all documents
     const combinedContent = documents.map(doc => doc.getText()).join('\n\n')
-    const wordCount = combinedContent.split(/\s+/).length
-    
+
+    // Check if content is empty or contains only whitespace
+    if (combinedContent.trim().length === 0) {
+      console.error('Document contains only whitespace or empty content')
+
+      await supabase
+        .from('knowledge_base_entries')
+        .update({
+          processing_status: 'failed',
+          error_message: 'No content could be extracted from the document',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', document.knowledge_base_entry_id)
+
+      return NextResponse.json({
+        success: false,
+        error: 'No content could be extracted from the document'
+      }, { status: 422 })
+    }
+
+    const trimmedContent = combinedContent.trim()
+    const wordCount = trimmedContent.length > 0 ? trimmedContent.split(/\s+/).length : 0
+
     console.log(`Extracted content: ${combinedContent.length} characters, ~${wordCount} words`)
 
     // Update knowledge base entry with extracted content

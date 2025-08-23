@@ -50,6 +50,7 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(
     new Set(onboardingStatus?.completedSteps || [])
   );
+  const [isMarkingStep, setIsMarkingStep] = useState(false);
 
   // Load onboarding status on mount and when user changes
   useEffect(() => {
@@ -190,26 +191,36 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
 
   // Step 0 handlers
   const handleBusinessProfileNext = async () => {
+    // Prevent concurrent execution
+    if (isMarkingStep) {
+      console.log('handleBusinessProfileNext already in progress, skipping');
+      return;
+    }
+
     console.log('handleBusinessProfileNext called');
     // Business profile saving is now handled in the OnboardingStep0 component
     // This handler is called after successful save
 
-    // Mark step 0 as completed and move to step 1
-    if (user) {
-      try {
+    setIsMarkingStep(true);
+
+    try {
+      // Mark step 0 as completed and refresh status
+      if (user) {
         console.log('Marking step 0 as completed for user:', user.id);
         await supabaseOnboardingAPI.markStepCompleted(user.id, 0);
         console.log('Step 0 marked as completed, refreshing onboarding status...');
-        // Refresh onboarding status
+        // Refresh onboarding status - this will drive UI state
         await checkOnboardingStatus();
         console.log('Onboarding status refreshed');
-      } catch (error) {
-        console.error('Failed to mark step completed:', error);
+        toast.success('Profil bisnis berhasil disimpan');
       }
+    } catch (error) {
+      console.error('Failed to mark step completed:', error);
+      toast.error('Failed to complete step');
+    } finally {
+      setIsMarkingStep(false);
     }
-
-    toast.success('Profil bisnis berhasil disimpan');
-    handleNext();
+    // Remove explicit handleNext() call - let DB-backed status drive UI
   };
 
   // Step 1 handlers
@@ -218,42 +229,53 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
     // Knowledge base processing is now handled in the OnboardingStep1Enhanced component
     // This handler is called after successful processing and system prompt generation
 
-    // Mark step 1 as completed and move to step 2
+    // Mark step 1 as completed and refresh status
     if (user) {
       try {
         console.log('Marking step 1 as completed for user:', user.id);
         await supabaseOnboardingAPI.markStepCompleted(user.id, 1);
         console.log('Step 1 marked as completed, refreshing onboarding status...');
-        // Refresh onboarding status
+        // Refresh onboarding status - this will drive UI state
         await checkOnboardingStatus();
         console.log('Onboarding status refreshed');
+
+        // Refresh onboarding status - this will drive UI state
+        await checkOnboardingStatus();
+        console.log('Onboarding status refreshed');
+        toast.success('Knowledge base berhasil diproses');
       } catch (error) {
         console.error('Failed to mark step completed:', error);
+        toast.error('Failed to complete step');
       }
     }
-
-    toast.success('Knowledge base berhasil diproses');
-    handleNext();
   };
 
   // Navigation handlers
   const handleNext = async () => {
     const nextStep = Math.min(currentStep + 1, 3);
 
-    // Update step in database
+    // Update step in database and only update local state after success
     if (user) {
       try {
         await supabaseOnboardingAPI.updateOnboardingStep(user.id, nextStep);
         // Refresh onboarding status
         await checkOnboardingStatus();
+
+        // Only update local state after successful async operations
+        setCurrentStep(nextStep);
+        setCompletedSteps(completed => new Set(completed).add(nextStep)); // Add nextStep, not currentStep
+        setError('');
       } catch (error) {
         console.error('Failed to update onboarding step:', error);
+        setError('Failed to update step');
+        // Don't update local state on failure
       }
+    } else {
+      // If no user, just update local state
+      setCurrentStep(nextStep);
+      setCompletedSteps(completed => new Set(completed).add(nextStep));
+      setError('');
     }
-
-    setCurrentStep(nextStep);
-    setCompletedSteps(completed => new Set(completed).add(currentStep));
-    setError('');
   };
 
   const handleBack = async () => {

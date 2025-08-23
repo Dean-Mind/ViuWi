@@ -5,63 +5,61 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { ApiResponse } from '@/types/supabase'
+import {
+  KnowledgeBaseEntry,
+  KnowledgeBaseDocument,
+  SystemPrompt,
+  DocumentUploadResult,
+  ProcessingResult
+} from '@/types/knowledgeBase'
 
-export interface KnowledgeBaseEntry {
-  id: string
-  userId: string
-  businessProfileId: string
-  entryType: 'document' | 'text' | 'url'
-  title?: string
-  content?: string
-  originalContent?: string
-  sourceUrl?: string
-  processingStatus: 'pending' | 'processing' | 'completed' | 'failed'
-  errorMessage?: string
-  createdAt: string
-  updatedAt: string
-  // Document metadata (only for document entries)
-  documentMetadata?: {
-    fileName: string
-    fileSize: number
-    fileType: string
-  }
+// Database entity interfaces for type safety
+interface DatabaseKnowledgeBaseEntry {
+  id: string;
+  user_id: string;
+  business_profile_id: string;
+  entry_type: 'document' | 'text' | 'url';
+  title: string | null;
+  content: string | null;
+  original_content: string | null;
+  source_url: string | null;
+  processing_status: 'pending' | 'processing' | 'completed' | 'failed';
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+  knowledge_base_documents?: DatabaseDocument[];
 }
 
-export interface KnowledgeBaseDocument {
-  id: string
-  knowledgeBaseEntryId: string
-  fileName: string
-  fileSize: number
-  fileType: string
-  storagePath: string
-  llamaparseJobId?: string
-  processingMetadata?: any
-  createdAt: string
+interface DatabaseDocument {
+  id: string;
+  knowledge_base_entry_id: string;
+  file_name: string;
+  file_size: number;
+  file_type: string;
+  storage_path: string;
+  llamaparse_job_id: string | null;
+  processing_metadata: any; // Keep as any for flexible metadata
+  created_at: string;
 }
 
-export interface SystemPrompt {
-  id: string
-  userId: string
-  businessProfileId: string
-  promptContent: string
-  generationStatus: 'pending' | 'generating' | 'completed' | 'failed'
-  generationMetadata?: any
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
+interface DatabaseSystemPrompt {
+  id: string;
+  user_id: string;
+  business_profile_id: string;
+  prompt_content: string;
+  generation_status: 'pending' | 'generating' | 'completed' | 'failed';
+  generation_metadata: any; // Keep as any for flexible metadata
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface DocumentUploadResult {
-  entryId: string
-  documentId: string
-  uploadPath: string
-}
-
-export interface ProcessingResult {
-  success: boolean
-  content?: string
-  error?: string
-  metadata?: any
+// Storage document interface for file operations
+interface StorageDocument {
+  storage_path: string;
+  file_name: string;
+  file_size: number;
+  file_type: string;
 }
 
 class SupabaseKnowledgeBaseService {
@@ -380,8 +378,8 @@ class SupabaseKnowledgeBaseService {
    */
   async processDocument(documentId: string): Promise<ApiResponse<ProcessingResult>> {
     try {
-      const user = await this.supabase.auth.getUser()
-      if (!user.data.user) {
+      const { data: { session }, error: sessionError } = await this.supabase.auth.getSession()
+      if (sessionError || !session?.access_token) {
         return {
           data: null,
           error: 'User not authenticated',
@@ -389,15 +387,15 @@ class SupabaseKnowledgeBaseService {
         }
       }
 
-      // Call Next.js API route instead of Supabase Edge Function
+      // Call Next.js API route with Authorization header
       const response = await fetch('/api/process-document', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          documentId,
-          userId: user.data.user.id
+          documentId
         })
       })
 
@@ -629,12 +627,29 @@ class SupabaseKnowledgeBaseService {
         }
       }
 
-      // Delete associated files from storage
+      // Delete associated files from storage with error handling
       if (entry.knowledge_base_documents?.length > 0) {
-        const filePaths = entry.knowledge_base_documents.map((doc: any) => doc.storage_path)
-        await this.supabase.storage
-          .from('knowledge-base-docs')
-          .remove(filePaths)
+        const filePaths = entry.knowledge_base_documents.map((doc: StorageDocument) => doc.storage_path)
+
+        try {
+          const { error: storageError } = await this.supabase.storage
+            .from('knowledge-base-docs')
+            .remove(filePaths)
+
+          if (storageError) {
+            console.error('Failed to delete files from storage:', storageError)
+            console.error('File paths that failed to delete:', filePaths)
+
+            // Don't proceed with database deletion if storage deletion fails
+            // This maintains consistency between storage and database
+            throw new Error(`Storage deletion failed: ${storageError.message}`)
+          }
+
+          console.log('Successfully deleted files from storage:', filePaths)
+        } catch (storageError) {
+          console.error('Storage deletion error:', storageError)
+          throw storageError
+        }
       }
 
       // Delete the entry (cascade will handle documents table)
@@ -662,18 +677,18 @@ class SupabaseKnowledgeBaseService {
   /**
    * Map database entry to service interface
    */
-  private mapDatabaseEntry(dbEntry: any): KnowledgeBaseEntry {
+  private mapDatabaseEntry(dbEntry: DatabaseKnowledgeBaseEntry): KnowledgeBaseEntry {
     return {
       id: dbEntry.id,
       userId: dbEntry.user_id,
       businessProfileId: dbEntry.business_profile_id,
       entryType: dbEntry.entry_type,
-      title: dbEntry.title,
-      content: dbEntry.content,
-      originalContent: dbEntry.original_content,
-      sourceUrl: dbEntry.source_url,
+      title: dbEntry.title || undefined,
+      content: dbEntry.content || undefined,
+      originalContent: dbEntry.original_content || undefined,
+      sourceUrl: dbEntry.source_url || undefined,
       processingStatus: dbEntry.processing_status,
-      errorMessage: dbEntry.error_message,
+      errorMessage: dbEntry.error_message || undefined,
       createdAt: dbEntry.created_at,
       updatedAt: dbEntry.updated_at
     }
@@ -682,7 +697,7 @@ class SupabaseKnowledgeBaseService {
   /**
    * Map database entry with document metadata to service interface
    */
-  private mapDatabaseEntryWithDocuments(dbEntry: any): KnowledgeBaseEntry {
+  private mapDatabaseEntryWithDocuments(dbEntry: DatabaseKnowledgeBaseEntry): KnowledgeBaseEntry {
     const baseEntry = this.mapDatabaseEntry(dbEntry)
 
     // Add document metadata if it's a document entry and has document data
@@ -701,7 +716,7 @@ class SupabaseKnowledgeBaseService {
   /**
    * Map database document to service interface
    */
-  private mapDatabaseDocument(dbDoc: any): KnowledgeBaseDocument {
+  private mapDatabaseDocument(dbDoc: DatabaseDocument): KnowledgeBaseDocument {
     return {
       id: dbDoc.id,
       knowledgeBaseEntryId: dbDoc.knowledge_base_entry_id,
@@ -709,7 +724,7 @@ class SupabaseKnowledgeBaseService {
       fileSize: dbDoc.file_size,
       fileType: dbDoc.file_type,
       storagePath: dbDoc.storage_path,
-      llamaparseJobId: dbDoc.llamaparse_job_id,
+      llamaparseJobId: dbDoc.llamaparse_job_id || undefined,
       processingMetadata: dbDoc.processing_metadata,
       createdAt: dbDoc.created_at
     }
@@ -718,7 +733,7 @@ class SupabaseKnowledgeBaseService {
   /**
    * Map database system prompt to service interface
    */
-  private mapDatabaseSystemPrompt(dbPrompt: any): SystemPrompt {
+  private mapDatabaseSystemPrompt(dbPrompt: DatabaseSystemPrompt): SystemPrompt {
     return {
       id: dbPrompt.id,
       userId: dbPrompt.user_id,

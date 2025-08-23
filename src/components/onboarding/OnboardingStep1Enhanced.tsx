@@ -4,18 +4,13 @@ import { useState, useEffect } from 'react';
 import { supabaseKnowledgeBaseAPI } from '@/services/supabaseKnowledgeBase';
 import { useAuth } from '@/stores/authStore';
 import { useAppToast } from '@/hooks/useAppToast';
-import { KnowledgeBaseEntry, ProcessingStatusInterface } from '@/types/knowledgeBase';
+import { KnowledgeBaseEntry, ProcessingStatusInterface, OnboardingStep1EnhancedProps, DEFAULT_KNOWLEDGE_BASE_CONFIG } from '@/types/knowledgeBase';
 import FileUploadArea from './FileUploadArea';
 import AuthButton from '../ui/AuthButton';
 import FormLabel from '../ui/FormLabel';
 import Alert from '../ui/Alert';
 
-interface OnboardingStep1EnhancedProps {
-  onNext: () => void
-  onBack: () => void
-  isLoading?: boolean
-  error?: string
-}
+
 
 export default function OnboardingStep1Enhanced({
   onNext,
@@ -172,14 +167,21 @@ export default function OnboardingStep1Enhanced({
       if (!trimmedUrl) return 'invalid or unknown';
 
       // Validate protocol
-      if (!trimmedUrl.match(/^https?:\/\//)) {
+      if (!/^https?:\/\//i.test(trimmedUrl)) {
         return 'invalid protocol';
       }
 
       const parsedUrl = new URL(trimmedUrl);
-      // Escape hostname to prevent XSS
+      // Use more comprehensive escaping
       const hostname = parsedUrl.hostname || 'invalid hostname';
-      return hostname.replace(/[<>"'&]/g, ''); // Basic XSS prevention
+      // HTML entity encoding for better XSS prevention
+      return hostname
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;');
     } catch (error) {
       return 'invalid or unknown';
     }
@@ -274,17 +276,29 @@ export default function OnboardingStep1Enhanced({
     }
   };
 
+  // Helper function to wrap async operations with timeout
+  const withTimeout = (promise: Promise<any>, timeoutMs: number, operation: string): Promise<any> => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`${operation} timed out after ${timeoutMs}ms`)), timeoutMs)
+      )
+    ]);
+  };
+
   // Process all saved content and generate system prompt
   const handleProcessAndContinue = async () => {
     if (!user?.id) return;
-    
+
     setIsProcessing(true);
     setProcessingStatus({
       isProcessing: true,
       currentStep: 'Starting processing...',
       progress: 0
     });
-    
+
+    const failedEntries: string[] = [];
+
     try {
       const documentsToProcess = savedEntries.filter(
         entry => entry.entryType === 'document' && entry.processingStatus === 'pending'
@@ -306,18 +320,41 @@ export default function OnboardingStep1Enhanced({
         });
 
         try {
-          // Get the document ID from the entry
-          const documentResult = await supabaseKnowledgeBaseAPI.getDocumentByEntryId(docEntry.id);
+          // Get the document ID from the entry with timeout
+          const documentResult = await withTimeout(
+            supabaseKnowledgeBaseAPI.getDocumentByEntryId(docEntry.id),
+            DEFAULT_KNOWLEDGE_BASE_CONFIG.processingTimeout,
+            `Getting document for ${docEntry.title}`
+          );
+
           if (documentResult.success && documentResult.data) {
-            const result = await supabaseKnowledgeBaseAPI.processDocument(documentResult.data.id);
+            const result = await withTimeout(
+              supabaseKnowledgeBaseAPI.processDocument(documentResult.data.id),
+              DEFAULT_KNOWLEDGE_BASE_CONFIG.processingTimeout,
+              `Processing document ${docEntry.title}`
+            );
+
             if (!result.success) {
               console.error(`Failed to process document ${docEntry.title}:`, result.error);
+              failedEntries.push(docEntry.title || docEntry.id);
             }
           } else {
             console.error(`Failed to get document for entry ${docEntry.id}:`, documentResult.error);
+            failedEntries.push(docEntry.title || docEntry.id);
           }
         } catch (error) {
           console.error(`Error processing document ${docEntry.title}:`, error);
+          failedEntries.push(docEntry.title || docEntry.id);
+
+          // Mark entry as failed in database
+          try {
+            await supabaseKnowledgeBaseAPI.updateKnowledgeBaseEntry(docEntry.id, {
+              processingStatus: 'failed',
+              errorMessage: error instanceof Error ? error.message : 'Processing timeout or error'
+            });
+          } catch (updateError) {
+            console.error(`Failed to update entry status for ${docEntry.id}:`, updateError);
+          }
         }
       }
       
@@ -331,16 +368,29 @@ export default function OnboardingStep1Enhanced({
         });
         
         try {
-          const result = await supabaseKnowledgeBaseAPI.processUrl(
-            urlEntry.id,
-            urlEntry.sourceUrl!
+          const result = await withTimeout(
+            supabaseKnowledgeBaseAPI.processUrl(urlEntry.id, urlEntry.sourceUrl!),
+            DEFAULT_KNOWLEDGE_BASE_CONFIG.processingTimeout,
+            `Processing URL ${urlEntry.sourceUrl}`
           );
-          
+
           if (!result.success) {
             console.error(`Failed to process URL ${urlEntry.sourceUrl}:`, result.error);
+            failedEntries.push(urlEntry.sourceUrl || urlEntry.id);
           }
         } catch (error) {
           console.error(`Error processing URL ${urlEntry.sourceUrl}:`, error);
+          failedEntries.push(urlEntry.sourceUrl || urlEntry.id);
+
+          // Mark entry as failed in database
+          try {
+            await supabaseKnowledgeBaseAPI.updateKnowledgeBaseEntry(urlEntry.id, {
+              processingStatus: 'failed',
+              errorMessage: error instanceof Error ? error.message : 'Processing timeout or error'
+            });
+          } catch (updateError) {
+            console.error(`Failed to update entry status for ${urlEntry.id}:`, updateError);
+          }
         }
       }
       
@@ -352,8 +402,10 @@ export default function OnboardingStep1Enhanced({
         progress: (currentStep / totalSteps) * 100
       });
 
-      const promptResult = await supabaseKnowledgeBaseAPI.generateSystemPrompt(
-        businessProfileId
+      const promptResult = await withTimeout(
+        supabaseKnowledgeBaseAPI.generateSystemPrompt(businessProfileId),
+        DEFAULT_KNOWLEDGE_BASE_CONFIG.processingTimeout,
+        'Generating system prompt'
       );
       
       if (promptResult.success) {
@@ -362,9 +414,14 @@ export default function OnboardingStep1Enhanced({
           currentStep: 'Processing complete!',
           progress: 100
         });
-        
-        toast.success('Knowledge base processed successfully!');
-        
+
+        // Show success message with details about failed entries if any
+        if (failedEntries.length > 0) {
+          toast.success(`Knowledge base processed! ${failedEntries.length} items failed and will be retried later.`);
+        } else {
+          toast.success('Knowledge base processed successfully!');
+        }
+
         // Wait a moment to show completion, then proceed
         setTimeout(() => {
           onNext();
@@ -372,7 +429,7 @@ export default function OnboardingStep1Enhanced({
       } else {
         throw new Error(promptResult.error || 'Failed to generate system prompt');
       }
-      
+
     } catch (error) {
       console.error('Processing failed:', error);
       setProcessingStatus({
@@ -381,7 +438,13 @@ export default function OnboardingStep1Enhanced({
         progress: 0,
         error: error instanceof Error ? error.message : 'Unknown error occurred'
       });
-      toast.error('Processing failed. Please try again.');
+
+      // Show specific error message for timeouts vs other errors
+      if (error instanceof Error && error.message.includes('timed out')) {
+        toast.error('Processing timed out. Some items may need to be processed later.');
+      } else {
+        toast.error('Processing failed. Please try again.');
+      }
     } finally {
       setIsProcessing(false);
     }

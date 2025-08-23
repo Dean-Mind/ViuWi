@@ -40,9 +40,20 @@ export async function middleware(request: NextRequest) {
   // Helper function to create redirect response with cookies
   const createRedirectResponse = (url: string) => {
     const redirectResponse = NextResponse.redirect(new URL(url, request.url))
-    request.cookies.getAll().forEach(cookie => {
-      redirectResponse.cookies.set(cookie.name, cookie.value)
+
+    // Preserve full Set-Cookie headers with all attributes
+    const setCookieHeaders = request.headers.getSetCookie?.() || []
+    setCookieHeaders.forEach(cookieHeader => {
+      redirectResponse.headers.append('Set-Cookie', cookieHeader)
     })
+
+    // Fallback: copy cookies manually if getSetCookie is not available
+    if (setCookieHeaders.length === 0) {
+      request.cookies.getAll().forEach(cookie => {
+        redirectResponse.cookies.set(cookie.name, cookie.value)
+      })
+    }
+
     return redirectResponse
   }
 

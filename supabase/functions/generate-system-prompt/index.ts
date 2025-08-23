@@ -32,16 +32,19 @@ interface KnowledgeBaseEntry {
   processing_status: string
 }
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGIN') ?? '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...CORS_HEADERS } });
+
 serve(async (req) => {
   // Handle CORS
   if (req.method === 'OPTIONS') {
-    return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      },
-    })
+    return new Response('ok', { headers: CORS_HEADERS })
   }
 
   try {
@@ -49,24 +52,39 @@ serve(async (req) => {
     const n8nWebhookBaseUrl = Deno.env.get('N8N_WEBHOOK_BASE_URL')
     if (!n8nWebhookBaseUrl || n8nWebhookBaseUrl.trim() === '') {
       console.error('N8N_WEBHOOK_BASE_URL environment variable is not set or empty')
-      return new Response(JSON.stringify({
-        success: false,
-        error: 'Server configuration error: N8N_WEBHOOK_BASE_URL not configured'
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return json({ success: false, error: 'Server configuration error: N8N_WEBHOOK_BASE_URL not configured' }, 500)
+    }
+
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
+    const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    if (!SUPABASE_URL || !SERVICE_ROLE_KEY || !ANON_KEY) {
+      console.error('Missing SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY/SUPABASE_ANON_KEY')
+      return json({ success: false, error: 'Server configuration error: Supabase env not configured' }, 500)
+    }
+
+    // Verify auth
+    const authHeader = req.headers.get('Authorization') ?? ''
+    if (!authHeader.startsWith('Bearer ')) {
+      return json({ success: false, error: 'Missing Authorization header' }, 401)
     }
 
     const { userId, businessProfileId }: SystemPromptRequest = await req.json()
 
     console.log(`Generating system prompt for user ${userId} and business ${businessProfileId}`)
 
-    // Initialize Supabase client
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    // Auth client to validate the JWT; DB client with service role for DB ops
+    const authClient = createClient(SUPABASE_URL, ANON_KEY, { global: { headers: { Authorization: authHeader } } })
+    const { data: userData, error: userError } = await authClient.auth.getUser()
+    if (userError || !userData?.user) {
+      return json({ success: false, error: 'Invalid or expired token' }, 401)
+    }
+    if (userData.user.id !== userId) {
+      return json({ success: false, error: 'Forbidden: user mismatch' }, 403)
+    }
+
+    // Service-role client (do not log or expose the key)
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
     
     // Create or update system prompt entry using UPSERT
     const { data: newPrompt, error: promptError } = await supabase
@@ -276,33 +294,16 @@ serve(async (req) => {
       throw updateError
     }
     
-    return new Response(JSON.stringify({ 
-      success: true, 
+    return json({
+      success: true,
       prompt: promptResult.output,
       promptId: newPrompt.id,
-      metadata: {
-        contentLength: promptResult.output.length,
-        knowledgeBaseEntries: contextData.totalEntries
-      }
-    }), {
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+      metadata: { contentLength: promptResult.output.length, knowledgeBaseEntries: contextData.totalEntries }
     })
-    
+
   } catch (error) {
     console.error('System prompt generation error:', error)
 
-    return new Response(JSON.stringify({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
+    return json({ success: false, error: error instanceof Error ? error.message : 'Unknown error occurred' }, 500)
   }
 })

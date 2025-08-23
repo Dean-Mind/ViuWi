@@ -154,24 +154,8 @@ export default function OnboardingStep0({
 
 
 
-      // Skip store validation and call Supabase API directly
-      const { supabaseBusinessProfileAPI } = await import('@/services/supabaseBusinessProfile');
-
-      // Try to get existing profile first
-      const existingProfile = await supabaseBusinessProfileAPI.getBusinessProfile(user.id);
-
-      let result;
-      if (existingProfile.success && existingProfile.data) {
-        // Update existing profile
-        result = await supabaseBusinessProfileAPI.updateBusinessProfile(existingProfile.data.id, fullFormData);
-      } else {
-        // Create new profile
-        result = await supabaseBusinessProfileAPI.createBusinessProfile(user.id, fullFormData);
-      }
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to save business profile');
-      }
+      // Use store's saveToSupabase method which handles logo upload and progress
+      await saveToSupabase(fullFormData, user.id);
 
       onNext();
     } catch (error) {

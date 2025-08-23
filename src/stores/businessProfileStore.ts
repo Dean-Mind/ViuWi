@@ -178,6 +178,7 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
   // Supabase actions
   saveToSupabase: async (formData: BusinessProfileFormData, userId: string) => {
     set({ isSaving: true, error: null });
+    let uploadedLogoPath: string | null = null;
 
     try {
       // Validate form data
@@ -202,6 +203,7 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
         }
 
         logoUrl = uploadResult.data.publicUrl;
+        uploadedLogoPath = uploadResult.data.path; // Store for potential cleanup
         set({ uploadProgress: 100 });
       }
 
@@ -258,6 +260,17 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
       // when all steps are completed, not just when business profile is saved
 
     } catch (error) {
+      // Clean up uploaded logo on failure
+      if (uploadedLogoPath) {
+        try {
+          // Extract filename from path for deletion
+          const fileName = uploadedLogoPath.split('/').pop() || '';
+          await supabaseBusinessProfileAPI.deleteLogo(userId, fileName);
+        } catch (cleanupError) {
+          console.error('Failed to clean up uploaded logo:', cleanupError);
+        }
+      }
+
       set({
         isSaving: false,
         error: error instanceof Error ? error.message : 'Failed to save business profile',

@@ -451,7 +451,9 @@ class SupabaseBusinessProfileService {
   /**
    * Convert Supabase row data to BusinessProfile format
    */
-  private async convertToBusinessProfile(data: BusinessProfileRow | BusinessProfileWithRelations): Promise<BusinessProfile> {
+  async convertToBusinessProfile(
+    data: BusinessProfileRow | BusinessProfileWithRelations
+  ): Promise<BusinessProfile> {
     // Get related data if not already included
     let operatingHours: OperatingHours[] = []
     let socialMedia: SocialMediaLinks = {}
