@@ -149,10 +149,10 @@ export default function OnboardingStep0({
         socialMedia: formData.socialMedia || {},
         registrationNumber: formData.registrationNumber || '',
         taxId: formData.taxId || '',
-        // Feature flags - default to false for step 0, will be set in step 2
-        featureProductCatalog: false,
-        featureOrderManagement: false,
-        featurePaymentSystem: false
+        // Feature flags - preserve existing settings, default to false only as last resort
+        featureProductCatalog: formData.featureProductCatalog ?? businessProfile?.featureProductCatalog ?? false,
+        featureOrderManagement: formData.featureOrderManagement ?? businessProfile?.featureOrderManagement ?? false,
+        featurePaymentSystem: formData.featurePaymentSystem ?? businessProfile?.featurePaymentSystem ?? false
       };
 
 

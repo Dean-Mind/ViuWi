@@ -24,12 +24,32 @@ The migration transforms the feature selection onboarding from local state manag
 
 ### Added Columns to `business_profiles` Table
 
+**Applied via**: Supabase MCP (Management API)
+
+The database changes properly handle tri-state boolean issues by:
+1. Feature columns already existed with DEFAULT false
+2. Verified no existing NULL values needed backfilling
+3. Set NOT NULL constraints to prevent future NULL values
+4. Added documentation comments for each feature column
+
+**Applied Changes**:
 ```sql
-ALTER TABLE business_profiles 
-ADD COLUMN IF NOT EXISTS feature_product_catalog BOOLEAN DEFAULT false,
-ADD COLUMN IF NOT EXISTS feature_order_management BOOLEAN DEFAULT false,
-ADD COLUMN IF NOT EXISTS feature_payment_system BOOLEAN DEFAULT false;
+-- Set NOT NULL constraints to prevent tri-state booleans
+ALTER TABLE business_profiles
+ALTER COLUMN feature_product_catalog SET NOT NULL,
+ALTER COLUMN feature_order_management SET NOT NULL,
+ALTER COLUMN feature_payment_system SET NOT NULL;
+
+-- Add documentation comments
+COMMENT ON COLUMN business_profiles.feature_product_catalog IS 'Controls Product Catalog dashboard feature activation';
+COMMENT ON COLUMN business_profiles.feature_order_management IS 'Controls Order Management dashboard feature activation';
+COMMENT ON COLUMN business_profiles.feature_payment_system IS 'Controls Payment System dashboard feature activation';
 ```
+
+**Final Schema**:
+- `feature_product_catalog`: `boolean NOT NULL DEFAULT false`
+- `feature_order_management`: `boolean NOT NULL DEFAULT false`
+- `feature_payment_system`: `boolean NOT NULL DEFAULT false`
 
 **Column Mapping:**
 - `feature_product_catalog` → Controls "Katalog Produk" dashboard feature

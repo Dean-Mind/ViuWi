@@ -34,6 +34,24 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
     isSaving
   } = useBusinessProfileStore();
 
+  // Sync features state with persisted businessProfile flags
+  useEffect(() => {
+    if (!businessProfile) return;
+
+    setFeatures(prev => prev.map(f => {
+      switch (f.id) {
+        case 'product_catalog':
+          return { ...f, enabled: businessProfile.featureProductCatalog };
+        case 'order_management':
+          return { ...f, enabled: businessProfile.featureOrderManagement };
+        case 'payment_system':
+          return { ...f, enabled: businessProfile.featurePaymentSystem };
+        default:
+          return f;
+      }
+    }));
+  }, [businessProfile]);
+
   // State derived from onboarding status
   const [currentStep, setCurrentStep] = useState(onboardingStatus?.currentStep || initialStep);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(
