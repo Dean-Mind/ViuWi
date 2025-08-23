@@ -38,9 +38,8 @@ Server-side route protection:
 #### 4. Client-side Guards (`OnboardingGuard.tsx`)
 React components for route protection:
 - `OnboardingGuard` - Generic guard with configurable requirements
-- `DashboardGuard` - Requires completed onboarding
+- `DashboardGuard` - Requires onboarding to be completed
 - `OnboardingOnlyGuard` - Prevents access if onboarding is completed
-
 ## User Flow
 
 ### New User Journey

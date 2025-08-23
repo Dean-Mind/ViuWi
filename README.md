@@ -6,11 +6,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 Before running the application, ensure you have the following environment variables configured:
 
-#### Supabase Edge Functions Environment Variables
+#### Environment Variables
 
-The following environment variables must be set in your Supabase project dashboard for the edge functions to work properly:
+Configure environment variables in the right runtime:
 
-- `N8N_WEBHOOK_BASE_URL` - Base URL for n8n webhook integration (e.g., `https://n8ncloud.com/webhook`)
+- Next.js Server (Vercel project settings → Environment Variables or `.env.local` for dev)
+  - `LLAMA_CLOUD_API_KEY` – LlamaParse API key used by the Next.js API route (`/api/process-document`).
+
+- Supabase Edge Functions (Supabase Dashboard → Settings → Edge Functions)
+  - `SUPABASE_SERVICE_ROLE_KEY` – Service-role key for server-side operations inside Edge Functions. Do not expose to the client or Next.js browser runtime.
+  - `N8N_WEBHOOK_BASE_URL` – Base URL for n8n webhook integration (e.g., `https://n8ncloud.com/webhook`).
 
 ### Development Server
 
@@ -53,12 +58,14 @@ To deploy the Supabase edge functions, use the provided deployment script:
 
 **Important**: After deployment, make sure to set the required environment variables in your Supabase project dashboard:
 
-1. Go to your Supabase project dashboard
-2. Navigate to Settings > Edge Functions
-3. Set the following environment variables:
-   - `LLAMA_CLOUD_API_KEY` - Your LlamaIndex Cloud API key
-   - `SUPABASE_SERVICE_ROLE_KEY` - Your service role key
-   - `N8N_WEBHOOK_BASE_URL` - Your n8n webhook base URL (e.g., `https://n8ncloud.com/webhook`)
+1. Go to your Supabase project dashboard  
+2. Navigate to Settings > Edge Functions  
+3. Set ONLY the following Edge Functions environment variables (do not add them to client/browser environments):  
+   - `LLAMA_CLOUD_API_KEY` – Your LlamaIndex Cloud API key  
+   - `SUPABASE_SERVICE_ROLE_KEY` – Your service role key (KEEP PRIVATE; never expose in Next.js client or `.env.*` with `NEXT_PUBLIC_` prefix)  
+   - `N8N_WEBHOOK_BASE_URL` – Your n8n webhook base URL (e.g., `https://n8ncloud.com/webhook`)
+
+For local development of the Next.js API route, put this in `.env.local`:
 
 ### Deploy on Vercel
 

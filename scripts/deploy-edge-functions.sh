@@ -21,9 +21,14 @@ if ! supabase projects list &> /dev/null; then
     exit 1
 fi
 
-# Determine PROJECT_REF from multiple sources
-# Priority: CLI argument > environment variable > supabase link > error
-PROJECT_REF=""
+# Project reference (env or arg)
+PROJECT_REF="${PROJECT_REF:-${1:-}}"
+if [ -z "$PROJECT_REF" ]; then
+  echo "❌ PROJECT_REF is not set. Provide via env or as the first arg."
+  echo "   Example: PROJECT_REF=your-ref ./scripts/deploy-edge-functions.sh"
+  echo "         or ./scripts/deploy-edge-functions.sh your-ref"
+  exit 1
+fi
 
 if [ -n "$1" ]; then
     PROJECT_REF="$1"

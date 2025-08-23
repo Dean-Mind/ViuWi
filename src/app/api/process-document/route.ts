@@ -5,6 +5,10 @@ import { promises as fs } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 
+export const runtime = 'nodejs'
+export const maxDuration = 60
+
+// ...rest of your route handler code...
 interface DocumentProcessRequest {
   documentId: string
 }
