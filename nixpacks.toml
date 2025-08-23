@@ -3,6 +3,13 @@
 # Optimized for Next.js 15.4.6 with React 19 and production deployment
 
 # =============================================================================
+# PROVIDER CONFIGURATION
+# =============================================================================
+# Force Node.js provider to prevent Deno detection from supabase/functions/
+[providers]
+node = true
+
+# =============================================================================
 # ENVIRONMENT VARIABLES
 # =============================================================================
 [variables]
