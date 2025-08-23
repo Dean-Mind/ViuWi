@@ -211,13 +211,7 @@ class SupabaseBusinessProfileService {
 
       // Update operating hours if provided
       if (formData.operatingHours) {
-        // Delete existing hours
-        await this.supabase
-          .from('operating_hours')
-          .delete()
-          .eq('business_profile_id', profileId)
-
-        // Insert new hours
+        // Upsert hours (requires unique index on (business_profile_id, day_of_week))
         const operatingHoursData: OperatingHoursInsert[] = formData.operatingHours.map(hour => ({
           business_profile_id: profileId,
           day_of_week: hour.day,
@@ -231,7 +225,7 @@ class SupabaseBusinessProfileService {
 
         const { error: hoursError } = await this.supabase
           .from('operating_hours')
-          .insert(operatingHoursData)
+          .upsert(operatingHoursData, { onConflict: 'business_profile_id,day_of_week' })
 
         if (hoursError) {
           return { data: null, error: hoursError.message, success: false }
