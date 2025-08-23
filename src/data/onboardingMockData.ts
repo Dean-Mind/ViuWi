@@ -16,7 +16,7 @@ export const mockOnboardingData = {
       ]
     },
     websiteLink: {
-      placeholder: "https://www.namadomainanda.com/faq"
+      placeholder: "https://www.namadomainanda.com"
     }
   },
   

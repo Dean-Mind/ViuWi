@@ -135,7 +135,7 @@ export default function URLContentModal({ isOpen, onClose }: URLContentModalProp
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 className="input input-bordered flex-1 rounded-2xl"
-                placeholder="https://www.example.com/faq"
+                placeholder="https://www.example.com"
                 pattern="https?://.*"
                 aria-invalid={url.trim() ? !isValidUrl(url) : undefined}
                 disabled={isExtracting}
