@@ -230,6 +230,11 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
         // Update logo URL if uploaded
         if (logoUrl) {
           await supabaseBusinessProfileAPI.updateLogoUrl(existingProfile.id, logoUrl);
+
+          // Propagate new logo URL into the returned profile data
+          if (result.success && result.data) {
+            result.data.logoBlobUrl = logoUrl;
+          }
         }
       } else {
         // Create new profile
