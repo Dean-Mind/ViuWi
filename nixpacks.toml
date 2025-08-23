@@ -26,13 +26,7 @@ NEXT_TELEMETRY_DISABLED = "1"  # Disable telemetry for faster builds
 [phases.setup]
 # Essential system packages for Node.js and Next.js builds
 # Note: pnpm is automatically detected and installed by nixpacks from pnpm-lock.yaml
-nixPkgs = [
-  "nodejs_20",     # Node.js 20 for better performance
-  "python3",       # Required for some native dependencies
-  "gcc",           # C compiler for native modules
-  "pkg-config",    # Package configuration tool
-  "git"            # Git for potential dependency resolution
-]
+
 [phases.install]
 cmds = ["pnpm install --frozen-lockfile"]
 
