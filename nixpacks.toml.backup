@@ -1,0 +1,107 @@
+# Nixpacks Configuration for ViuWi Next.js Application
+# BACKUP OF ORIGINAL CONFIGURATION - DO NOT USE FOR DEPLOYMENT
+# This is the original configuration that caused the "undefined variable 'pnpm'" error
+
+# =============================================================================
+# ENVIRONMENT VARIABLES
+# =============================================================================
+[variables]
+# Use Node.js 20 for better performance and caching
+NIXPACKS_NODE_VERSION = "20"
+
+# Production environment settings
+NODE_ENV = "production"
+CI = "true"
+
+# pnpm configuration for optimal caching
+NPM_CONFIG_PRODUCTION = "false"  # Ensure dev deps are installed for build
+PNPM_HOME = "/app/.pnpm"
+PNPM_STORE_DIR = "/app/.pnpm-store"  # Pinned store directory for consistent caching
+
+# Network resilience configuration for pnpm
+PNPM_FETCH_RETRIES = "5"  # Retry failed downloads 5 times
+PNPM_FETCH_RETRY_FACTOR = "2"  # Exponential backoff factor
+PNPM_FETCH_RETRY_MINTIMEOUT = "10000"  # Minimum retry timeout (10 seconds)
+PNPM_FETCH_RETRY_MAXTIMEOUT = "60000"  # Maximum retry timeout (60 seconds)
+
+# Next.js optimizations
+NEXT_TELEMETRY_DISABLED = "1"  # Disable telemetry for faster builds
+
+# =============================================================================
+# BUILD PHASES
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SETUP PHASE: Install system packages and tools
+# -----------------------------------------------------------------------------
+[phases.setup]
+# Essential packages for Node.js and Next.js builds
+nixPkgs = [
+  "nodejs_20",     # Node.js 20 for better performance
+  "pnpm",          # pnpm package manager - THIS CAUSED THE ERROR
+  "python3",       # Required for some native dependencies
+  "gcc",           # C compiler for native modules
+  "pkg-config",    # Package configuration tool
+  "git"            # Git for potential dependency resolution
+]
+
+# Cache pnpm store directory
+cacheDirectories = [
+  "/app/.pnpm-store"
+]
+
+# -----------------------------------------------------------------------------
+# INSTALL PHASE: Install dependencies with optimal caching
+# -----------------------------------------------------------------------------
+[phases.install]
+# Use frozen lockfile for consistent builds and prefer offline for speed
+cmds = [
+  "pnpm install --frozen-lockfile --prefer-offline --store-dir=/app/.pnpm-store"
+]
+
+# Comprehensive caching for faster subsequent builds
+cacheDirectories = [
+  "node_modules/.cache",           # General Node.js cache
+  "/app/.pnpm-store",              # Consolidated pnpm package store (absolute path)
+  "node_modules/.cache/webpack",   # Webpack cache
+  "node_modules/.cache/@swc"       # SWC compiler cache
+]
+
+# -----------------------------------------------------------------------------
+# BUILD PHASE: Build the Next.js application
+# -----------------------------------------------------------------------------
+[phases.build]
+# Build the application
+cmds = [
+  "pnpm run build"
+]
+
+# Cache build artifacts and compilation results
+cacheDirectories = [
+  ".next/cache",                   # Next.js build cache
+  "node_modules/.cache",           # Node.js cache
+  "/app/.pnpm-store",              # Consolidated pnpm package store (absolute path)
+  "node_modules/.cache/webpack",   # Webpack cache
+  "node_modules/.cache/@swc",      # SWC cache
+  "node_modules/.cache/terser-webpack-plugin"  # Terser cache
+]
+
+# Depend on install phase
+dependsOn = ["install"]
+
+# =============================================================================
+# START CONFIGURATION
+# =============================================================================
+[start]
+# Use pnpm to start the production server
+cmd = "pnpm run start"
+
+# =============================================================================
+# OPTIMIZATION NOTES
+# =============================================================================
+# This configuration optimizes for:
+# 1. Build Speed: Node.js 20, comprehensive caching, frozen lockfile
+# 2. Reliability: Consistent dependency versions, offline-first approach
+# 3. Performance: Production environment, disabled telemetry
+# 4. Caching: Multi-layer caching for dependencies and build artifacts
+# 5. Docker Efficiency: Optimal file inclusion for layer caching
