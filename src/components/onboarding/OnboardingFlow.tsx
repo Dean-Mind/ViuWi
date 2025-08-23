@@ -285,7 +285,6 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
       case 3:
         return (
           <OnboardingStep3
-            qrCodeUrl={mockOnboardingData.whatsappConnection.qrCodeUrl}
             onQRScanned={handleQRScanned}
             onBack={handleBack}
             isLoading={isLoading}

@@ -137,20 +137,42 @@ export default function OnboardingStep1Enhanced({
 
     setIsSaving(true);
     try {
-      const result = await supabaseKnowledgeBaseAPI.createTextEntry(
-        user.id,
-        businessProfileId,
-        textInput,
-        'Manual Text Entry'
-      );
-      
-      if (result.success && result.data) {
-        setSavedEntries(prev => [result.data!, ...prev]);
-        setOriginalTextContent(textInput.trim());
-        setTextInput('');
-        toast.success('Text content saved successfully');
+      // Check if a text entry already exists
+      const existingTextEntry = savedEntries.find(entry => entry.entryType === 'text');
+
+      if (existingTextEntry) {
+        // Update existing text entry
+        const result = await supabaseKnowledgeBaseAPI.updateKnowledgeBaseEntry(existingTextEntry.id, {
+          content: textInput.trim(),
+          title: 'Manual Text Entry',
+          processingStatus: 'completed' // Text entries are immediately complete
+        });
+
+        if (result.success && result.data) {
+          setSavedEntries(prev => prev.map(entry =>
+            entry.id === existingTextEntry.id ? result.data! : entry
+          ));
+          setOriginalTextContent(textInput.trim());
+          toast.success('Text content updated successfully');
+        } else {
+          toast.error(result.error || 'Failed to update text content');
+        }
       } else {
-        toast.error(result.error || 'Failed to save text content');
+        // Create new text entry
+        const result = await supabaseKnowledgeBaseAPI.createTextEntry(
+          user.id,
+          businessProfileId,
+          textInput,
+          'Manual Text Entry'
+        );
+
+        if (result.success && result.data) {
+          setSavedEntries(prev => [result.data!, ...prev]);
+          setOriginalTextContent(textInput.trim());
+          toast.success('Text content saved successfully');
+        } else {
+          toast.error(result.error || 'Failed to save text content');
+        }
       }
     } catch (error) {
       console.error('Failed to save text:', error);
@@ -210,7 +232,6 @@ export default function OnboardingStep1Enhanced({
             entry.id === existingUrlEntry.id ? result.data! : entry
           ));
           setOriginalUrlContent(websiteUrl.trim());
-          setWebsiteUrl('');
           toast.success('URL updated successfully');
         } else {
           toast.error(result.error || 'Failed to update URL');
@@ -227,7 +248,6 @@ export default function OnboardingStep1Enhanced({
         if (result.success && result.data) {
           setSavedEntries(prev => [result.data!, ...prev]);
           setOriginalUrlContent(websiteUrl.trim());
-          setWebsiteUrl('');
           toast.success('URL saved successfully');
         } else {
           toast.error(result.error || 'Failed to save URL');
@@ -467,8 +487,12 @@ export default function OnboardingStep1Enhanced({
   };
 
   const canProceed = savedEntries.length > 0;
-  const hasUnsavedContent = (textInput.trim() !== originalTextContent.trim()) ||
-                           (websiteUrl.trim() !== originalUrlContent.trim());
+
+  // Improved logic to detect unsaved content
+  const hasUnsavedTextContent = textInput.trim() !== '' && textInput.trim() !== originalTextContent.trim();
+  const hasUnsavedUrlContent = websiteUrl.trim() !== '' && websiteUrl.trim() !== originalUrlContent.trim();
+  const hasUnsavedContent = hasUnsavedTextContent || hasUnsavedUrlContent;
+
   const isLoading = externalLoading || isSaving || isProcessing;
 
   return (
@@ -515,15 +539,25 @@ export default function OnboardingStep1Enhanced({
             <p>- Jam operasional kami adalah Senin–Jumat, pukul 09.00–17.00</p>
             <p>- Anda dapat mengajukan refund maksimal 7 hari setelah pembelian.</p>
           </div>
-          <AuthButton
-            onClick={handleSaveText}
-            loading={isSaving}
-            disabled={!textInput.trim() || isLoading}
-            className="w-auto px-6"
-            variant="secondary"
-          >
-            Simpan Teks
-          </AuthButton>
+          <div className="flex items-center gap-3">
+            <AuthButton
+              onClick={handleSaveText}
+              loading={isSaving}
+              disabled={!textInput.trim() || isLoading}
+              className="w-auto px-6"
+              variant="secondary"
+            >
+              {originalTextContent && textInput.trim() === originalTextContent.trim() ? 'Update Teks' : 'Simpan Teks'}
+            </AuthButton>
+            {originalTextContent && textInput.trim() === originalTextContent.trim() && (
+              <span className="text-sm text-success flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Tersimpan
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -539,15 +573,25 @@ export default function OnboardingStep1Enhanced({
             onChange={(e) => setWebsiteUrl(e.target.value)}
             disabled={isLoading}
           />
-          <AuthButton
-            onClick={handleSaveUrl}
-            loading={isSaving}
-            disabled={!websiteUrl.trim() || isLoading}
-            className="w-auto px-6"
-            variant="secondary"
-          >
-            Simpan URL
-          </AuthButton>
+          <div className="flex items-center gap-3">
+            <AuthButton
+              onClick={handleSaveUrl}
+              loading={isSaving}
+              disabled={!websiteUrl.trim() || isLoading}
+              className="w-auto px-6"
+              variant="secondary"
+            >
+              {originalUrlContent && websiteUrl.trim() === originalUrlContent.trim() ? 'Update URL' : 'Simpan URL'}
+            </AuthButton>
+            {originalUrlContent && websiteUrl.trim() === originalUrlContent.trim() && (
+              <span className="text-sm text-success flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Tersimpan
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -595,7 +639,10 @@ export default function OnboardingStep1Enhanced({
       {/* Unsaved Content Warning */}
       {hasUnsavedContent && (
         <Alert type="warning">
-          Ada konten yang belum disimpan. Klik &quot;Simpan&quot; sebelum melanjutkan.
+          Ada konten yang belum disimpan:
+          {hasUnsavedTextContent && <span className="block">• Teks yang diketik</span>}
+          {hasUnsavedUrlContent && <span className="block">• URL website</span>}
+          <span className="block mt-1">Klik tombol &quot;Simpan&quot; yang sesuai sebelum melanjutkan.</span>
         </Alert>
       )}
 

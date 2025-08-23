@@ -25,7 +25,7 @@ export interface OnboardingStep2Props {
 }
 
 export interface OnboardingStep3Props {
-  qrCodeUrl: string;
+  qrCodeUrl?: string; // Optional fallback URL
   onQRScanned: () => void;
   onBack: () => void;
   isLoading?: boolean;
