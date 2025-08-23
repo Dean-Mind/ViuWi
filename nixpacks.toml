@@ -31,11 +31,10 @@ nixPkgs = [
   "python3",       # Required for some native dependencies
   "gcc",           # C compiler for native modules
   "pkg-config",    # Package configuration tool
-  "git",            # Git for potential dependency resolution
-  "pnpm"
+  "git"            # Git for potential dependency resolution
 ]
 [phases.install]
-cmds = ["pnpm install --frozen-lockfile"]
+cmds = ['npm install -g corepack', 'corepack enable', 'corepack prepare pnpm@10.14.0 --activate', 'pnpm install']
 
 [phases.build] 
 cmds = ["pnpm run build"]
