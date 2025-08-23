@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { OnboardingFlowProps, FeatureOption } from '@/types/onboarding';
 import { mockOnboardingData } from '@/data/onboardingMockData';
 import ProgressIndicator from './ProgressIndicator';
 import OnboardingStep0 from './OnboardingStep0';
-import OnboardingStep1 from './OnboardingStep1';
+import OnboardingStep1Enhanced from './OnboardingStep1Enhanced';
 import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
 import { useAppToast } from '@/hooks/useAppToast';
+import { useAuth, useAuthActions, useOnboardingStatus } from '@/stores/authStore';
+import { supabaseOnboardingAPI } from '@/services/supabaseOnboarding';
 import {
   useSetDocuments,
   useSetTextContent,
@@ -33,12 +35,37 @@ const generateDocumentId = (index?: number): string => {
 };
 
 export default function OnboardingFlow({ initialStep = 0, onComplete }: OnboardingFlowProps) {
-  const [currentStep, setCurrentStep] = useState(initialStep);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set([0])); // Step 0 is completed by default
   const [features, setFeatures] = useState<FeatureOption[]>(mockOnboardingData.features as FeatureOption[]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const toast = useAppToast();
+
+  // Auth state and actions
+  const { user } = useAuth();
+  const { completeOnboarding, checkOnboardingStatus } = useAuthActions();
+  const { onboardingStatus, isCheckingOnboarding } = useOnboardingStatus();
+
+  // State derived from onboarding status
+  const [currentStep, setCurrentStep] = useState(onboardingStatus?.currentStep || initialStep);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(
+    new Set(onboardingStatus?.completedSteps || [])
+  );
+  const [isMarkingStep, setIsMarkingStep] = useState(false);
+
+  // Load onboarding status on mount and when user changes
+  useEffect(() => {
+    if (user && !isCheckingOnboarding) {
+      checkOnboardingStatus();
+    }
+  }, [user, checkOnboardingStatus, isCheckingOnboarding]);
+
+  // Update local state when onboarding status changes
+  useEffect(() => {
+    if (onboardingStatus) {
+      setCurrentStep(onboardingStatus.currentStep);
+      setCompletedSteps(new Set(onboardingStatus.completedSteps));
+    }
+  }, [onboardingStatus]);
 
   // Knowledge base store actions
   const setDocuments = useSetDocuments();
@@ -145,6 +172,13 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
     try {
       // Simulate WhatsApp connection
       await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Mark onboarding as completed in the database
+      if (user) {
+        await completeOnboarding();
+        toast.success('Onboarding completed successfully!');
+      }
+
       toast.success('WhatsApp connected successfully');
       onComplete();
     } catch (_err) {
@@ -156,27 +190,109 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
   };
 
   // Step 0 handlers
-  // Step 0 handlers
   const handleBusinessProfileNext = async () => {
-    // Business profile validation is handled in the component
-    // Just show success and proceed to next step
-    toast.success('Business profile saved successfully');
-    handleNext();
+    // Prevent concurrent execution
+    if (isMarkingStep) {
+      console.log('handleBusinessProfileNext already in progress, skipping');
+      return;
+    }
+
+    console.log('handleBusinessProfileNext called');
+    // Business profile saving is now handled in the OnboardingStep0 component
+    // This handler is called after successful save
+
+    setIsMarkingStep(true);
+
+    try {
+      // Mark step 0 as completed and refresh status
+      if (user) {
+        console.log('Marking step 0 as completed for user:', user.id);
+        await supabaseOnboardingAPI.markStepCompleted(user.id, 0);
+        console.log('Step 0 marked as completed, refreshing onboarding status...');
+        // Refresh onboarding status - this will drive UI state
+        await checkOnboardingStatus();
+        console.log('Onboarding status refreshed');
+        toast.success('Profil bisnis berhasil disimpan');
+      }
+    } catch (error) {
+      console.error('Failed to mark step completed:', error);
+      toast.error('Failed to complete step');
+    } finally {
+      setIsMarkingStep(false);
+    }
+    // Remove explicit handleNext() call - let DB-backed status drive UI
+  };
+
+  // Step 1 handlers
+  const handleKnowledgeBaseNext = async () => {
+    console.log('handleKnowledgeBaseNext called');
+    // Knowledge base processing is now handled in the OnboardingStep1Enhanced component
+    // This handler is called after successful processing and system prompt generation
+
+    // Mark step 1 as completed and refresh status
+    if (user) {
+      try {
+        console.log('Marking step 1 as completed for user:', user.id);
+        await supabaseOnboardingAPI.markStepCompleted(user.id, 1);
+        console.log('Step 1 marked as completed, refreshing onboarding status...');
+        // Refresh onboarding status - this will drive UI state
+        await checkOnboardingStatus();
+        console.log('Onboarding status refreshed');
+
+        // Refresh onboarding status - this will drive UI state
+        await checkOnboardingStatus();
+        console.log('Onboarding status refreshed');
+        toast.success('Knowledge base berhasil diproses');
+      } catch (error) {
+        console.error('Failed to mark step completed:', error);
+        toast.error('Failed to complete step');
+      }
+    }
   };
 
   // Navigation handlers
-  const handleNext = () => {
-    setCurrentStep(prev => {
-      const nextStep = Math.min(prev + 1, 3);
-      // Mark current step as completed when moving to next step
-      setCompletedSteps(completed => new Set(completed).add(prev));
-      return nextStep;
-    });
-    setError('');
+  const handleNext = async () => {
+    const nextStep = Math.min(currentStep + 1, 3);
+
+    // Update step in database and only update local state after success
+    if (user) {
+      try {
+        await supabaseOnboardingAPI.updateOnboardingStep(user.id, nextStep);
+        // Refresh onboarding status
+        await checkOnboardingStatus();
+
+        // Only update local state after successful async operations
+        setCurrentStep(nextStep);
+        setCompletedSteps(completed => new Set(completed).add(nextStep)); // Add nextStep, not currentStep
+        setError('');
+      } catch (error) {
+        console.error('Failed to update onboarding step:', error);
+        setError('Failed to update step');
+        // Don't update local state on failure
+      }
+    } else {
+      // If no user, just update local state
+      setCurrentStep(nextStep);
+      setCompletedSteps(completed => new Set(completed).add(nextStep));
+      setError('');
+    }
   };
 
-  const handleBack = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 0));
+  const handleBack = async () => {
+    const prevStep = Math.max(currentStep - 1, 0);
+
+    // Update step in database
+    if (user) {
+      try {
+        await supabaseOnboardingAPI.updateOnboardingStep(user.id, prevStep);
+        // Refresh onboarding status
+        await checkOnboardingStatus();
+      } catch (error) {
+        console.error('Failed to update onboarding step:', error);
+      }
+    }
+
+    setCurrentStep(prevStep);
     setError('');
   };
 
@@ -203,11 +319,8 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
         );
       case 1:
         return (
-          <OnboardingStep1
-            onDocumentUpload={handleDocumentUpload}
-            onTextSubmit={handleTextSubmit}
-            onWebsiteLinkSubmit={handleWebsiteLinkSubmit}
-            onNext={handleNext}
+          <OnboardingStep1Enhanced
+            onNext={handleKnowledgeBaseNext}
             onBack={handleBack}
             isLoading={isLoading}
             error={error}

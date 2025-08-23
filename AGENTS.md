@@ -14,12 +14,15 @@ This document provides essential context for AI models interacting with this pro
 * **Runtime:** React 19.1.0
 * **Styling:** Tailwind CSS 4 + DaisyUI 5.0.50 (Apple-style design with rounded-2xl corners)
 * **State Management:** Zustand 5.0.7 (multiple domain-specific stores)
-* **Key Libraries/Dependencies:** 
+* **Key Libraries/Dependencies:**
   - `lucide-react` (icons)
   - `papaparse` & `xlsx` (CSV/Excel import/export)
   - `date-fns` (date manipulation)
   - `lodash-es` (utilities)
   - `@lottiefiles/dotlottie-react` (animations)
+  - `@supabase/supabase-js` & `@supabase/ssr` (authentication & backend services)
+  - `@llamaindex/cloud` (document processing with LlamaParse)
+  - `llamaindex` (AI document processing and indexing)
 * **Package Manager:** pnpm (with workspace configuration)
 * **Platforms:** Web (responsive design for mobile, tablet, desktop)
 
@@ -28,12 +31,15 @@ This document provides essential context for AI models interacting with this pro
 * **Overall Architecture:** Feature-based modular architecture with domain-driven design. Each business domain (customers, products, orders, etc.) has its own components, stores, and utilities organized in dedicated folders.
 * **Directory Structure Philosophy:**
   * `/src/app`: Next.js App Router pages with file-based routing
+  * `/src/app/api`: Next.js API routes for server-side processing (document processing, etc.)
   * `/src/components`: Feature-organized React components (auth, dashboard, customerManagement, etc.)
   * `/src/stores`: Zustand stores for state management (one per domain)
+  * `/src/services`: Service layer for API interactions (Supabase, external APIs)
   * `/src/hooks`: Custom React hooks for data aggregation and business logic
   * `/src/utils`: Utility functions and helpers
   * `/src/types`: TypeScript type definitions
   * `/src/lib`: Shared libraries and configurations
+  * `/supabase`: Supabase configuration, migrations, and Edge Functions
   * `/docs`: Comprehensive project documentation
 * **Module Organization:** Components are organized by feature/domain rather than by type, promoting cohesion and maintainability.
 
@@ -62,12 +68,15 @@ This document provides essential context for AI models interacting with this pro
 ## 5. Key Files & Entrypoints
 
 * **Main Entrypoint:** `src/app/page.tsx` (landing page), `src/app/dashboard/page.tsx` (main app)
-* **Configuration:** 
+* **API Routes:** `src/app/api/process-document/route.ts` (document processing with LlamaParse)
+* **Edge Functions:** `supabase/functions/generate-system-prompt/index.ts` (AI system prompt generation)
+* **Configuration:**
   - `next.config.ts` (Next.js configuration)
   - `tailwind.config.ts` (Tailwind + DaisyUI configuration)
   - `tsconfig.json` (TypeScript configuration)
   - `eslint.config.mjs` (ESLint configuration)
-* **CI/CD Pipeline:** Not currently configured (future enhancement)
+  - `supabase/config.toml` (Supabase local development configuration)
+* **Database:** Supabase with comprehensive migrations in `supabase/migrations/`
 
 ## 6. Development & Testing Workflow
 
@@ -101,11 +110,14 @@ This document provides essential context for AI models interacting with this pro
   - Use Zustand stores for state management, create new stores for new domains
   - Write comprehensive documentation for new features
 
-* **Security:** 
+* **Security:**
   - Never hardcode API keys or sensitive data
   - Use environment variables for configuration
   - Implement proper input validation and sanitization
   - Follow React security best practices for XSS prevention
+  - Authentication uses Supabase Auth with secure session management
+  - Implement proper route protection and auth guards
+  - Use secure password reset flows with time-limited tokens
 
 * **Dependencies:** 
   - Use `pnpm add <package>` to add new dependencies
@@ -125,14 +137,33 @@ This document provides essential context for AI models interacting with this pro
   - **Product Catalog** (`/katalogproduk`): Inventory management with CSV/Excel import, categories, and status tracking
   - **Order Management** (`/pesanan`): Order processing, status tracking, and multi-product orders
   - **CS Handover** (`/cshandover`): Customer service conversation management and handover functionality
-  - **Knowledge Base** (`/knowledgebase`): Document and content management for customer service
+  - **Knowledge Base** (`/knowledgebase`): Advanced document and content management system with:
+    * PDF/DOC/DOCX document processing using LlamaParse (EU region support)
+    * Text content management and URL content extraction
+    * AI-powered system prompt generation based on knowledge base content
+    * Document upload with Supabase Storage integration
+    * Real-time processing status tracking
   - **Payments** (`/pembayaran`): Payment processing and configuration
   - **Analytics** (`/laporan-analitik`): Business intelligence and reporting
   - **Dashboard** (`/dashboard`): Unified view of all business metrics and quick actions
 
 * **User Journey:** Landing Page → Authentication → Onboarding → Dashboard → Feature Pages
-* **Authentication Flow:** Complete auth system with registration, login, password reset, and email verification
-* **Onboarding:** 4-step guided setup for new users including business profile and WhatsApp integration
+* **Authentication System:**
+  - **Complete Auth Flow**: Login, Registration, Email Verification, Forgot Password, Reset Password
+  - **Supabase Integration**: Full backend integration with Supabase Auth service
+  - **OAuth Support**: Google authentication with seamless social login
+  - **State Management**: Dedicated Zustand auth store with session persistence
+  - **Route Protection**: Comprehensive auth guards and protected routing
+  - **Security Features**: Secure session management, email verification, password reset tokens
+  - **UI Components**: Complete auth component library with error handling and loading states
+  - **Auth Provider**: React context provider for global auth state management
+* **Enhanced Onboarding System:**
+  - **4-Step Guided Setup**: Business Profile → Knowledge Base → Feature Selection → WhatsApp Integration
+  - **Document Processing Integration**: Upload and process documents during onboarding
+  - **AI System Prompt Generation**: Automatic generation of personalized chatbot prompts
+  - **Route Protection**: Comprehensive middleware to ensure proper onboarding completion
+  - **Progress Tracking**: Database-backed step completion tracking with validation
+  - **File Upload**: Drag-and-drop document upload with real-time processing feedback
 
 ## 9. UI/UX Guidelines
 
@@ -141,5 +172,30 @@ This document provides essential context for AI models interacting with this pro
 * **Accessibility:** WCAG compliance with proper ARIA labels, keyboard navigation, and screen reader support
 * **Theme Support:** Light/dark theme toggle with consistent color schemes
 * **Loading States:** Skeleton loading, progress indicators, and error boundaries for better UX
+
+## 10. Advanced Features & Integrations
+
+* **Document Processing Pipeline:**
+  - **LlamaParse Integration**: Advanced PDF/DOC processing with EU region support (`api.cloud.eu.llamaindex.ai`)
+  - **Next.js API Routes**: Server-side document processing with proper file handling and cleanup
+  - **Temporary File Management**: Secure temporary file creation and cleanup for document processing
+  - **Error Handling**: Comprehensive error handling with detailed logging and user feedback
+
+* **AI System Integration:**
+  - **System Prompt Generation**: AI-powered chatbot prompt generation using n8n webhooks
+  - **Knowledge Base Context**: Dynamic prompt generation based on business profile and knowledge base content
+  - **UPSERT Logic**: Prevents duplicate system prompts with database constraints
+
+* **Database Architecture:**
+  - **Comprehensive Schema**: Complete Supabase schema with migrations for all business domains
+  - **Knowledge Base Tables**: `knowledge_base_entries`, `knowledge_base_documents`, `system_prompts`
+  - **Unique Constraints**: Prevents data duplication with proper database constraints
+  - **Row Level Security**: Implemented for secure multi-tenant data access
+
+* **Service Layer Architecture:**
+  - **Domain-Specific Services**: Separate service classes for different business domains
+  - **Supabase Integration**: Comprehensive Supabase client integration with proper error handling
+  - **Type Safety**: Full TypeScript integration with proper type definitions
+  - **Testing Support**: Service layer designed for easy unit testing
 
 This guide ensures consistent development practices and helps maintain the high quality and cohesive architecture of the ViuWi platform.

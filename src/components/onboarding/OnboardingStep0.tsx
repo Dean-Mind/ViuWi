@@ -1,46 +1,82 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { BusinessType, BusinessCategory, businessTypeOptions, businessCategoryOptions, indonesianProvinces } from '@/data/businessProfileMockData';
 import { useBusinessProfileStore } from '@/stores/businessProfileStore';
+import { useAuth } from '@/stores/authStore';
 import { OnboardingStep0Props } from '@/types/onboarding';
 import AuthButton from '../ui/AuthButton';
 import FormLabel from '../ui/FormLabel';
 import Alert from '../ui/Alert';
 import FileUploadArea from './FileUploadArea';
 
-export default function OnboardingStep0({ 
+export default function OnboardingStep0({
   onNext,
   isLoading,
-  error 
+  error
 }: OnboardingStep0Props) {
-  // Temporary local state for testing
-  const [formData, setFormData] = useState({
-    businessName: '',
-    businessType: BusinessType.OTHER,
-    businessCategory: BusinessCategory.OTHER,
-    businessPhone: '',
-    businessEmail: '',
-    address: '',
-    city: '',
-    province: '',
-    postalCode: '',
-    description: ''
-  });
+  // Get auth user
+  const { user } = useAuth();
+
+  // Get store state and actions
+  const {
+    formData,
+    isSaving,
+    uploadProgress,
+    validateBusinessProfile,
+    updateFormData,
+    saveToSupabase,
+    loadAndPopulateForm,
+    businessProfile
+  } = useBusinessProfileStore();
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [selectedBusinessType, setSelectedBusinessType] = useState<BusinessType>(BusinessType.OTHER);
+  const [selectedBusinessType, setSelectedBusinessType] = useState<BusinessType>(
+    formData.businessType || BusinessType.OTHER
+  );
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Get validation function from store
-  const validateBusinessProfile = useBusinessProfileStore(state => state.validateBusinessProfile);
+  // Auto-load existing business profile data
+  useEffect(() => {
+    console.log('Auto-load effect triggered:', {
+      user: !!user,
+      isInitialLoad,
+      hasFormData: !!formData.businessName,
+      hasBusinessProfile: !!businessProfile
+    });
 
-  const updateFormData = (updates: Record<string, unknown>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
-  };
+    if (user && isInitialLoad && !formData.businessName) {
+      console.log('Loading business profile for user:', user.id);
+      loadAndPopulateForm(user.id).catch(error => {
+        console.error('Failed to load business profile:', error);
+        // Don't show error to user for missing profile (expected for new users)
+      }).finally(() => {
+        setIsInitialLoad(false);
+      });
+    } else if (user && isInitialLoad) {
+      // User is authenticated but form already has data, mark as loaded
+      console.log('User authenticated, form has data, marking as loaded');
+      setIsInitialLoad(false);
+    }
+  }, [user, formData.businessName, businessProfile, loadAndPopulateForm, isInitialLoad]);
+
+  // Update selected business type when form data changes
+  useEffect(() => {
+    if (formData.businessType && formData.businessType !== selectedBusinessType) {
+      setSelectedBusinessType(formData.businessType);
+    }
+  }, [formData.businessType, selectedBusinessType]);
+
+  // Clear validation errors when form data is populated from database
+  useEffect(() => {
+    if (formData.businessName && validationErrors.length > 0) {
+      setValidationErrors([]);
+    }
+  }, [formData.businessName, validationErrors.length]);
 
   const handleInputChange = (field: string, value: string | File | null) => {
     updateFormData({ [field]: value });
-    
+
     // Clear validation errors when user starts typing
     if (validationErrors.length > 0) {
       setValidationErrors([]);
@@ -49,7 +85,7 @@ export default function OnboardingStep0({
 
   const handleFileUpload = (files: FileList) => {
     if (files.length > 0) {
-      updateFormData({ logo: files[0] });
+      handleInputChange('logo', files[0]);
     }
   };
 
@@ -62,24 +98,85 @@ export default function OnboardingStep0({
     });
   };
 
-  const handleNext = () => {
-    // Validate required fields
-    const errors = validateBusinessProfile(formData);
-    
-    if (errors.length > 0) {
-      setValidationErrors(errors);
+  const handleNext = async () => {
+    if (!user) {
+      setValidationErrors(['User not authenticated']);
       return;
     }
 
-    // Clear errors and proceed
-    setValidationErrors([]);
-    onNext();
+    // Simple validation - just check required fields
+    const requiredFieldErrors = [];
+    if (!formData.businessName?.trim()) requiredFieldErrors.push('Business name is required');
+    if (!formData.businessPhone?.trim()) requiredFieldErrors.push('Business phone is required');
+    if (!formData.address?.trim()) requiredFieldErrors.push('Business address is required');
+    if (!formData.city?.trim()) requiredFieldErrors.push('City is required');
+    if (!formData.province?.trim()) requiredFieldErrors.push('Province is required');
+
+
+
+    if (requiredFieldErrors.length > 0) {
+      setValidationErrors(requiredFieldErrors);
+      return;
+    }
+
+    try {
+      // Clear errors and save to Supabase
+      setValidationErrors([]);
+
+      // Convert partial form data to full form data with defaults
+      const fullFormData = {
+        businessName: formData.businessName || '',
+        businessType: formData.businessType || BusinessType.OTHER,
+        businessCategory: formData.businessCategory || BusinessCategory.OTHER,
+        description: formData.description || '',
+        logo: formData.logo || null,
+        businessPhone: formData.businessPhone || '',
+        businessEmail: formData.businessEmail || '',
+        address: formData.address || '',
+        city: formData.city || '',
+        province: formData.province || '',
+        postalCode: formData.postalCode || '',
+        country: formData.country || 'Indonesia',
+        operatingHours: formData.operatingHours || [
+          { day: 'monday', isOpen: true, openTime: '09:00', closeTime: '17:00' },
+          { day: 'tuesday', isOpen: true, openTime: '09:00', closeTime: '17:00' },
+          { day: 'wednesday', isOpen: true, openTime: '09:00', closeTime: '17:00' },
+          { day: 'thursday', isOpen: true, openTime: '09:00', closeTime: '17:00' },
+          { day: 'friday', isOpen: true, openTime: '09:00', closeTime: '17:00' },
+          { day: 'saturday', isOpen: true, openTime: '09:00', closeTime: '17:00' },
+          { day: 'sunday', isOpen: true, openTime: '09:00', closeTime: '17:00' }
+        ],
+        timezone: formData.timezone || 'Asia/Jakarta',
+        socialMedia: formData.socialMedia || {},
+        registrationNumber: formData.registrationNumber || '',
+        taxId: formData.taxId || ''
+      };
+
+
+
+      // Use store's saveToSupabase method which handles logo upload and progress
+      await saveToSupabase(fullFormData, user.id);
+
+      onNext();
+    } catch (error) {
+      console.error('Failed to save business profile:', error);
+      setValidationErrors([error instanceof Error ? error.message : 'Failed to save business profile']);
+    }
   };
 
-  // Use validation function from store as single source of truth (memoized for performance)
+  // Simplified validation - just check required fields are present
   const canProceed = useMemo(() => {
-    return validateBusinessProfile(formData).length === 0;
-  }, [formData, validateBusinessProfile]);
+    // Ensure all required fields are present and valid
+    const hasRequiredFields = formData.businessName?.trim() &&
+                             formData.businessPhone?.trim() &&
+                             formData.address?.trim() &&
+                             formData.city?.trim() &&
+                             formData.province?.trim();
+
+
+
+    return !!hasRequiredFields;
+  }, [formData]);
 
   return (
     <div className="space-y-8">
@@ -296,15 +393,31 @@ export default function OnboardingStep0({
         </div>
       </div>
 
+      {/* Upload Progress */}
+      {uploadProgress > 0 && uploadProgress < 100 && (
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-base-content/70">
+            <span>Uploading logo...</span>
+            <span>{uploadProgress}%</span>
+          </div>
+          <div className="w-full bg-base-200 rounded-full h-2">
+            <div
+              className="bg-brand-orange h-2 rounded-full transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            ></div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation Button */}
       <div className="flex justify-end pt-4">
         <AuthButton
           onClick={handleNext}
-          loading={isLoading}
-          disabled={!canProceed}
+          loading={isLoading || isSaving}
+          disabled={!canProceed || isSaving}
           className="min-w-32 px-8"
         >
-          Lanjutkan
+          {isSaving ? 'Menyimpan...' : 'Lanjutkan'}
         </AuthButton>
       </div>
     </div>

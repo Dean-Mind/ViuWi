@@ -141,6 +141,7 @@ export interface BusinessProfileFormData {
   businessCategory: BusinessCategory;
   description: string;
   logo: File | null;
+  existingLogoUrl?: string; // URL of existing logo for display
   
   // Contact information
   businessPhone: string;

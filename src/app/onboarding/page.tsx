@@ -6,6 +6,7 @@ import AuthLayout from '@/components/ui/AuthLayout';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import OnboardingSuccessPage from '@/components/onboarding/OnboardingSuccessPage';
 
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
