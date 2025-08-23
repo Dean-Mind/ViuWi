@@ -160,7 +160,7 @@ cmd = "npm run start"
 ### Explicit Build Phases
 ```toml
 [phases.install]
-cmds = ['npm install -g pnpm@10.14.0', 'pnpm install --frozen-lockfile']
+cmds = ['npm install -g corepack@0.28.2', 'corepack enable', 'corepack prepare pnpm@10.14.0 --activate', 'pnpm install --frozen-lockfile']
 
 [phases.build]
 cmds = ["pnpm run build"]
@@ -170,8 +170,9 @@ cmd = "pnpm run start"
 ```
 
 ### Package Manager Installation Strategy
-- **Approach**: Use npm to globally install pnpm@10.14.0 instead of corepack
-- **Reason**: Avoids corepack version compatibility issues with older Node.js versions
+- **Approach**: Install compatible corepack version (0.28.2) then use it to manage pnpm
+- **Reason**: Maintains corepack workflow while ensuring compatibility with Node.js 20
+- **Benefits**: Proper package manager version management and consistency
 
 ### Docker Context Exclusions
 Created `.dockerignore` to exclude:

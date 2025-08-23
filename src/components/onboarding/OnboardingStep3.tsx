@@ -1,17 +1,81 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import { OnboardingStep3Props } from '@/types/onboarding';
 import { mockOnboardingData } from '@/data/onboardingMockData';
+import { supabaseWhatsAppAPI } from '@/services/supabaseWhatsApp';
+import { useBusinessProfileStore } from '@/stores/businessProfileStore';
+import { useAuth } from '@/stores/authStore';
+import { useAppToast } from '@/hooks/useAppToast';
 import QRCodeDisplay from './QRCodeDisplay';
 import AuthButton from '../ui/AuthButton';
+import Alert from '../ui/Alert';
 
-export default function OnboardingStep3({ 
-  qrCodeUrl, 
-  onQRScanned, 
+export default function OnboardingStep3({
+  qrCodeUrl,
+  onQRScanned,
   onBack,
-  isLoading 
+  isLoading
 }: OnboardingStep3Props) {
   const { whatsappConnection } = mockOnboardingData;
+  const { user } = useAuth();
+  const { businessProfile } = useBusinessProfileStore();
+  const toast = useAppToast();
+
+  // QR generation state
+  const [qrCodeData, setQrCodeData] = useState<string>('');
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
+  const [qrError, setQrError] = useState<string>('');
+
+  // Generate QR code
+  const generateQRCode = useCallback(async () => {
+    if (!businessProfile?.id) {
+      setQrError('Business profile not found. Please complete previous steps.');
+      return;
+    }
+
+    setIsGeneratingQR(true);
+    setQrError('');
+
+    try {
+      console.log('Generating WhatsApp QR for business profile:', businessProfile.id);
+
+      const result = await supabaseWhatsAppAPI.generateWhatsAppQR(businessProfile.id);
+
+      if (result.success && result.data) {
+        setQrCodeData(result.data.qrCodeData);
+        toast.success('WhatsApp QR code generated successfully!');
+      } else {
+        const errorMessage = result.error || 'Failed to generate QR code';
+        setQrError(errorMessage);
+        toast.error(errorMessage);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate QR code';
+      setQrError(errorMessage);
+      toast.error(errorMessage);
+      console.error('QR generation error:', error);
+    } finally {
+      setIsGeneratingQR(false);
+    }
+  }, [businessProfile?.id, toast]);
+
+  // Auto-generate QR on component mount
+  useEffect(() => {
+    if (businessProfile?.id && !qrCodeData && !isGeneratingQR && !qrError) {
+      generateQRCode();
+    }
+  }, [businessProfile?.id, qrCodeData, isGeneratingQR, qrError, generateQRCode]);
+
+  // Load business profile if not available
+  useEffect(() => {
+    if (!businessProfile && user?.id && !isGeneratingQR) {
+      // Business profile should already be loaded from previous steps
+      // If not, we'll show an error
+      console.warn('Business profile not found in OnboardingStep3');
+      setQrError('Business profile not found. Please go back and complete the business profile step.');
+    }
+  }, [businessProfile, user?.id, isGeneratingQR]);
 
   return (
     <div className="space-y-6">
@@ -25,8 +89,21 @@ export default function OnboardingStep3({
         </p>
       </div>
 
+      {/* Error Alert */}
+      {qrError && !isGeneratingQR && (
+        <Alert type="error">
+          {qrError}
+        </Alert>
+      )}
+
       {/* QR Code */}
-      <QRCodeDisplay qrCodeUrl={qrCodeUrl} />
+      <QRCodeDisplay
+        qrCodeUrl={qrCodeUrl} // Fallback to prop if provided
+        qrCodeData={qrCodeData}
+        isLoading={isGeneratingQR}
+        error={qrError}
+        onRetry={generateQRCode}
+      />
 
       {/* Instructions */}
       <div className="space-y-2">
@@ -50,6 +127,7 @@ export default function OnboardingStep3({
         <AuthButton
           onClick={onQRScanned}
           loading={isLoading}
+          disabled={isGeneratingQR || !!qrError}
           className="flex-1"
         >
           Saya sudah scan QR
