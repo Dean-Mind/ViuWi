@@ -3,13 +3,6 @@
 # Optimized for Next.js 15.4.6 with React 19 and production deployment
 
 # =============================================================================
-# PROVIDER CONFIGURATION
-# =============================================================================
-# Force Node.js provider to prevent Deno detection from supabase/functions/
-[providers]
-node = true
-
-# =============================================================================
 # ENVIRONMENT VARIABLES
 # =============================================================================
 [variables]
@@ -40,7 +33,14 @@ nixPkgs = [
   "pkg-config",    # Package configuration tool
   "git"            # Git for potential dependency resolution
 ]
+[phases.install]
+cmds = ["pnpm install --frozen-lockfile"]
 
+[phases.build] 
+cmds = ["pnpm run build"]
+
+[start]
+cmd = "pnpm run start"
 # =============================================================================
 # OPTIMIZATION NOTES
 # =============================================================================
