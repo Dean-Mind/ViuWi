@@ -4,7 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 interface UrlProcessRequest {
   entryId: string
   url: string
-  userId?: string // Optional for backward compatibility
+  // userId removed to prevent reliance on unverified client-supplied userId
 }
 
 interface N8nCrawlerResponse {
@@ -28,7 +28,6 @@ serve(async (req) => {
 
   let requestBody: UrlProcessRequest | null = null;
   let userId: string | undefined;
-  let requestUserId: string | undefined;
 
   try {
     // Validate required environment variables
@@ -54,8 +53,8 @@ serve(async (req) => {
 
     // Parse request body once and store it
     requestBody = await req.json()
-    const { entryId, url, userId: reqUserId } = requestBody
-    requestUserId = reqUserId
+    const { entryId, url } = requestBody
+    // No longer extract userId from request body for security
 
     // Input validation
     const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -280,8 +279,8 @@ serve(async (req) => {
           Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
         )
 
-        // Use JWT-derived userId (from earlier in the function) or fallback to requestBody userId
-        const errorUserId = userId || requestUserId
+        // Use only JWT-derived userId for security (no fallback to client-supplied userId)
+        const errorUserId = userId
 
         if (errorUserId) {
           await supabase
@@ -293,14 +292,8 @@ serve(async (req) => {
             .eq('id', requestBody.entryId)
             .eq('user_id', errorUserId)
         } else {
-          // Fallback: update by entryId only if no userId available
-          await supabase
-            .from('knowledge_base_entries')
-            .update({
-              processing_status: 'failed',
-              error_message: error instanceof Error ? error.message : 'Unknown error occurred'
-            })
-            .eq('id', requestBody.entryId)
+          // Skip recovery write when no userId exists to avoid IDOR risk
+          console.error('Cannot update entry status: no verified userId available for entry', requestBody.entryId)
         }
       } catch (e) {
         console.error('Failed to update error status:', e)

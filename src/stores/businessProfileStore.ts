@@ -230,6 +230,11 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
         // Update logo URL if uploaded
         if (logoUrl) {
           await supabaseBusinessProfileAPI.updateLogoUrl(existingProfile.id, logoUrl);
+          // Don't set logoBlobUrl to public URL - set logo field instead
+          if (result.data) {
+            result.data.logo = logoUrl;
+            // Keep logoBlobUrl as is (blob preview) - don't overwrite with public URL
+          }
         }
       } else {
         // Create new profile
@@ -239,7 +244,9 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
         // Update logo URL if uploaded
         if (logoUrl && result.data) {
           await supabaseBusinessProfileAPI.updateLogoUrl(result.data.id, logoUrl);
-          result.data.logoBlobUrl = logoUrl;
+          // Don't set logoBlobUrl to public URL - set logo field instead
+          result.data.logo = logoUrl;
+          // Keep logoBlobUrl as is (blob preview) - don't overwrite with public URL
         }
       }
 

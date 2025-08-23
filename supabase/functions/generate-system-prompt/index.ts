@@ -205,18 +205,49 @@ serve(async (req) => {
     
     console.log(`Prepared context with ${contextData.totalEntries} knowledge base entries (${contextData.completedEntries} completed, ${contextData.pendingEntries} pending)`)
 
-    // Call n8n webhook for system prompt generation
+    // Call n8n webhook for system prompt generation with HMAC authentication
     const n8nWebhookUrl = `${n8nWebhookBaseUrl}/system-prompt`
     console.log(`Calling n8n webhook at: ${n8nWebhookUrl}`)
+
+    // Prepare request body
+    const requestBody = JSON.stringify({
+      content: JSON.stringify(contextData, null, 2)
+    })
+
+    // Generate HMAC signature for authentication
+    const webhookSecret = Deno.env.get('N8N_WEBHOOK_SECRET')
+    if (!webhookSecret) {
+      console.error('N8N_WEBHOOK_SECRET environment variable is not set')
+      return json({ success: false, error: 'Server configuration error: N8N_WEBHOOK_SECRET not configured' }, 500)
+    }
+
+    const timestamp = Math.floor(Date.now() / 1000).toString()
+    const signaturePayload = requestBody + '|' + timestamp
+
+    // Create HMAC-SHA256 signature
+    const encoder = new TextEncoder()
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(webhookSecret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    )
+    const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(signaturePayload))
+    const signatureHex = Array.from(new Uint8Array(signature))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('')
+
     const n8nResponse = await fetch(n8nWebhookUrl, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'ViuWi-System-Prompt/1.0'
+        'User-Agent': 'ViuWi-System-Prompt/1.0',
+        'X-Timestamp': timestamp,
+        'X-Signature': signatureHex,
+        'Authorization': `Bearer ${webhookSecret.substring(0, 8)}...` // Trimmed secret for identification
       },
-      body: JSON.stringify({ 
-        content: JSON.stringify(contextData, null, 2)
-      })
+      body: requestBody
     })
     
     if (!n8nResponse.ok) {
@@ -234,13 +265,10 @@ serve(async (req) => {
         })
         .eq('id', newPrompt.id)
       
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: `System prompt generation failed: ${n8nResponse.status}` 
-      }), { 
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return json({
+        success: false,
+        error: `System prompt generation failed: ${n8nResponse.status}`
+      }, 500)
     }
     
     const promptResult: N8nSystemPromptResponse = await n8nResponse.json()
@@ -259,13 +287,10 @@ serve(async (req) => {
         })
         .eq('id', newPrompt.id)
       
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'No system prompt generated' 
-      }), { 
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
+      return json({
+        success: false,
+        error: 'No system prompt generated'
+      }, 400)
     }
     
     console.log(`Successfully generated system prompt with ${promptResult.output.length} characters`)
