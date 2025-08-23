@@ -23,7 +23,6 @@ export default function OnboardingStep0({
     formData,
     isSaving,
     uploadProgress,
-    validateBusinessProfile,
     updateFormData,
     saveToSupabase,
     loadAndPopulateForm,
@@ -149,7 +148,11 @@ export default function OnboardingStep0({
         timezone: formData.timezone || 'Asia/Jakarta',
         socialMedia: formData.socialMedia || {},
         registrationNumber: formData.registrationNumber || '',
-        taxId: formData.taxId || ''
+        taxId: formData.taxId || '',
+        // Feature flags - preserve existing settings, default to false only as last resort
+        featureProductCatalog: formData.featureProductCatalog ?? businessProfile?.featureProductCatalog ?? false,
+        featureOrderManagement: formData.featureOrderManagement ?? businessProfile?.featureOrderManagement ?? false,
+        featurePaymentSystem: formData.featurePaymentSystem ?? businessProfile?.featurePaymentSystem ?? false
       };
 
 

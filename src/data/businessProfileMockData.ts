@@ -128,7 +128,12 @@ export interface BusinessProfile {
   // Business registration (optional)
   registrationNumber?: string;
   taxId?: string;
-  
+
+  // Feature activation flags
+  featureProductCatalog: boolean;
+  featureOrderManagement: boolean;
+  featurePaymentSystem: boolean;
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
@@ -164,6 +169,11 @@ export interface BusinessProfileFormData {
   // Business registration
   registrationNumber: string;
   taxId: string;
+
+  // Feature activation flags
+  featureProductCatalog: boolean;
+  featureOrderManagement: boolean;
+  featurePaymentSystem: boolean;
 }
 
 // Store types (global state data)
@@ -350,7 +360,12 @@ export const mockBusinessProfile: BusinessProfile = {
   
   registrationNumber: '1234567890123',
   taxId: '12.345.678.9-012.000',
-  
+
+  // Feature activation flags (default enabled for mock)
+  featureProductCatalog: true,
+  featureOrderManagement: true,
+  featurePaymentSystem: true,
+
   createdAt: new Date('2024-01-01T00:00:00Z'),
   updatedAt: new Date('2024-01-15T10:30:00Z')
 };

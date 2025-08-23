@@ -100,6 +100,7 @@ export default function ProfileForm() {
             <div className="w-24 h-24 rounded-full border-2 border-base-300 overflow-hidden bg-base-200">
               {profile.avatar ? (
                 profile.avatar.startsWith('blob:') ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={profile.avatar}
                     alt="Profile Picture preview"

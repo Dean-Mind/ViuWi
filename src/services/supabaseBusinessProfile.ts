@@ -51,6 +51,9 @@ class SupabaseBusinessProfileService {
           timezone: formData.timezone,
           registration_number: formData.registrationNumber || null,
           tax_id: formData.taxId || null,
+          feature_product_catalog: formData.featureProductCatalog || false,
+          feature_order_management: formData.featureOrderManagement || false,
+          feature_payment_system: formData.featurePaymentSystem || false,
         } as BusinessProfileInsert)
         .select()
         .single()
@@ -197,6 +200,9 @@ class SupabaseBusinessProfileService {
       if (formData.timezone) updateData.timezone = formData.timezone
       if (formData.registrationNumber !== undefined) updateData.registration_number = formData.registrationNumber || null
       if (formData.taxId !== undefined) updateData.tax_id = formData.taxId || null
+      if (formData.featureProductCatalog !== undefined) updateData.feature_product_catalog = formData.featureProductCatalog
+      if (formData.featureOrderManagement !== undefined) updateData.feature_order_management = formData.featureOrderManagement
+      if (formData.featurePaymentSystem !== undefined) updateData.feature_payment_system = formData.featurePaymentSystem
 
       const { data: profileData, error: profileError } = await this.supabase
         .from('business_profiles')
@@ -450,7 +456,7 @@ class SupabaseBusinessProfileService {
   ): Promise<BusinessProfile> {
     // Get related data if not already included
     let operatingHours: OperatingHours[] = []
-    let socialMedia: SocialMediaLinks = {}
+    const socialMedia: SocialMediaLinks = {}
 
     if ('operating_hours' in data && 'social_media_links' in data) {
       // Data already includes relations
@@ -519,8 +525,56 @@ class SupabaseBusinessProfileService {
       socialMedia,
       registrationNumber: data.registration_number || undefined,
       taxId: data.tax_id || undefined,
+      featureProductCatalog: data.feature_product_catalog || false,
+      featureOrderManagement: data.feature_order_management || false,
+      featurePaymentSystem: data.feature_payment_system || false,
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
+    }
+  }
+
+  /**
+   * Update feature activation settings
+   */
+  async updateFeatureSettings(
+    businessProfileId: string,
+    features: {
+      featureProductCatalog?: boolean;
+      featureOrderManagement?: boolean;
+      featurePaymentSystem?: boolean;
+    }
+  ): Promise<ApiResponse<BusinessProfile>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('business_profiles')
+        .update({
+          feature_product_catalog: features.featureProductCatalog,
+          feature_order_management: features.featureOrderManagement,
+          feature_payment_system: features.featurePaymentSystem,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', businessProfileId)
+        .select(`
+          *,
+          operating_hours(*),
+          social_media_links(*)
+        `)
+        .single();
+
+      if (error) {
+        return { data: null, error: error.message, success: false };
+      }
+
+      // Transform database row to BusinessProfile
+      const profile = await this.convertToBusinessProfile(data);
+      return { data: profile, error: null, success: true };
+    } catch (error) {
+      console.error('Error updating feature settings:', error);
+      return {
+        data: null,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        success: false
+      };
     }
   }
 }

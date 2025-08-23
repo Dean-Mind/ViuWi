@@ -28,6 +28,9 @@ export interface Database {
           onboarding_completed: boolean
           current_onboarding_step: number
           completed_steps: number[]
+          feature_product_catalog: boolean
+          feature_order_management: boolean
+          feature_payment_system: boolean
           created_at: string
           updated_at: string
         }
@@ -52,6 +55,9 @@ export interface Database {
           onboarding_completed?: boolean
           current_onboarding_step?: number
           completed_steps?: number[]
+          feature_product_catalog?: boolean
+          feature_order_management?: boolean
+          feature_payment_system?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -76,6 +82,9 @@ export interface Database {
           onboarding_completed?: boolean
           current_onboarding_step?: number
           completed_steps?: number[]
+          feature_product_catalog?: boolean
+          feature_order_management?: boolean
+          feature_payment_system?: boolean
           created_at?: string
           updated_at?: string
         }

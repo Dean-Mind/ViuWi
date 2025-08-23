@@ -33,7 +33,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     )
 
     return () => subscription.unsubscribe()
-  }, [initializeAuth, login, logout, supabase.auth])
+  }, [initializeAuth, login, logout, checkOnboardingStatus, supabase.auth])
 
   return <>{children}</>
 }

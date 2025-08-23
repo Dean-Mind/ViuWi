@@ -80,7 +80,7 @@ This document provides essential context for AI models interacting with this pro
   - `tsconfig.json` (TypeScript configuration)
   - `eslint.config.mjs` (ESLint configuration)
   - `supabase/config.toml` (Supabase local development configuration)
-* **Database:** Supabase with comprehensive migrations in `supabase/migrations/`
+* **Database:** Supabase with schema management via Supabase MCP (preferred over SQL migrations)
 
 ## 6. Development & Testing Workflow
 
@@ -163,6 +163,12 @@ This document provides essential context for AI models interacting with this pro
   - **Auth Provider**: React context provider for global auth state management
 * **Enhanced Onboarding System:**
   - **4-Step Guided Setup**: Business Profile → Knowledge Base → Feature Selection → WhatsApp Integration
+  - **Step 2 Feature Selection**: Complete Supabase-backed feature toggle system
+    * Users select optional features (Product Catalog, Order Management, Payment System)
+    * Basic features (CS Handover, Customer Management, Knowledge Base) always enabled
+    * Selections persist to `business_profiles` table with NOT NULL constraints
+    * Dashboard feature toggles sync with onboarding selections
+    * Fallback system: Business Profile → localStorage → defaults
   - **Document Processing Integration**: Upload and process documents during onboarding
   - **AI System Prompt Generation**: Automatic generation of personalized chatbot prompts
   - **Route Protection**: Comprehensive middleware to ensure proper onboarding completion
@@ -191,15 +197,44 @@ This document provides essential context for AI models interacting with this pro
   - **UPSERT Logic**: Prevents duplicate system prompts with database constraints
 
 * **Database Architecture:**
-  - **Comprehensive Schema**: Complete Supabase schema with migrations for all business domains
+  - **Comprehensive Schema**: Complete Supabase schema managed via Supabase MCP
+  - **Business Profile Tables**: `business_profiles` with feature toggle columns (NOT NULL constraints)
   - **Knowledge Base Tables**: `knowledge_base_entries`, `knowledge_base_documents`, `system_prompts`
+  - **Feature Toggle Schema**: `feature_product_catalog`, `feature_order_management`, `feature_payment_system`
   - **Unique Constraints**: Prevents data duplication with proper database constraints
   - **Row Level Security**: Implemented for secure multi-tenant data access
+  - **Schema Management**: Use Supabase MCP instead of SQL migration files
 
 * **Service Layer Architecture:**
   - **Domain-Specific Services**: Separate service classes for different business domains
   - **Supabase Integration**: Comprehensive Supabase client integration with proper error handling
   - **Type Safety**: Full TypeScript integration with proper type definitions
   - **Testing Support**: Service layer designed for easy unit testing
+
+## 11. Feature Toggle System
+
+* **Architecture**: Complete feature toggle system integrated with onboarding and dashboard
+* **Feature Categories**:
+  - **Basic Features** (Always Enabled): CS Handover, Customer Management, Knowledge Base
+  - **Optional Features** (User Selectable): Product Catalog, Order Management, Payment System
+  - **Future Features** (Coming Soon): Dynamic Forms, Feedback Rating, etc.
+* **Data Flow**:
+  - **Onboarding Step 2**: User selections → Business Profile → Database
+  - **Dashboard Load**: Database → Business Profile → Feature Toggle Store → UI
+  - **Dashboard Toggles**: UI → Feature Toggle Store → Business Profile → Database
+* **Implementation**:
+  - **Store**: `featureToggleStore` with business profile integration
+  - **Service**: `supabaseBusinessProfileAPI.updateFeatureSettings()`
+  - **Components**: `OnboardingStep2`, `FeatureCard`, `PageFeatureSwitcher`
+  - **Database**: Feature columns in `business_profiles` table with NOT NULL constraints
+* **Fallback System**: Business Profile → localStorage → defaults (for users without profiles)
+
+## 12. Database Management Guidelines
+
+* **Preferred Method**: Use Supabase MCP tool instead of SQL migration files
+* **Schema Changes**: Apply via `supabase` tool with proper error handling
+* **Migration Pattern**: Always include defensive backfill steps for NULL values
+* **Idempotent Operations**: Ensure all database changes can be run multiple times safely
+* **Documentation**: Update both code and documentation when making schema changes
 
 This guide ensures consistent development practices and helps maintain the high quality and cohesive architecture of the ViuWi platform.

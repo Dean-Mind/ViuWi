@@ -78,37 +78,44 @@ export const useFeatureToggleStore = create<FeatureToggleState>()((set, get) => 
     set({ isLoading: true, error: null });
 
     try {
-      // Simulate async operation (in case we want to load from API later)
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Import business profile store dynamically to avoid circular dependency
+      const { useBusinessProfileStore } = await import('./businessProfileStore');
+      const businessProfile = useBusinessProfileStore.getState().businessProfile;
 
-      // Guard against SSR where localStorage is not available
-      if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
-        set({ isLoading: false, error: null });
-        return;
-      }
-
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsedFeatures: FeatureState = JSON.parse(saved);
-
-        // Validate the loaded data has all required keys
+      if (businessProfile) {
         const validatedFeatures: FeatureState = {
-          katalogProduk: parsedFeatures.katalogProduk ?? defaultFeatures.katalogProduk,
-          pesanan: parsedFeatures.pesanan ?? defaultFeatures.pesanan,
-          pembayaran: parsedFeatures.pembayaran ?? defaultFeatures.pembayaran,
-          knowledgeBase: parsedFeatures.knowledgeBase ?? defaultFeatures.knowledgeBase,
+          katalogProduk: businessProfile.featureProductCatalog,
+          pesanan: businessProfile.featureOrderManagement,
+          pembayaran: businessProfile.featurePaymentSystem,
+          knowledgeBase: true, // Always enabled (basic feature)
         };
 
         set({ features: validatedFeatures });
       } else {
-        // No saved data, use defaults
-        set({ features: defaultFeatures });
+        // No business profile, try localStorage as fallback
+        if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            const parsedFeatures: FeatureState = JSON.parse(saved);
+            const validatedFeatures: FeatureState = {
+              katalogProduk: parsedFeatures.katalogProduk ?? defaultFeatures.katalogProduk,
+              pesanan: parsedFeatures.pesanan ?? defaultFeatures.pesanan,
+              pembayaran: parsedFeatures.pembayaran ?? defaultFeatures.pembayaran,
+              knowledgeBase: true, // Always enabled
+            };
+            set({ features: validatedFeatures });
+          } else {
+            set({ features: defaultFeatures });
+          }
+        } else {
+          set({ features: defaultFeatures });
+        }
       }
     } catch (error) {
       console.error('Failed to load feature states:', error);
-      set({ 
+      set({
         error: 'Failed to load feature settings',
-        features: defaultFeatures // Fallback to defaults
+        features: defaultFeatures
       });
     } finally {
       set({ isLoading: false });
@@ -117,20 +124,26 @@ export const useFeatureToggleStore = create<FeatureToggleState>()((set, get) => 
 
   saveFeatureStates: async () => {
     try {
-      // Simulate async operation (in case we want to save to API later)
-      await new Promise(resolve => setTimeout(resolve, 50));
+      const { features } = get();
 
-      // Guard against SSR where localStorage is not available
-      if (typeof window === "undefined" || typeof window.localStorage === "undefined") {
-        // Clear any previous errors but don't attempt to save
-        set({ error: null });
-        return;
+      // Import business profile store dynamically to avoid circular dependency
+      const { useBusinessProfileStore } = await import('./businessProfileStore');
+      const businessProfile = useBusinessProfileStore.getState().businessProfile;
+
+      if (businessProfile) {
+        // Update business profile with new feature settings
+        await useBusinessProfileStore.getState().updateFeatureSettings({
+          featureProductCatalog: features.katalogProduk,
+          featureOrderManagement: features.pesanan,
+          featurePaymentSystem: features.pembayaran,
+        });
+      } else {
+        // Fallback to localStorage if no business profile
+        if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(features));
+        }
       }
 
-      const { features } = get();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(features));
-
-      // Clear any previous errors on successful save
       set({ error: null });
     } catch (error) {
       console.error('Failed to save feature states:', error);

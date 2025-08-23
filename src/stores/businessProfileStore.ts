@@ -43,6 +43,11 @@ interface BusinessProfileState {
   saveToSupabase: (formData: BusinessProfileFormData, userId: string) => Promise<void>;
   loadFromSupabase: (userId: string, populateForm?: boolean) => Promise<void>;
   uploadLogoToSupabase: (file: File, userId: string) => Promise<string>;
+  updateFeatureSettings: (features: {
+    featureProductCatalog?: boolean;
+    featureOrderManagement?: boolean;
+    featurePaymentSystem?: boolean;
+  }) => Promise<void>;
 
   // Form population actions
   populateFormFromProfile: (profile: BusinessProfile) => void;
@@ -81,7 +86,10 @@ const getDefaultFormData = (): Partial<BusinessProfileFormData> => ({
     whatsapp: ''
   },
   registrationNumber: '',
-  taxId: ''
+  taxId: '',
+  featureProductCatalog: false,
+  featureOrderManagement: false,
+  featurePaymentSystem: false
 });
 
 export const useBusinessProfileStore = create<BusinessProfileState>()((set, get) => ({
@@ -118,7 +126,7 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
     }
   },
 
-  createBusinessProfile: async (formData: BusinessProfileFormData) => {
+  createBusinessProfile: async (_formData: BusinessProfileFormData) => {
     set({ isLoading: true, error: null });
 
     try {
@@ -480,6 +488,38 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
           logoBlobUrl: undefined
         } : null
       }));
+    }
+  },
+
+  updateFeatureSettings: async (features) => {
+    const { businessProfile } = get();
+    if (!businessProfile) {
+      throw new Error('No business profile found');
+    }
+
+    set({ isSaving: true, error: null });
+
+    try {
+      const result = await supabaseBusinessProfileAPI.updateFeatureSettings(
+        businessProfile.id,
+        features
+      );
+
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Failed to update feature settings');
+      }
+
+      set({
+        businessProfile: result.data,
+        isSaving: false,
+        error: null
+      });
+    } catch (error) {
+      set({
+        isSaving: false,
+        error: error instanceof Error ? error.message : 'Failed to update feature settings'
+      });
+      throw error;
     }
   }
 }));
