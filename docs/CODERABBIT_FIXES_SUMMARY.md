@@ -10,7 +10,7 @@ This document summarizes the fixes implemented for the three critical issues ide
 
 **Solution**: Applied database changes via Supabase MCP that:
 - Verified feature columns already existed with DEFAULT false
-- Confirmed no existing NULL values needed backfilling
+- Includes defensive backfill step for any NULL values (idempotent)
 - Set NOT NULL constraints to prevent future NULL values
 - Added documentation comments for each feature column
 
@@ -48,6 +48,17 @@ This document summarizes the fixes implemented for the three critical issues ide
 
 ### Database Changes (via Supabase MCP)
 ```sql
+-- Defensively backfill any NULL values to false (idempotent, safe to run multiple times)
+UPDATE business_profiles
+SET
+  feature_product_catalog = COALESCE(feature_product_catalog, false),
+  feature_order_management = COALESCE(feature_order_management, false),
+  feature_payment_system = COALESCE(feature_payment_system, false)
+WHERE
+  feature_product_catalog IS NULL
+  OR feature_order_management IS NULL
+  OR feature_payment_system IS NULL;
+
 -- Set NOT NULL constraints to prevent tri-state booleans
 ALTER TABLE business_profiles
 ALTER COLUMN feature_product_catalog SET NOT NULL,
@@ -64,6 +75,8 @@ COMMENT ON COLUMN business_profiles.feature_payment_system IS 'Controls Payment 
 - `feature_product_catalog`: `boolean NOT NULL DEFAULT false`
 - `feature_order_management`: `boolean NOT NULL DEFAULT false`
 - `feature_payment_system`: `boolean NOT NULL DEFAULT false`
+
+**Note**: The backfill step is idempotent and safe to run multiple times across different environments. It only updates rows where NULL values exist, making it safe for production deployments.
 
 ### State Synchronization
 ```typescript

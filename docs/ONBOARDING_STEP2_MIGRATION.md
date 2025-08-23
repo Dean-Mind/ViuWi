@@ -28,12 +28,25 @@ The migration transforms the feature selection onboarding from local state manag
 
 The database changes properly handle tri-state boolean issues by:
 1. Feature columns already existed with DEFAULT false
-2. Verified no existing NULL values needed backfilling
+2. Defensive backfill step ensures no NULL values exist (idempotent)
 3. Set NOT NULL constraints to prevent future NULL values
 4. Added documentation comments for each feature column
 
+**Note**: The backfill step is idempotent and safe to run multiple times across different environments. It only updates rows where NULL values exist, making it safe for production deployments.
+
 **Applied Changes**:
 ```sql
+-- Defensively backfill any NULL values to false (idempotent, safe to run multiple times)
+UPDATE business_profiles
+SET
+  feature_product_catalog = COALESCE(feature_product_catalog, false),
+  feature_order_management = COALESCE(feature_order_management, false),
+  feature_payment_system = COALESCE(feature_payment_system, false)
+WHERE
+  feature_product_catalog IS NULL
+  OR feature_order_management IS NULL
+  OR feature_payment_system IS NULL;
+
 -- Set NOT NULL constraints to prevent tri-state booleans
 ALTER TABLE business_profiles
 ALTER COLUMN feature_product_catalog SET NOT NULL,
