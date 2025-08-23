@@ -218,8 +218,7 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'ViuWi-System-Prompt/1.0'
-      },
+        'X-Client': 'ViuWi-System-Prompt/1.0'      },
       body: requestBody
     })
     
