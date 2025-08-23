@@ -53,12 +53,14 @@ To deploy the Supabase edge functions, use the provided deployment script:
 
 **Important**: After deployment, make sure to set the required environment variables in your Supabase project dashboard:
 
-1. Go to your Supabase project dashboard
-2. Navigate to Settings > Edge Functions
-3. Set the following environment variables:
-   - `LLAMA_CLOUD_API_KEY` - Your LlamaIndex Cloud API key
-   - `SUPABASE_SERVICE_ROLE_KEY` - Your service role key
-   - `N8N_WEBHOOK_BASE_URL` - Your n8n webhook base URL (e.g., `https://n8ncloud.com/webhook`)
+1. Go to your Supabase project dashboard  
+2. Navigate to Settings > Edge Functions  
+3. Set ONLY the following Edge Functions environment variables (do not add them to client/browser environments):  
+   - `LLAMA_CLOUD_API_KEY` – Your LlamaIndex Cloud API key  
+   - `SUPABASE_SERVICE_ROLE_KEY` – Your service role key (KEEP PRIVATE; never expose in Next.js client or `.env.*` with `NEXT_PUBLIC_` prefix)  
+   - `N8N_WEBHOOK_BASE_URL` – Your n8n webhook base URL (e.g., `https://n8ncloud.com/webhook`)
+
+For local development of the Next.js API route, put this in `.env.local`:
 
 ### Deploy on Vercel
 
