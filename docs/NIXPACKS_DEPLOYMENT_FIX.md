@@ -153,14 +153,14 @@ cmd = "npm run start"
 
 ## Latest Configuration Changes
 
-### Node.js Version Update
-- **Changed from**: Node.js 20 (v20.6.1 was too old for corepack)
-- **Changed to**: Node.js 22 (better corepack compatibility)
+### Node.js Version
+- **Using**: Node.js 20 (available in nixpkgs)
+- **Issue**: Node.js 22 not available in the nixpkgs version used by nixpacks
 
 ### Explicit Build Phases
 ```toml
 [phases.install]
-cmds = ['corepack enable', 'corepack prepare pnpm@10.14.0 --activate', 'pnpm install --frozen-lockfile']
+cmds = ['npm install -g pnpm@10.14.0', 'pnpm install --frozen-lockfile']
 
 [phases.build]
 cmds = ["pnpm run build"]
@@ -168,6 +168,10 @@ cmds = ["pnpm run build"]
 [start]
 cmd = "pnpm run start"
 ```
+
+### Package Manager Installation Strategy
+- **Approach**: Use npm to globally install pnpm@10.14.0 instead of corepack
+- **Reason**: Avoids corepack version compatibility issues with older Node.js versions
 
 ### Docker Context Exclusions
 Created `.dockerignore` to exclude:

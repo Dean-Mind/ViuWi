@@ -6,8 +6,8 @@
 # ENVIRONMENT VARIABLES
 # =============================================================================
 [variables]
-# Use Node.js 22 for better corepack compatibility
-NIXPACKS_NODE_VERSION = "22"
+# Use Node.js 20 (available in nixpkgs)
+NIXPACKS_NODE_VERSION = "20"
 
 # Production environment settings
 NODE_ENV = "production"
@@ -27,14 +27,14 @@ NEXT_TELEMETRY_DISABLED = "1"  # Disable telemetry for faster builds
 # Essential system packages for Node.js and Next.js builds
 # Note: pnpm is automatically detected and installed by nixpacks from pnpm-lock.yaml
 nixPkgs = [
-  "nodejs_22",     # Node.js 22 for better corepack compatibility
+  "nodejs_20",     # Node.js 20 (available in nixpkgs)
   "python3",       # Required for some native dependencies
   "gcc",           # C compiler for native modules
   "pkg-config",    # Package configuration tool
   "git"            # Git for potential dependency resolution
 ]
 [phases.install]
-cmds = ['corepack enable', 'corepack prepare pnpm@10.14.0 --activate', 'pnpm install --frozen-lockfile']
+cmds = ['npm install -g corepack@0.28.2', 'corepack enable', 'corepack prepare pnpm@10.14.0 --activate', 'pnpm install --frozen-lockfile']
 
 [phases.build] 
 cmds = ["pnpm run build"]
