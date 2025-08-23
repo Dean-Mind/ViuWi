@@ -10,6 +10,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Exclude Supabase Edge Functions from build
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+    };
+    return config;
+  },
+  // Exclude supabase functions directory
+  outputFileTracingExcludes: {
+    '*': ['./supabase/functions/**/*'],
+  },
   async redirects() {
     return [
       {

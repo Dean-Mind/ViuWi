@@ -38,7 +38,7 @@ interface DatabaseDocument {
   file_type: string;
   storage_path: string;
   llamaparse_job_id: string | null;
-  processing_metadata: any; // Keep as any for flexible metadata
+  processing_metadata: Record<string, unknown>; // Flexible metadata
   created_at: string;
 }
 
@@ -48,7 +48,7 @@ interface DatabaseSystemPrompt {
   business_profile_id: string;
   prompt_content: string;
   generation_status: 'pending' | 'generating' | 'completed' | 'failed';
-  generation_metadata: any; // Keep as any for flexible metadata
+  generation_metadata: Record<string, unknown>; // Flexible metadata
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -313,7 +313,7 @@ class SupabaseKnowledgeBaseService {
     errorMessage: string;
   }>): Promise<ApiResponse<KnowledgeBaseEntry>> {
     try {
-      const updateData: any = {};
+      const updateData: Record<string, unknown> = {};
 
       if (updates.title !== undefined) updateData.title = updates.title;
       if (updates.content !== undefined) updateData.content = updates.content;

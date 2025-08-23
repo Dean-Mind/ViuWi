@@ -142,6 +142,7 @@ export default function BusinessInfoForm() {
               {brandSettings.logoBlobUrl || brandSettings.logo ? (
                 <div className="relative w-full h-full">
                   {brandSettings.logoBlobUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={brandSettings.logoBlobUrl}
                       alt="Business Logo preview"

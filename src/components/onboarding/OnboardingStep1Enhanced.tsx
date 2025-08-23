@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabaseKnowledgeBaseAPI } from '@/services/supabaseKnowledgeBase';
 import { useAuth } from '@/stores/authStore';
 import { useAppToast } from '@/hooks/useAppToast';
@@ -76,21 +76,7 @@ export default function OnboardingStep1Enhanced({
       });
   };
 
-  // Load business profile on mount
-  useEffect(() => {
-    if (user?.id) {
-      loadBusinessProfile();
-    }
-  }, [user?.id]);
-
-  // Load existing entries when business profile is available
-  useEffect(() => {
-    if (user?.id && businessProfileId) {
-      loadExistingEntries();
-    }
-  }, [user?.id, businessProfileId]);
-
-  const loadBusinessProfile = async () => {
+  const loadBusinessProfile = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -103,9 +89,9 @@ export default function OnboardingStep1Enhanced({
     } catch (error) {
       console.error('Failed to load business profile:', error);
     }
-  };
+  }, [user?.id]);
 
-  const loadExistingEntries = async () => {
+  const loadExistingEntries = useCallback(async () => {
     if (!user?.id || !businessProfileId) return;
 
     try {
@@ -129,7 +115,21 @@ export default function OnboardingStep1Enhanced({
     } catch (error) {
       console.error('Failed to load existing entries:', error);
     }
-  };
+  }, [user?.id, businessProfileId]);
+
+  // Load business profile on mount
+  useEffect(() => {
+    if (user?.id) {
+      loadBusinessProfile();
+    }
+  }, [user?.id, loadBusinessProfile]);
+
+  // Load existing entries when business profile is available
+  useEffect(() => {
+    if (user?.id && businessProfileId) {
+      loadExistingEntries();
+    }
+  }, [user?.id, businessProfileId, loadExistingEntries]);
 
   // Save text content
   const handleSaveText = async () => {
@@ -182,7 +182,7 @@ export default function OnboardingStep1Enhanced({
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#x27;')
         .replace(/\//g, '&#x2F;');
-    } catch (error) {
+    } catch (_error) {
       return 'invalid or unknown';
     }
   };
@@ -277,10 +277,10 @@ export default function OnboardingStep1Enhanced({
   };
 
   // Helper function to wrap async operations with timeout
-  const withTimeout = (promise: Promise<any>, timeoutMs: number, operation: string): Promise<any> => {
+  const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number, operation: string): Promise<T> => {
     return Promise.race([
       promise,
-      new Promise((_, reject) =>
+      new Promise<T>((_, reject) =>
         setTimeout(() => reject(new Error(`${operation} timed out after ${timeoutMs}ms`)), timeoutMs)
       )
     ]);
@@ -595,7 +595,7 @@ export default function OnboardingStep1Enhanced({
       {/* Unsaved Content Warning */}
       {hasUnsavedContent && (
         <Alert type="warning">
-          Ada konten yang belum disimpan. Klik "Simpan" sebelum melanjutkan.
+          Ada konten yang belum disimpan. Klik &quot;Simpan&quot; sebelum melanjutkan.
         </Alert>
       )}
 

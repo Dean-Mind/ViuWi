@@ -10,29 +10,11 @@ import OnboardingStep2 from './OnboardingStep2';
 import OnboardingStep3 from './OnboardingStep3';
 import { useAppToast } from '@/hooks/useAppToast';
 import { useAuth, useAuthActions, useOnboardingStatus } from '@/stores/authStore';
+import { useBusinessProfileStore } from '@/stores/businessProfileStore';
 import { supabaseOnboardingAPI } from '@/services/supabaseOnboarding';
-import {
-  useSetDocuments,
-  useSetTextContent,
-  useSetUrlContent,
-  useSetUrlExtractionStatus,
-  DocumentFile
-} from '@/stores/knowledgeBaseStore';
+// Knowledge base store imports removed - using enhanced components
 
-/**
- * Generate a robust unique ID for documents
- * Uses crypto.randomUUID() when available, falls back to timestamp + random string + index
- */
-const generateDocumentId = (index?: number): string => {
-  // Use crypto.randomUUID() if available (Node 14.17+/modern browsers)
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return `doc_${crypto.randomUUID()}`;
-  }
-
-  // Fallback for older environments with index to ensure uniqueness
-  const indexSuffix = typeof index === 'number' ? `_${index}` : '';
-  return `doc_${Date.now()}_${Math.random().toString(36).slice(2, 11)}${indexSuffix}`;
-};
+// Document ID generation removed - using enhanced components
 
 export default function OnboardingFlow({ initialStep = 0, onComplete }: OnboardingFlowProps) {
   const [features, setFeatures] = useState<FeatureOption[]>(mockOnboardingData.features as FeatureOption[]);
@@ -44,6 +26,13 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
   const { user } = useAuth();
   const { completeOnboarding, checkOnboardingStatus } = useAuthActions();
   const { onboardingStatus, isCheckingOnboarding } = useOnboardingStatus();
+
+  // Business profile store
+  const {
+    businessProfile,
+    updateFeatureSettings,
+    isSaving
+  } = useBusinessProfileStore();
 
   // State derived from onboarding status
   const [currentStep, setCurrentStep] = useState(onboardingStatus?.currentStep || initialStep);
@@ -67,87 +56,10 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
     }
   }, [onboardingStatus]);
 
-  // Knowledge base store actions
-  const setDocuments = useSetDocuments();
-  const setTextContent = useSetTextContent();
-  const setUrlContent = useSetUrlContent();
-  const setUrlExtractionStatus = useSetUrlExtractionStatus();
+  // Knowledge base store actions removed - using enhanced components
 
 
-  // Step 1 handlers
-  const handleDocumentUpload = async (files: FileList) => {
-    setIsLoading(true);
-    setError('');
-    try {
-      // Simulate upload and convert FileList to DocumentFile array
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const documentFiles: DocumentFile[] = Array.from(files).map((file, index) => ({
-        id: generateDocumentId(index),
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        uploadedAt: new Date(),
-      }));
-
-      // Save to knowledge base store
-      setDocuments(documentFiles);
-
-      toast.success(`Successfully uploaded ${files.length} document${files.length > 1 ? 's' : ''}`);
-    } catch (_err) {
-      setError('Failed to upload documents');
-      toast.error('Failed to upload documents. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleTextSubmit = async (text: string): Promise<void> => {
-    setIsLoading(true);
-    setError('');
-    try {
-      // Simulate text processing
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Save to knowledge base store
-      setTextContent(text);
-
-      toast.success('Content processed successfully');
-    } catch (err) {
-      setError('Failed to process text');
-      toast.error('Failed to process content. Please try again.');
-      throw err; // Re-throw to allow child component to handle
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleWebsiteLinkSubmit = async (url: string): Promise<void> => {
-    setIsLoading(true);
-    setError('');
-    try {
-      // Set extraction status to extracting
-      setUrlExtractionStatus('extracting');
-
-      // Simulate content extraction
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Simulate extracted content
-      const extractedContent = `Extracted content from ${url}. This would contain the actual website content in a real implementation.`;
-
-      // Save to knowledge base store
-      setUrlContent(url, extractedContent);
-
-      toast.success('Website content extracted successfully');
-    } catch (err) {
-      setError('Failed to extract website content');
-      setUrlExtractionStatus('error');
-      toast.error('Failed to extract website content. Please try again.');
-      throw err; // Re-throw to allow child component to handle
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Legacy handlers removed - onboarding now uses enhanced components
 
   // Step 2 handlers
   const handleFeatureToggle = (featureId: string, enabled: boolean) => {
@@ -161,9 +73,50 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
   };
 
   const handleFeatureExpand = (featureId: string) => {
-    setFeatures(prev => prev.map(feature => 
+    setFeatures(prev => prev.map(feature =>
       feature.id === featureId ? { ...feature, expanded: !feature.expanded } : feature
     ));
+  };
+
+  // New handler for step 2 completion
+  const handleFeatureSelectionNext = async () => {
+    if (isMarkingStep) {
+      console.log('handleFeatureSelectionNext already in progress, skipping');
+      return;
+    }
+
+    console.log('handleFeatureSelectionNext called');
+    setIsMarkingStep(true);
+
+    try {
+      if (user && businessProfile) {
+        console.log('Saving feature selections for user:', user.id);
+
+        // Extract feature settings from current features state
+        const featureSettings = {
+          featureProductCatalog: features.find(f => f.id === 'product_catalog')?.enabled || false,
+          featureOrderManagement: features.find(f => f.id === 'order_management')?.enabled || false,
+          featurePaymentSystem: features.find(f => f.id === 'payment_system')?.enabled || false,
+        };
+
+        // Save feature settings to business profile
+        await updateFeatureSettings(featureSettings);
+
+        console.log('Feature settings saved, marking step 2 as completed');
+        await supabaseOnboardingAPI.markStepCompleted(user.id, 2);
+
+        console.log('Step 2 marked as completed, refreshing onboarding status...');
+        await checkOnboardingStatus();
+
+        console.log('Onboarding status refreshed');
+        toast.success('Pengaturan fitur berhasil disimpan');
+      }
+    } catch (error) {
+      console.error('Failed to save feature settings:', error);
+      toast.error('Failed to save feature settings');
+    } finally {
+      setIsMarkingStep(false);
+    }
   };
 
   // Step 3 handlers
@@ -250,33 +203,7 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
     }
   };
 
-  // Navigation handlers
-  const handleNext = async () => {
-    const nextStep = Math.min(currentStep + 1, 3);
-
-    // Update step in database and only update local state after success
-    if (user) {
-      try {
-        await supabaseOnboardingAPI.updateOnboardingStep(user.id, nextStep);
-        // Refresh onboarding status
-        await checkOnboardingStatus();
-
-        // Only update local state after successful async operations
-        setCurrentStep(nextStep);
-        setCompletedSteps(completed => new Set(completed).add(nextStep)); // Add nextStep, not currentStep
-        setError('');
-      } catch (error) {
-        console.error('Failed to update onboarding step:', error);
-        setError('Failed to update step');
-        // Don't update local state on failure
-      }
-    } else {
-      // If no user, just update local state
-      setCurrentStep(nextStep);
-      setCompletedSteps(completed => new Set(completed).add(nextStep));
-      setError('');
-    }
-  };
+  // Generic handleNext removed - using specific handlers for each step
 
   const handleBack = async () => {
     const prevStep = Math.max(currentStep - 1, 0);
@@ -332,9 +259,9 @@ export default function OnboardingFlow({ initialStep = 0, onComplete }: Onboardi
             features={features}
             onFeatureToggle={handleFeatureToggle}
             onFeatureExpand={handleFeatureExpand}
-            onNext={handleNext}
+            onNext={handleFeatureSelectionNext}
             onBack={handleBack}
-            isLoading={isLoading}
+            isLoading={isLoading || isSaving}
           />
         );
       case 3:

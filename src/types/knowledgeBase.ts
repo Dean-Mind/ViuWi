@@ -31,7 +31,7 @@ export interface KnowledgeBaseDocument {
   fileType: string
   storagePath: string
   llamaparseJobId?: string
-  processingMetadata?: Record<string, any>
+  processingMetadata?: Record<string, unknown>
   createdAt: string
 }
 
@@ -41,7 +41,7 @@ export interface SystemPrompt {
   businessProfileId: string
   promptContent: string
   generationStatus: 'pending' | 'generating' | 'completed' | 'failed'
-  generationMetadata?: Record<string, any>
+  generationMetadata?: Record<string, unknown>
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -57,7 +57,7 @@ export interface ProcessingResult {
   success: boolean
   content?: string
   error?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface KnowledgeBaseStats {
@@ -174,7 +174,7 @@ export class KnowledgeBaseError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: Record<string, any>
+    public details?: Record<string, unknown>
   ) {
     super(message)
     this.name = 'KnowledgeBaseError'
@@ -182,21 +182,21 @@ export class KnowledgeBaseError extends Error {
 }
 
 export class DocumentProcessingError extends KnowledgeBaseError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'DOCUMENT_PROCESSING_ERROR', details)
     this.name = 'DocumentProcessingError'
   }
 }
 
 export class UrlProcessingError extends KnowledgeBaseError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'URL_PROCESSING_ERROR', details)
     this.name = 'UrlProcessingError'
   }
 }
 
 export class SystemPromptGenerationError extends KnowledgeBaseError {
-  constructor(message: string, details?: Record<string, any>) {
+  constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'SYSTEM_PROMPT_GENERATION_ERROR', details)
     this.name = 'SystemPromptGenerationError'
   }
