@@ -31,7 +31,7 @@ nixPkgs = [
   "python3",       # Required for some native dependencies
   "gcc",           # C compiler for native modules
   "pkg-config",    # Package configuration tool
-  "git"            # Git for potential dependency resolution
+  "git",            # Git for potential dependency resolution
   "pnpm"
 ]
 [phases.install]
