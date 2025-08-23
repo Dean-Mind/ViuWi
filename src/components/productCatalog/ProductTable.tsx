@@ -55,30 +55,16 @@ function ProductRow({
       <td className="p-4 min-w-0">
         <div className="font-medium text-base-content break-words">{product.name}</div>
       </td>
-      <td className="p-4 max-w-xs" style={{ containerType: 'inline-size' }}>
-        <div className="text-sm text-base-content/70" style={{
-          maxWidth: 'calc(100cqw - 2rem)',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}>
-          {product.description}
-        </div>
+      <td className="p-4 min-w-0">
+        <div className="text-sm text-base-content/70 break-words">{product.description}</div>
       </td>
-      <td className="p-4 max-w-xs" style={{ containerType: 'inline-size' }}>
-        <div className="text-sm text-base-content/70" style={{
-          maxWidth: 'calc(100cqw - 2rem)',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis'
-        }}>
-          {product.detail}
-        </div>
+      <td className="p-4 min-w-0">
+        <div className="text-sm text-base-content/70 break-words">{product.detail}</div>
       </td>
-      <td className="p-4">
-        <div className="text-sm text-base-content">{category?.name || 'Unknown'}</div>
+      <td className="p-4 min-w-0">
+        <div className="text-sm text-base-content break-words">{category?.name || 'Unknown'}</div>
       </td>
-      <td className="p-4">
+      <td className="p-4 min-w-0">
         <StatusDropdown
           productId={product.id}
           currentStatus={product.status}
@@ -87,8 +73,10 @@ function ProductRow({
           disabled={isStatusUpdating}
         />
       </td>
-      <td className="p-4">
-        <div className="font-medium text-base-content">{formatPrice(product.price)}</div>
+      <td className="p-4 min-w-0">
+        <div className="font-medium text-base-content whitespace-nowrap">
+          {formatPrice(product.price)}
+        </div>
       </td>
       <td className="p-4">
         <ProductActions
@@ -142,13 +130,13 @@ export default function ProductTable({ onEditProduct, onDeleteProduct, onViewPro
             <tr className="bg-brand-orange text-white">
               <th className="p-4 text-center font-semibold text-sm w-12">#</th>
               <th className="p-4 text-left font-semibold text-sm w-16">Foto</th>
-              <th className="p-4 text-left font-semibold text-sm w-28">Nama</th>
-              <th className="p-4 text-left font-semibold text-sm w-36">Deskripsi</th>
-              <th className="p-4 text-left font-semibold text-sm w-36">Detail</th>
-              <th className="p-4 text-left font-semibold text-sm w-20">Kategori</th>
-              <th className="p-4 text-left font-semibold text-sm w-20">Status</th>
-              <th className="p-4 text-left font-semibold text-sm w-24">Harga</th>
-              <th className="p-4 text-center font-semibold text-sm w-32">Aksi</th>
+              <th className="p-4 text-left font-semibold text-sm w-24">Nama</th>
+              <th className="p-4 text-left font-semibold text-sm w-20">Deskripsi</th>
+              <th className="p-4 text-left font-semibold text-sm w-20">Detail</th>
+              <th className="p-4 text-left font-semibold text-sm w-16">Kategori</th>
+              <th className="p-4 text-left font-semibold text-sm w-16">Status</th>
+              <th className="p-4 text-left font-semibold text-sm w-20">Harga</th>
+              <th className="p-4 text-center font-semibold text-sm w-24">Aksi</th>
             </tr>
           </thead>
           <tbody>

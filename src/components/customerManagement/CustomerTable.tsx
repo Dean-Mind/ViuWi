@@ -12,7 +12,8 @@ function CityName({ cityId }: { cityId?: string }) {
   if (!cityId) return <span className="text-base-content">-</span>;
 
   const city = cities.find(c => c.id === cityId);
-  return <span className="text-base-content">{city?.name || '-'}</span>;
+  const cityName = city?.name || '-';
+  return <span className="text-base-content break-words">{cityName}</span>;
 }
 
 interface CustomerTableProps {
@@ -43,30 +44,28 @@ function CustomerRow({
       <td className="p-4 text-center">
         <div className="text-sm font-medium text-base-content">{rowNumber}</div>
       </td>
-      <td className="p-4">
+      <td className="p-4 min-w-0">
         <div className="flex flex-col">
-          <span className="font-medium text-base-content">{customer.name}</span>
+          <span className="font-medium text-base-content break-words">{customer.name}</span>
           <span className="text-sm text-base-content/60">{formatCustomerPhone(customer.phone)}</span>
         </div>
       </td>
-      <td className="p-4">
+      <td className="p-4 min-w-0">
         <CityName cityId={customer.cityId} />
       </td>
-      <td className="p-4">
-        <span className="text-base-content">
-          {customer.email || '-'}
-        </span>
+      <td className="p-4 min-w-0">
+        <span className="text-base-content break-words">{customer.email || '-'}</span>
       </td>
-      <td className="p-4">
-        <span className={`badge ${getCustomerTypeBadgeColor(customer.customerType)} badge-sm`}>
+      <td className="p-4 min-w-0">
+        <span className={`badge ${getCustomerTypeBadgeColor(customer.customerType)} badge-sm break-words`}>
           {getCustomerTypeLabel(customer.customerType)}
         </span>
       </td>
-      <td className="p-4 text-center">
+      <td className="p-4 text-center min-w-0">
         <span className="font-medium text-base-content">{customer.totalOrders}</span>
       </td>
-      <td className="p-4 text-right">
-        <span className="font-medium text-base-content">
+      <td className="p-4 text-right min-w-0">
+        <span className="font-medium text-base-content whitespace-nowrap">
           {formatCurrency(customer.totalSpent)}
         </span>
       </td>
@@ -128,13 +127,13 @@ export default function CustomerTable({ onEditCustomer, onDeleteCustomer, onView
           <thead>
             <tr className="bg-brand-orange text-white">
               <th className="p-4 text-center font-semibold text-sm w-12">#</th>
-              <th className="p-4 text-left font-semibold text-sm w-28">Nama & Telepon</th>
-              <th className="p-4 text-left font-semibold text-sm w-20">Kota</th>
-              <th className="p-4 text-left font-semibold text-sm w-24">Email</th>
-              <th className="p-4 text-left font-semibold text-sm w-20">Tipe</th>
-              <th className="p-4 text-center font-semibold text-sm w-20">Total Pesanan</th>
-              <th className="p-4 text-right font-semibold text-sm w-24">Total Belanja</th>
-              <th className="p-4 text-center font-semibold text-sm w-32">Aksi</th>
+              <th className="p-4 text-left font-semibold text-sm w-24">Nama & Telepon</th>
+              <th className="p-4 text-left font-semibold text-sm w-16">Kota</th>
+              <th className="p-4 text-left font-semibold text-sm w-20">Email</th>
+              <th className="p-4 text-left font-semibold text-sm w-16">Tipe</th>
+              <th className="p-4 text-center font-semibold text-sm w-16">Total Pesanan</th>
+              <th className="p-4 text-right font-semibold text-sm w-20">Total Belanja</th>
+              <th className="p-4 text-center font-semibold text-sm w-24">Aksi</th>
             </tr>
           </thead>
           <tbody>
