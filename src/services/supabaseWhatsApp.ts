@@ -103,9 +103,9 @@ class SupabaseWhatsAppService {
    * Validate base64 image data
    */
   validateBase64ImageData(data: string): boolean {
-    // Check if it's valid base64
-    if (!data.match(/^[A-Za-z0-9+/]*={0,2}$/)) {
-      console.warn('Invalid base64 format:', data.substring(0, 50) + '...');
+    // Check if it's valid base64 (including URL-safe characters)
+    if (!data.match(/^[A-Za-z0-9+/\-_]*={0,2}$/)) {
+      console.warn('Invalid base64 format - input redacted, length:', data.length);
       return false
     }
 
@@ -119,10 +119,28 @@ class SupabaseWhatsAppService {
   }
 
   /**
+   * Normalize URL-safe base64 to standard base64
+   */
+  private normalizeBase64(data: string): string {
+    // Replace URL-safe characters with standard base64 characters
+    let normalized = data.replace(/-/g, '+').replace(/_/g, '/');
+
+    // Add padding if needed (base64 length should be multiple of 4)
+    const padding = normalized.length % 4;
+    if (padding > 0) {
+      normalized += '='.repeat(4 - padding);
+    }
+
+    return normalized;
+  }
+
+  /**
    * Convert base64 data to data URL for display
    */
   convertToDataUrl(base64Data: string, mimetype: string = 'image/png'): string {
-    return `data:${mimetype};base64,${base64Data}`
+    // Normalize URL-safe base64 to standard base64 for display
+    const normalizedData = this.normalizeBase64(base64Data);
+    return `data:${mimetype};base64,${normalizedData}`
   }
 }
 

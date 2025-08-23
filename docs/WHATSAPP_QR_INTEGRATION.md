@@ -62,12 +62,53 @@ User ← QRCodeDisplay ← OnboardingStep3 ← WhatsAppService ← Edge Function
 
 ### Environment Variables
 
-Required environment variables for the edge function:
+The WhatsApp QR generation feature requires different environment variable configurations for deployment versus local development:
 
-- `N8N_WEBHOOK_BASE_URL`: Base URL for n8n webhooks (default: configured in .env.local)
+#### For Deployed Supabase Edge Functions
+
+**Important**: Deployed Supabase Edge Functions do NOT read `.env.local` files. Environment variables must be configured as Supabase secrets via the dashboard or CLI.
+
+**Required Supabase Secrets:**
+- `N8N_WEBHOOK_BASE_URL`: Base URL for n8n webhooks
 - `N8N_TIMEOUT_MS`: Timeout for webhook calls in milliseconds (default: 30000)
 - `SUPABASE_URL`: Supabase project URL
 - `SUPABASE_ANON_KEY`: Supabase anonymous key
+
+**Setting Secrets via CLI:**
+```bash
+# Set individual secrets
+supabase secrets set N8N_WEBHOOK_BASE_URL=https://your-n8n-instance.com/webhook
+supabase secrets set N8N_TIMEOUT_MS=30000
+supabase secrets set SUPABASE_URL=https://your-project.supabase.co
+supabase secrets set SUPABASE_ANON_KEY=your-anon-key
+
+# List all secrets
+supabase secrets list
+
+# Deploy functions after setting secrets
+supabase functions deploy generate-whatsapp-qr
+```
+
+**Setting Secrets via Dashboard:**
+1. Go to your Supabase project dashboard
+2. Navigate to Edge Functions → Settings
+3. Add each environment variable in the "Secrets" section
+
+#### For Local Development (Supabase Edge Functions Emulator)
+
+For local development using `supabase functions serve`, create a `.env` file in your project root:
+
+```bash
+# .env (for local Edge Functions emulator)
+N8N_WEBHOOK_BASE_URL=https://your-n8n-instance.com/webhook
+N8N_TIMEOUT_MS=30000
+SUPABASE_URL=http://localhost:54321
+SUPABASE_ANON_KEY=your-local-anon-key
+```
+
+**Note**: The local emulator reads from `.env` files, while deployed functions only read from Supabase secrets.
+
+For more information, see the [Supabase Edge Functions documentation](https://supabase.com/docs/guides/functions/secrets).
 
 ## Error Handling
 
@@ -105,8 +146,11 @@ Required environment variables for the edge function:
 1. **Authentication**: All requests require valid user authentication
 2. **Authorization**: Users can only generate QR codes for their own business profiles
 3. **Data Validation**: All inputs and responses are validated
-4. **Rate Limiting**: Implemented at the edge function level
+4. **Access Control**: Protected by authentication and business profile ownership validation
 5. **Timeout Protection**: Prevents hanging requests
+6. **Data Security**: Base64 QR data is validated and sanitized before processing
+
+**Note**: Rate limiting is not currently implemented but is planned for future releases. Current protection relies on authentication requirements and business profile ownership validation.
 
 ## Usage
 

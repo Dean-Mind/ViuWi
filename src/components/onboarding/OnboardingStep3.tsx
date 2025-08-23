@@ -67,15 +67,22 @@ export default function OnboardingStep3({
     }
   }, [businessProfile?.id, qrCodeData, isGeneratingQR, qrError, generateQRCode]);
 
-  // Load business profile if not available
+  // Clear error when business profile becomes available
+  useEffect(() => {
+    if (businessProfile?.id && qrError) {
+      setQrError('');
+    }
+  }, [businessProfile?.id, qrError]);
+
+  // Handle missing business profile with non-blocking notification
   useEffect(() => {
     if (!businessProfile && user?.id && !isGeneratingQR) {
       // Business profile should already be loaded from previous steps
-      // If not, we'll show an error
+      // Show a non-blocking toast instead of persistent error
       console.warn('Business profile not found in OnboardingStep3');
-      setQrError('Business profile not found. Please go back and complete the business profile step.');
+      toast.error('Business profile not found. Please go back and complete the business profile step.');
     }
-  }, [businessProfile, user?.id, isGeneratingQR]);
+  }, [businessProfile, user?.id, isGeneratingQR, toast]);
 
   return (
     <div className="space-y-6">
@@ -89,8 +96,8 @@ export default function OnboardingStep3({
         </p>
       </div>
 
-      {/* Error Alert */}
-      {qrError && !isGeneratingQR && (
+      {/* Error Alert - only show when there's an error AND no QR is available */}
+      {qrError && !isGeneratingQR && !qrCodeUrl && !qrCodeData && (
         <Alert type="error">
           {qrError}
         </Alert>
@@ -101,7 +108,7 @@ export default function OnboardingStep3({
         qrCodeUrl={qrCodeUrl} // Fallback to prop if provided
         qrCodeData={qrCodeData}
         isLoading={isGeneratingQR}
-        error={qrError}
+        error={(!qrCodeUrl && !qrCodeData) ? qrError : undefined}
         onRetry={generateQRCode}
       />
 
@@ -127,7 +134,7 @@ export default function OnboardingStep3({
         <AuthButton
           onClick={onQRScanned}
           loading={isLoading}
-          disabled={isGeneratingQR || !!qrError}
+          disabled={isGeneratingQR || (!qrCodeUrl && !qrCodeData)}
           className="flex-1"
         >
           Saya sudah scan QR
