@@ -54,9 +54,6 @@ function CustomerRow({
         <CityName cityId={customer.cityId} />
       </td>
       <td className="p-4 min-w-0">
-        <span className="text-base-content break-words">{customer.email || '-'}</span>
-      </td>
-      <td className="p-4 min-w-0">
         <span className={`badge ${getCustomerTypeBadgeColor(customer.customerType)} badge-sm break-words`}>
           {getCustomerTypeLabel(customer.customerType)}
         </span>
@@ -129,7 +126,6 @@ export default function CustomerTable({ onEditCustomer, onDeleteCustomer, onView
               <th className="p-4 text-center font-semibold text-sm w-12">#</th>
               <th className="p-4 text-left font-semibold text-sm w-24">Nama & Telepon</th>
               <th className="p-4 text-left font-semibold text-sm w-16">Kota</th>
-              <th className="p-4 text-left font-semibold text-sm w-20">Email</th>
               <th className="p-4 text-left font-semibold text-sm w-16">Tipe</th>
               <th className="p-4 text-center font-semibold text-sm w-16">Total Pesanan</th>
               <th className="p-4 text-right font-semibold text-sm w-20">Total Belanja</th>

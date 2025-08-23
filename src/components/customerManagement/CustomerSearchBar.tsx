@@ -24,7 +24,7 @@ export default function CustomerSearchBar() {
 
       <input
         type="text"
-        placeholder="Cari pelanggan (nama, nomor, kota, alamat)..."
+        placeholder="Cari pelanggan (nama, nomor, kota, email, alamat)..."
         value={searchQuery}
         onChange={handleSearchChange}
         autoComplete="off"
