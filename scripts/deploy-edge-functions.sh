@@ -21,36 +21,26 @@ if ! supabase projects list &> /dev/null; then
     exit 1
 fi
 
-# Project reference (env or arg)
-PROJECT_REF="${PROJECT_REF:-${1:-}}"
+# Resolve PROJECT_REF once (arg → env → linked project)
+PROJECT_REF="${1:-${PROJECT_REF:-}}"
 if [ -z "$PROJECT_REF" ]; then
-  echo "❌ PROJECT_REF is not set. Provide via env or as the first arg."
-  echo "   Example: PROJECT_REF=your-ref ./scripts/deploy-edge-functions.sh"
-  echo "         or ./scripts/deploy-edge-functions.sh your-ref"
-  exit 1
-fi
-
-if [ -n "$1" ]; then
-    PROJECT_REF="$1"
-    echo "📋 Using PROJECT_REF from command line argument: $PROJECT_REF"
-elif [ -n "$PROJECT_REF" ]; then
-    echo "📋 Using PROJECT_REF from environment variable: $PROJECT_REF"
+  # Try to use the currently linked project
+  LINKED_REF=$(supabase status 2>/dev/null | awk -F': ' '/Project ref/{print $2}' | tr -d '[:space:]')
+  if [ -n "$LINKED_REF" ]; then
+    PROJECT_REF="$LINKED_REF"
+    echo "📋 Using PROJECT_REF from linked project: $PROJECT_REF"
+  else
+    echo "❌ PROJECT_REF is not set. Provide via CLI arg or env."
+    echo "   Example: PROJECT_REF=your-ref ./scripts/deploy-edge-functions.sh"
+    echo "         or ./scripts/deploy-edge-functions.sh your-ref"
+    exit 1
+  fi
 else
-    # Try to get from supabase link
-    LINKED_REF=$(supabase link 2>/dev/null | grep 'Project ref:' | awk '{print $3}' | tr -d '\n')
-    if [ -n "$LINKED_REF" ]; then
-        PROJECT_REF="$LINKED_REF"
-        echo "📋 Using PROJECT_REF from supabase link: $PROJECT_REF"
-    else
-        echo "❌ PROJECT_REF not found. Please provide it via:"
-        echo "   1. Command line argument: $0 <project-ref>"
-        echo "   2. Environment variable: export PROJECT_REF=<project-ref>"
-        echo "   3. Or run 'supabase link' to link to a project"
-        echo ""
-        echo "💡 You can find your project ref in the Supabase Dashboard URL:"
-        echo "   https://supabase.com/dashboard/project/<project-ref>"
-        exit 1
-    fi
+  if [ -n "$1" ]; then
+    echo "📋 Using PROJECT_REF from command line argument: $PROJECT_REF"
+  else
+    echo "📋 Using PROJECT_REF from environment variable: $PROJECT_REF"
+  fi
 fi
 
 # Validate PROJECT_REF format (basic check)
