@@ -21,8 +21,14 @@ if ! supabase projects list &> /dev/null; then
     exit 1
 fi
 
-# Project reference
-PROJECT_REF="yvtxhcbtuhprupyfryry"
+# Project reference (env or arg)
+PROJECT_REF="${PROJECT_REF:-${1:-}}"
+if [ -z "$PROJECT_REF" ]; then
+  echo "❌ PROJECT_REF is not set. Provide via env or as the first arg."
+  echo "   Example: PROJECT_REF=your-ref ./scripts/deploy-edge-functions.sh"
+  echo "         or ./scripts/deploy-edge-functions.sh your-ref"
+  exit 1
+fi
 
 echo "📋 Project Reference: $PROJECT_REF"
 echo ""
