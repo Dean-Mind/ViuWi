@@ -1,35 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile } from '@/data/dashboardMockData';
 import { Languages, Bell, User, Settings, LogOut, MessageCircle } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import Image from 'next/image';
 import { useAppToast } from '@/hooks/useAppToast';
+import { useBotStatusStore } from '@/stores/botStatusStore';
 
 interface HeaderProps {
   user: UserProfile;
-  isLive: boolean;
   language: string;
   hasNotifications: boolean;
   isChatOpen?: boolean;
   onLanguageChange?: (language: string) => void;
   onNotificationClick?: () => void;
   onProfileAction?: (action: 'profile' | 'settings' | 'logout') => void;
-  onLiveToggle?: (isLive: boolean) => void;
   onChatToggle?: () => void;
 }
 
 export default function Header({
   user,
-  isLive,
   language: _language,
   hasNotifications,
   isChatOpen,
   onLanguageChange,
   onNotificationClick,
   onProfileAction,
-  onLiveToggle,
   onChatToggle
 }: HeaderProps) {
   const [_dropdownStates, setDropdownStates] = useState({
@@ -38,6 +35,16 @@ export default function Header({
     profile: false
   });
   const toast = useAppToast();
+
+  // Use global bot status store
+  const { isOnline: isLive, setOnline, isLoading: isBotStatusLoading, error: botStatusError } = useBotStatusStore();
+
+  // Handle bot status errors
+  useEffect(() => {
+    if (botStatusError) {
+      toast.error(`Bot status update failed: ${botStatusError}`);
+    }
+  }, [botStatusError, toast]);
 
   const _toggleDropdown = (dropdown: keyof typeof _dropdownStates) => {
     setDropdownStates(prev => ({
@@ -76,12 +83,14 @@ export default function Header({
                 type="checkbox"
                 className="toggle toggle-success"
                 checked={isLive}
+                disabled={isBotStatusLoading}
+                aria-busy={isBotStatusLoading}
                 onChange={(e) => {
                   const newStatus = e.target.checked;
-                  onLiveToggle?.(newStatus);
-                  toast.info(`Status changed to ${newStatus ? 'online' : 'offline'}`);
+                  setOnline(newStatus);
+                  toast.info(`Bot status changed to ${newStatus ? 'online' : 'offline'}`);
                 }}
-                aria-label="Toggle between live and offline status"
+                aria-label="Toggle between bot online and offline status"
                 aria-describedby="live-status-description"
               />
               <div className="flex items-center gap-1.5">
@@ -92,7 +101,7 @@ export default function Header({
               </div>
             </label>
             <span id="live-status-description" className="sr-only">
-              {isLive ? 'Currently live and accepting connections' : 'Currently offline and not accepting connections'}
+              {isLive ? 'Bot is currently online and handling conversations' : 'Bot is currently offline - conversations handled by CS agents only'}
             </span>
           </div>
 

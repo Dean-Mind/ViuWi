@@ -69,6 +69,7 @@ export default function ChatView({
         <ChatHeader
           user={conversation.user}
           botEnabled={conversation.botEnabled}
+          conversationId={conversation.id}
           onBotToggle={onBotToggle}
         />
       </div>
