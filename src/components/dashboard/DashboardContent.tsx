@@ -7,6 +7,7 @@ import DashboardCard, { DashboardIcons } from './DashboardCard';
 import { DashboardLoading, DashboardErrorBoundary } from './DashboardLoadingStates';
 import { usePaymentActions } from '@/stores/paymentStore';
 import { DASHBOARD_LABELS, formatTime } from '@/lib/localization';
+import MockDataNotice from '@/components/ui/MockDataNotice';
 
 export default function DashboardContent() {
   const router = useRouter();
@@ -117,6 +118,9 @@ export default function DashboardContent() {
               </button>
             </div>
           </div>
+
+          {/* Mock Data Notice */}
+          <MockDataNotice feature="dashboard" />
 
           {/* Key Performance Indicators Section */}
           <section>

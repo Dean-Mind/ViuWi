@@ -63,8 +63,20 @@ export default function Header({
 
   return (
     <header className="navbar bg-base-100 border-b border-base-300 h-20 px-8 rounded-3xl">
-      {/* Left side - empty */}
+      {/* Left side - Logo */}
       <div className="navbar-start">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/ViuWi.png"
+            alt="ViuWi Dashboard"
+            width={32}
+            height={32}
+            className="object-contain"
+          />
+          <span className="text-brand-orange font-nunito text-lg font-bold hidden sm:block">
+            ViuWi
+          </span>
+        </div>
       </div>
 
       {/* Right side - controls */}

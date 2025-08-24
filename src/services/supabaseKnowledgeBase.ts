@@ -746,6 +746,44 @@ class SupabaseKnowledgeBaseService {
       updatedAt: dbPrompt.updated_at
     }
   }
+
+  /**
+   * Get all system prompts for a business profile
+   */
+  async getSystemPrompts(businessProfileId: string): Promise<ApiResponse<SystemPrompt[]>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('system_prompts')
+        .select('*')
+        .eq('business_profile_id', businessProfileId)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Failed to fetch system prompts:', error)
+        throw error
+      }
+
+      return {
+        data: data?.map(prompt => this.mapDatabaseSystemPrompt(prompt)) || [],
+        error: null,
+        success: true
+      }
+    } catch (error) {
+      console.error('Error fetching system prompts:', error)
+      return {
+        data: null,
+        error: error instanceof Error ? error.message : 'Failed to fetch system prompts',
+        success: false
+      }
+    }
+  }
+
+  /**
+   * Delete a knowledge base entry (alias for deleteEntry)
+   */
+  async deleteKnowledgeBaseEntry(entryId: string): Promise<ApiResponse<boolean>> {
+    return this.deleteEntry(entryId);
+  }
 }
 
 export const supabaseKnowledgeBaseAPI = new SupabaseKnowledgeBaseService()

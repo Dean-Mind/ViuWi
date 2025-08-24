@@ -1,18 +1,36 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useUrlContent } from '@/stores/knowledgeBaseStore';
+import { useUrlContent, useProcessUrlManually } from '@/stores/knowledgeBaseStore';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
 import URLContentModal from './URLContentModal';
+import { useAppToast } from '@/hooks/useAppToast';
 
 export default function URLContentSection() {
   const urlContent = useUrlContent();
+  const processUrl = useProcessUrlManually();
+  const toast = useAppToast();
   const [showModal, setShowModal] = useState(false);
 
   const truncateText = (text: string, maxLength: number = 200) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  };
+
+  const handleProcessUrl = async () => {
+    if (!urlContent.url || !urlContent.id) {
+      toast.error('URL entry ID not found. Please save the URL first.');
+      return;
+    }
+
+    try {
+      await processUrl(urlContent.id, urlContent.url);
+      toast.success('URL content extracted successfully');
+    } catch (error) {
+      console.error('URL processing error:', error);
+      toast.error('Failed to extract URL content');
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -42,7 +60,7 @@ export default function URLContentSection() {
       default:
         return (
           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-base-300 text-base-content/60">
-            Not extracted
+            Ready to extract
           </span>
         );
     }
@@ -85,9 +103,19 @@ export default function URLContentSection() {
                     </svg>
                     <span className="text-sm font-medium text-base-content/80">URL:</span>
                   </div>
-                  {getStatusBadge(urlContent.status)}
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(urlContent.status)}
+                    {(urlContent.status === 'idle' || urlContent.status === 'error') && urlContent.id && (
+                      <button
+                        onClick={handleProcessUrl}
+                        className="btn btn-xs btn-primary rounded-2xl"
+                      >
+                        {urlContent.status === 'error' ? 'Retry' : 'Extract'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                
+
                 <a
                   href={urlContent.url}
                   target="_blank"

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { useAddDocuments, DocumentFile } from '@/stores/knowledgeBaseStore';
+import { useKnowledgeBaseStore } from '@/stores/knowledgeBaseStore';
 import { useAppToast } from '@/hooks/useAppToast';
 import { formatFileSize } from '@/utils/fileUtils';
 
@@ -14,7 +14,7 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const addDocuments = useAddDocuments();
+  const uploadDocuments = useKnowledgeBaseStore(state => state.uploadDocuments);
   const toast = useAppToast();
 
   const supportedFormats = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
@@ -61,23 +61,14 @@ export default function DocumentsModal({ isOpen, onClose }: DocumentsModalProps)
 
   const handleUpload = async (files: File[]) => {
     setIsUploading(true);
-    
+
     try {
-      // Simulate upload process
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const documentFiles: DocumentFile[] = files.map(file => ({
-        id: `doc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        uploadedAt: new Date(),
-      }));
-      
-      addDocuments(documentFiles);
+      // Use real Supabase upload
+      await uploadDocuments(files);
       toast.success(`Successfully uploaded ${files.length} document${files.length > 1 ? 's' : ''}`);
       onClose();
-    } catch (_error) {
+    } catch (error) {
+      console.error('Upload error:', error);
       toast.error('Failed to upload documents. Please try again.');
     } finally {
       setIsUploading(false);

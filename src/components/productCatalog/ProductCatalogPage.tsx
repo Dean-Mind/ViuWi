@@ -30,6 +30,7 @@ import PlusIcon from '@/components/icons/PlusIcon';
 import DownloadIcon from '@/components/icons/DownloadIcon';
 import { Filter } from 'lucide-react';
 import { useAppToast } from '@/hooks/useAppToast';
+import MockDataNotice from '@/components/ui/MockDataNotice';
 
 /**
  * Generate a robust unique ID for products
@@ -160,6 +161,9 @@ export default function ProductCatalogPage() {
           {/* Feature Content */}
           {isFeatureEnabled ? (
             <>
+              {/* Mock Data Notice */}
+              <MockDataNotice feature="katalogProduk" />
+
               {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-base-200 rounded-2xl p-4">

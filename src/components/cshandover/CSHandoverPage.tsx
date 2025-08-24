@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import MessageListPanel from './MessageListPanel';
 import ChatView from './ChatView';
+import MockDataNotice from '@/components/ui/MockDataNotice';
 
 import {
   mockMessageData,
@@ -239,6 +240,11 @@ export default function CSHandoverPage({
 
   return (
     <div className="flex flex-col h-full bg-base-200 min-h-0">
+      {/* Mock Data Notice */}
+      <div className="px-6 pt-6">
+        <MockDataNotice feature="cshandover" />
+      </div>
+
       {/* Main Content */}
       <div className="flex flex-1 min-h-0">
         {/* Message List Panel */}

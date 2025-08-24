@@ -1,15 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useDocuments, useRemoveDocument } from '@/stores/knowledgeBaseStore';
+import { useDocuments, useRemoveDocument, useProcessDocumentManually, DocumentFile } from '@/stores/knowledgeBaseStore';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { formatFileSize } from '@/utils/fileUtils';
 import DocumentsModal from './DocumentsModal';
+import ProcessingStatusBadge from './ProcessingStatusBadge';
+import { useAppToast } from '@/hooks/useAppToast';
 
 export default function DocumentsSection() {
   const documents = useDocuments();
   const removeDocument = useRemoveDocument();
+  const processDocument = useProcessDocumentManually();
+  const toast = useAppToast();
   const [showModal, setShowModal] = useState(false);
   const [documentToRemove, setDocumentToRemove] = useState<string | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -30,6 +34,20 @@ export default function DocumentsSection() {
   const cancelRemove = () => {
     setDocumentToRemove(null);
     setIsConfirmOpen(false);
+  };
+
+  const handleProcessDocument = async (documentId: string, documentName: string) => {
+    try {
+      await processDocument(documentId);
+      toast.success(`Document '${documentName}' processed successfully`);
+    } catch (_error) {
+      toast.error(`Failed to process '${documentName}'`);
+    }
+  };
+
+  // Get document processing status from the actual file data
+  const getDocumentStatus = (file: DocumentFile): 'pending' | 'processing' | 'completed' | 'failed' => {
+    return file.processingStatus;
   };
 
   return (
@@ -80,14 +98,23 @@ export default function DocumentsSection() {
                     </div>
 
                     {/* File Info */}
-                    <div>
+                    <div className="flex-1">
                       <p className="font-medium text-base-content">{file.name}</p>
                       <p className="text-sm text-base-content/60">
-                        {formatFileSize(file.size)} • Uploaded {formatDistanceToNow(file.uploadedAt, { 
-                          addSuffix: true, 
-                          locale: id 
+                        {formatFileSize(file.size)} • Uploaded {formatDistanceToNow(file.uploadedAt, {
+                          addSuffix: true,
+                          locale: id
                         })}
                       </p>
+
+                      {/* Processing Status */}
+                      <div className="mt-2">
+                        <ProcessingStatusBadge
+                          status={getDocumentStatus(file)}
+                          onProcess={() => handleProcessDocument(file.id, file.name)}
+                          onRetry={() => handleProcessDocument(file.id, file.name)}
+                        />
+                      </div>
                     </div>
                   </div>
 

@@ -36,25 +36,25 @@ export default function HeroSection() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className="group bg-base-100/80 backdrop-blur-sm p-8 rounded-3xl border border-base-300/50 hover:border-brand-orange/30 transition-all duration-300 hover:shadow-xl hover:shadow-brand-orange/10">
               <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">🤖</div>
-              <h3 className="text-xl font-bold text-base-content mb-3">AI Otomatis</h3>
+              <h3 className="text-xl font-bold text-base-content mb-3">Layanan AI Pelanggan</h3>
               <p className="text-base-content/70 leading-relaxed">
-                Teknologi AI canggih untuk percakapan alami dan respons cepat
+                Respons otomatis 24/7 dengan percakapan alami
               </p>
             </div>
 
             <div className="group bg-base-100/80 backdrop-blur-sm p-8 rounded-3xl border border-base-300/50 hover:border-brand-orange/30 transition-all duration-300 hover:shadow-xl hover:shadow-brand-orange/10">
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">⚡</div>
-              <h3 className="text-xl font-bold text-base-content mb-3">Setup Mudah</h3>
+              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">📱</div>
+              <h3 className="text-xl font-bold text-base-content mb-3">Integrasi WhatsApp</h3>
               <p className="text-base-content/70 leading-relaxed">
-                Mulai dalam hitungan menit dengan panduan onboarding interaktif
+                Komunikasi pelanggan langsung melalui WhatsApp Business
               </p>
             </div>
 
             <div className="group bg-base-100/80 backdrop-blur-sm p-8 rounded-3xl border border-base-300/50 hover:border-brand-orange/30 transition-all duration-300 hover:shadow-xl hover:shadow-brand-orange/10">
               <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">📊</div>
-              <h3 className="text-xl font-bold text-base-content mb-3">Wawasan Bisnis</h3>
+              <h3 className="text-xl font-bold text-base-content mb-3">Analitik Bisnis</h3>
               <p className="text-base-content/70 leading-relaxed">
-                Analitik real-time untuk tingkatkan kepuasan pelanggan
+                Wawasan real-time dan dashboard pelaporan lengkap
               </p>
             </div>
           </div>
@@ -63,11 +63,11 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-8">
             <button
               onClick={handleGetStarted}
-              className="group btn bg-gradient-to-r from-brand-orange to-brand-orange-light hover:from-brand-orange-light hover:to-brand-orange text-white border-none rounded-2xl px-12 py-4 text-lg font-semibold min-w-64 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="btn btn-primary bg-brand-orange border-brand-orange hover:bg-brand-orange-dark text-white transition-all duration-200 focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 rounded-2xl px-12 py-4 text-lg font-semibold min-w-64"
             >
               <span className="flex items-center gap-2">
                 Mulai Gratis
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </span>
@@ -75,7 +75,7 @@ export default function HeroSection() {
 
             <button
               onClick={handleSignIn}
-              className="btn btn-outline border-2 border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white rounded-2xl px-12 py-4 text-lg font-semibold min-w-64 hover:scale-105 transition-all duration-300"
+              className="btn btn-outline border-brand-orange text-brand-orange hover:bg-brand-orange/10 hover:text-brand-orange hover:border-brand-orange transition-all duration-200 focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 rounded-2xl px-12 py-4 text-lg font-semibold min-w-64"
             >
               Masuk
             </button>
@@ -84,14 +84,14 @@ export default function HeroSection() {
           {/* Trust Indicators */}
           <div className="pt-12 space-y-4">
             <p className="text-base-content/60 text-sm font-medium">
-              Dipercaya oleh ribuan bisnis di Indonesia
+              Dibuat untuk bisnis dari semua ukuran • Cocok untuk semua industri
             </p>
             <div className="flex justify-center items-center gap-8 opacity-60">
-              <div className="text-2xl">🏪</div>
-              <div className="text-2xl">🏥</div>
-              <div className="text-2xl">🏫</div>
-              <div className="text-2xl">🏢</div>
-              <div className="text-2xl">🛒</div>
+              <div className="text-2xl">🇮🇩</div>
+              <div className="text-2xl">⚡</div>
+              <div className="text-2xl">🔒</div>
+              <div className="text-2xl">📈</div>
+              <div className="text-2xl">🤝</div>
             </div>
           </div>
         </div>

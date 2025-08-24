@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 const steps = [
   {
@@ -64,7 +65,7 @@ export default function HowItWorksSection() {
 
                 <div className="relative bg-base-200/50 p-8 rounded-3xl border border-base-300/50 hover:border-brand-orange/30 transition-all duration-300 hover:shadow-lg hover:shadow-brand-orange/10 group">
                   {/* Step Number */}
-                  <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-r from-brand-orange to-brand-orange-light rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                  <div className="absolute -top-4 -left-4 w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
                     {step.number}
                   </div>
 
@@ -101,7 +102,7 @@ export default function HowItWorksSection() {
           <div className="lg:hidden space-y-4 mb-16">
             {steps.map((step, index) => (
               <div key={index} className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-brand-orange to-brand-orange-light rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                <div className="flex-shrink-0 w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
                   {step.number}
                 </div>
                 <div className="flex-1 bg-base-200/50 p-6 rounded-3xl border border-base-300/50">
@@ -132,12 +133,12 @@ export default function HowItWorksSection() {
                 dengan teknologi AI terdepan
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="btn bg-gradient-to-r from-brand-orange to-brand-orange-light hover:from-brand-orange-light hover:to-brand-orange text-white border-none rounded-2xl px-8 py-3 font-semibold">
+                <Link
+                  href="/auth/register"
+                  className="btn btn-primary bg-brand-orange border-brand-orange hover:bg-brand-orange-dark text-white transition-all duration-200 focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 rounded-2xl px-8 py-3 font-semibold"
+                >
                   Mulai Gratis Sekarang
-                </button>
-                <button className="btn btn-outline border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white rounded-2xl px-8 py-3 font-semibold">
-                  Demo Live
-                </button>
+                </Link>
               </div>
             </div>
           </div>

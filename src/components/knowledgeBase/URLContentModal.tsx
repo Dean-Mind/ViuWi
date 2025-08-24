@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUrlContent, useSetUrlContent, useSetUrlExtractionStatus } from '@/stores/knowledgeBaseStore';
+import { useUrlContent, useSetUrlContent, useSetUrlExtractionStatus, useKnowledgeBaseData } from '@/stores/knowledgeBaseStore';
 import { useAppToast } from '@/hooks/useAppToast';
 
 interface URLContentModalProps {
@@ -13,6 +13,7 @@ export default function URLContentModal({ isOpen, onClose }: URLContentModalProp
   const urlContent = useUrlContent();
   const setUrlContent = useSetUrlContent();
   const setUrlExtractionStatus = useSetUrlExtractionStatus();
+  const knowledgeBaseData = useKnowledgeBaseData();
   const toast = useAppToast();
   
   const [url, setUrl] = useState('');
@@ -88,6 +89,14 @@ export default function URLContentModal({ isOpen, onClose }: URLContentModalProp
     try {
       setUrlContent(url.trim(), extractedContent);
       toast.success('URL content saved successfully');
+
+      // Show regeneration suggestion if AI guidelines exist
+      if (knowledgeBaseData.aiGuidelines.content.trim()) {
+        setTimeout(() => {
+          toast.info('Consider regenerating your AI guidelines to include the updated content');
+        }, 1000);
+      }
+
       onClose();
     } catch (_error) {
       toast.error('Failed to save URL content. Please try again.');

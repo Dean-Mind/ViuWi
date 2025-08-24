@@ -1,16 +1,18 @@
 'use client';
 
 import React from 'react';
+import LandingHeader from '@/components/landing/LandingHeader';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import TestimonialsSection from '@/components/landing/TestimonialsSection';
-import PricingSection from '@/components/landing/PricingSection';
 import Footer from '@/components/landing/Footer';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-base-100">
+      {/* Header */}
+      <LandingHeader />
+
       {/* Hero Section */}
       <HeroSection />
 
@@ -22,14 +24,6 @@ export default function Home() {
       {/* How It Works Section */}
       <section id="demo">
         <HowItWorksSection />
-      </section>
-
-      {/* Testimonials Section */}
-      <TestimonialsSection />
-
-      {/* Pricing Section */}
-      <section id="pricing">
-        <PricingSection />
       </section>
 
       {/* Footer */}
