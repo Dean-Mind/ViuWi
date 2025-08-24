@@ -148,12 +148,22 @@ export const useBotStatusLogic = () => {
    */
   const disableAllConversationBots = () => {
     const { conversations } = useConversationStore.getState();
-    
-    conversations.forEach(conversation => {
-      if (conversation.botEnabled) {
-        updateConversationBotStatus(conversation.id, false);
-      }
-    });
+
+    // Get conversations that need to be updated
+    const conversationsToUpdate = conversations
+      .filter(conv => conv.botEnabled)
+      .map(conv => conv.id);
+
+    // Perform single batched state update if there are conversations to update
+    if (conversationsToUpdate.length > 0) {
+      useConversationStore.setState(state => ({
+        conversations: state.conversations.map(conv =>
+          conversationsToUpdate.includes(conv.id)
+            ? { ...conv, botEnabled: false }
+            : conv
+        )
+      }));
+    }
   };
 
   return {

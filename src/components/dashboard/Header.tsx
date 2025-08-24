@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile } from '@/data/dashboardMockData';
 import { Languages, Bell, User, Settings, LogOut, MessageCircle } from 'lucide-react';
 import ThemeToggle from '@/components/ui/ThemeToggle';
@@ -37,7 +37,14 @@ export default function Header({
   const toast = useAppToast();
 
   // Use global bot status store
-  const { isOnline: isLive, toggleStatus: toggleBotStatus, isLoading: isBotStatusLoading } = useBotStatusStore();
+  const { isOnline: isLive, setOnline, isLoading: isBotStatusLoading, error: botStatusError } = useBotStatusStore();
+
+  // Handle bot status errors
+  useEffect(() => {
+    if (botStatusError) {
+      toast.error(`Bot status update failed: ${botStatusError}`);
+    }
+  }, [botStatusError, toast]);
 
   const _toggleDropdown = (dropdown: keyof typeof _dropdownStates) => {
     setDropdownStates(prev => ({
@@ -77,9 +84,10 @@ export default function Header({
                 className="toggle toggle-success"
                 checked={isLive}
                 disabled={isBotStatusLoading}
+                aria-busy={isBotStatusLoading}
                 onChange={(e) => {
                   const newStatus = e.target.checked;
-                  toggleBotStatus();
+                  setOnline(newStatus);
                   toast.info(`Bot status changed to ${newStatus ? 'online' : 'offline'}`);
                 }}
                 aria-label="Toggle between bot online and offline status"

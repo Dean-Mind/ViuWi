@@ -15,16 +15,22 @@ export default function Home() {
       <HeroSection />
 
       {/* Features Section */}
-      <FeaturesSection />
+      <section id="features">
+        <FeaturesSection />
+      </section>
 
       {/* How It Works Section */}
-      <HowItWorksSection />
+      <section id="demo">
+        <HowItWorksSection />
+      </section>
 
       {/* Testimonials Section */}
       <TestimonialsSection />
 
       {/* Pricing Section */}
-      <PricingSection />
+      <section id="pricing">
+        <PricingSection />
+      </section>
 
       {/* Footer */}
       <Footer />

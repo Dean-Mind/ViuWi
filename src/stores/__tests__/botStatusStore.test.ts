@@ -31,15 +31,18 @@ jest.mock('../businessProfileStore', () => ({
 }));
 
 // Mock conversation store
+const mockConversationState = {
+  conversations: [
+    { id: 'conv1', botEnabled: true },
+    { id: 'conv2', botEnabled: false }
+  ],
+  updateBotStatus: jest.fn()
+};
+
 jest.mock('../conversationStore', () => ({
   useConversationStore: {
-    getState: jest.fn(() => ({
-      conversations: [
-        { id: 'conv1', botEnabled: true },
-        { id: 'conv2', botEnabled: false }
-      ],
-      updateBotStatus: jest.fn()
-    }))
+    getState: jest.fn(() => mockConversationState),
+    setState: jest.fn()
   }
 }));
 
@@ -108,6 +111,53 @@ describe('botStatusStore', () => {
       });
       
       expect(result.current.error).toBe(null);
+    });
+
+    it('should disable conversation bots when going offline', async () => {
+      const { useConversationStore } = await import('../conversationStore');
+      const mockSetState = useConversationStore.setState as jest.Mock;
+
+      const { result } = renderHook(() => useBotStatusStore());
+
+      // Start with online status
+      act(() => {
+        result.current.setOnline(true);
+      });
+
+      // Go offline
+      act(() => {
+        result.current.setOnline(false);
+      });
+
+      // Wait for dynamic import to resolve
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // Verify setState was called with a reducer function
+      expect(mockSetState).toHaveBeenCalled();
+
+      // Get the reducer function that was passed to setState
+      const reducerCall = mockSetState.mock.calls.find(call => typeof call[0] === 'function');
+      expect(reducerCall).toBeDefined();
+
+      if (reducerCall) {
+        const reducer = reducerCall[0];
+        const mockState = {
+          conversations: [
+            { id: 'conv1', botEnabled: true },
+            { id: 'conv2', botEnabled: false },
+            { id: 'conv3', botEnabled: true }
+          ]
+        };
+
+        const newState = reducer(mockState);
+
+        // Verify that enabled conversations are now disabled
+        expect(newState.conversations).toEqual([
+          { id: 'conv1', botEnabled: false },
+          { id: 'conv2', botEnabled: false },
+          { id: 'conv3', botEnabled: false }
+        ]);
+      }
     });
   });
 

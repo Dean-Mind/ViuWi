@@ -54,6 +54,7 @@ class SupabaseBusinessProfileService {
           feature_product_catalog: formData.featureProductCatalog || false,
           feature_order_management: formData.featureOrderManagement || false,
           feature_payment_system: formData.featurePaymentSystem || false,
+          bot_status_online: formData.botStatusOnline ?? true,
         } as BusinessProfileInsert)
         .select()
         .single()

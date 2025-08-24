@@ -107,9 +107,9 @@ export default function TestimonialsSection() {
                 className="group bg-base-100 p-8 rounded-3xl border border-base-300/50 hover:border-brand-orange/30 transition-all duration-300 hover:shadow-xl hover:shadow-brand-orange/10 hover:-translate-y-1"
               >
                 {/* Rating */}
-                <div className="flex items-center gap-1 mb-4">
+                <div className="flex items-center gap-1 mb-4" role="img" aria-label={`${testimonial.rating} out of 5 stars`}>
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <span key={i} className="text-yellow-400 text-lg">⭐</span>
+                    <span key={i} className="text-yellow-400 text-lg" aria-hidden="true">⭐</span>
                   ))}
                 </div>
 

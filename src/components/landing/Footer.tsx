@@ -8,25 +8,25 @@ const footerLinks = {
     { name: 'Fitur', href: '#features' },
     { name: 'Harga', href: '#pricing' },
     { name: 'Demo', href: '#demo' },
-    { name: 'API Docs', href: '#api' }
+    { name: 'API Docs', href: '/api-docs' }
   ],
   company: [
-    { name: 'Tentang Kami', href: '#about' },
-    { name: 'Karir', href: '#careers' },
-    { name: 'Blog', href: '#blog' },
-    { name: 'Kontak', href: '#contact' }
+    { name: 'Tentang Kami', href: '/about' },
+    { name: 'Karir', href: '/careers' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Kontak', href: '/contact' }
   ],
   support: [
-    { name: 'Help Center', href: '#help' },
-    { name: 'Community', href: '#community' },
-    { name: 'Status', href: '#status' },
-    { name: 'Security', href: '#security' }
+    { name: 'Help Center', href: '/help' },
+    { name: 'Community', href: '/community' },
+    { name: 'Status', href: '/status' },
+    { name: 'Security', href: '/security' }
   ],
   legal: [
-    { name: 'Privacy Policy', href: '#privacy' },
-    { name: 'Terms of Service', href: '#terms' },
-    { name: 'Cookie Policy', href: '#cookies' },
-    { name: 'GDPR', href: '#gdpr' }
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
+    { name: 'Cookie Policy', href: '/cookies' },
+    { name: 'GDPR', href: '/gdpr' }
   ]
 };
 

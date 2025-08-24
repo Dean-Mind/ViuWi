@@ -171,17 +171,42 @@ export default function PricingSection() {
 
                   {/* Pricing */}
                   <div>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold text-base-content">Rp</span>
-                      <span className="text-5xl font-bold text-base-content">{plan.price}</span>
-                      {plan.period && (
-                        <span className="text-base-content/60">{plan.period}</span>
-                      )}
-                    </div>
-                    {billingPeriod === 'yearly' && plan.price !== 'Custom' && (
-                      <p className="text-sm text-green-600 font-medium">
-                        Hemat Rp {parseInt(plan.price.replace('.', '')) * 12 * 0.2} per tahun
-                      </p>
+                    {plan.price === 'Custom' ? (
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-5xl font-bold text-base-content">Custom</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-4xl font-bold text-base-content">Rp</span>
+                          <span className="text-5xl font-bold text-base-content">
+                            {(() => {
+                              // Parse numeric value safely by removing dots/commas
+                              const monthlyNumber = parseInt(plan.price.replace(/[.,]/g, ''));
+
+                              if (billingPeriod === 'yearly') {
+                                // Apply 20% discount for yearly billing
+                                const yearlyPrice = monthlyNumber * 12 * 0.8;
+                                return new Intl.NumberFormat('id-ID').format(yearlyPrice);
+                              } else {
+                                return new Intl.NumberFormat('id-ID').format(monthlyNumber);
+                              }
+                            })()}
+                          </span>
+                          <span className="text-base-content/60">
+                            {billingPeriod === 'yearly' ? '/tahun' : '/bulan'}
+                          </span>
+                        </div>
+                        {billingPeriod === 'yearly' && (
+                          <p className="text-sm text-green-600 font-medium">
+                            Hemat Rp {(() => {
+                              const monthlyNumber = parseInt(plan.price.replace(/[.,]/g, ''));
+                              const savings = monthlyNumber * 12 * 0.2;
+                              return new Intl.NumberFormat('id-ID').format(savings);
+                            })()} per tahun
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
 

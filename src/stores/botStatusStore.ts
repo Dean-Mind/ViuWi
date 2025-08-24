@@ -46,6 +46,13 @@ export const useBotStatusStore = create<BotStatusState>()((set, get) => ({
     if (previousStatus && !online) {
       // Import conversation store dynamically to avoid circular dependency
       import('./conversationStore').then(({ useConversationStore }) => {
+        // Re-check the current bot online state to prevent race condition
+        const currentBotState = get();
+        if (currentBotState.isOnline) {
+          // Bot was toggled back online while import was resolving, abort the disable operation
+          return;
+        }
+
         const { conversations } = useConversationStore.getState();
 
         // Get conversations that need to be updated

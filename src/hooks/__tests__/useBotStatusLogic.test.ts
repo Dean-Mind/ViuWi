@@ -13,9 +13,15 @@ jest.mock('../../stores/botStatusStore', () => ({
   }
 }));
 
-// Mock the conversation store
+// Mock the conversation store with jest functions and state
 const mockConversationStore = {
-  updateBotStatus: () => {}
+  conversations: [
+    { id: 'conv1', botEnabled: true },
+    { id: 'conv2', botEnabled: false }
+  ],
+  updateBotStatus: jest.fn(),
+  getState: jest.fn(() => mockConversationStore),
+  setState: jest.fn()
 };
 
 jest.mock('../../stores/conversationStore', () => ({
