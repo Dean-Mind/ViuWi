@@ -225,24 +225,18 @@ export const useCustomerStore = create<CustomerState>()((set, get) => ({
   
   // Computed getters
   getFilteredCustomers: () => {
-    const state = get();
-    const { customers, searchQuery, filters } = state;
+    const { customers, searchQuery, filters } = get();
     let filtered = customers;
 
-    // Apply search first
+    // Apply search first (name, phone, email only)
     if (searchQuery && searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
-      const { cities } = state;
+      const q = searchQuery.toLowerCase().trim();
+      const qDigits = q.replace(/\D/g, '');
       filtered = filtered.filter(customer => {
-        // Get city name for search
-        const cityName = customer.cityId ?
-          cities.find(city => city.id === customer.cityId)?.name?.toLowerCase() || '' : '';
-
-        return customer.name.toLowerCase().includes(query) ||
-          customer.phone.replace(/\D/g, '').includes(query.replace(/\D/g, '')) ||
-          cityName.includes(query) ||
-          customer.email?.toLowerCase().includes(query) ||
-          customer.notes?.toLowerCase().includes(query);
+        const nameMatch = customer.name.toLowerCase().includes(q);
+        const emailMatch = (customer.email?.toLowerCase() || '').includes(q);
+        const phoneMatch = customer.phone.replace(/\D/g, '').includes(qDigits);
+        return nameMatch || emailMatch || (qDigits.length > 0 && phoneMatch);
       });
     }
 
@@ -288,9 +282,8 @@ export const useCustomerStore = create<CustomerState>()((set, get) => ({
 
 // Stable selectors following the pattern from productStore
 export const useCustomers = () => useCustomerStore(state => state.customers);
-export const useFilteredCustomers = () => useCustomerStore(
-  useShallow(state => state.getFilteredCustomers())
-);
+export const useFilteredCustomers = () =>
+  useCustomerStore(state => state.getFilteredCustomers());
 export const useCustomerSearchQuery = () => useCustomerStore(state => state.searchQuery);
 export const useSelectedCustomers = () => useCustomerStore(state => state.selectedCustomers);
 export const useIsCustomerLoading = () => useCustomerStore(state => state.isLoading);
