@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useTextContent, useSetTextContent } from '@/stores/knowledgeBaseStore';
+import { useTextContent, useSetTextContent, useKnowledgeBaseData } from '@/stores/knowledgeBaseStore';
 import { useAppToast } from '@/hooks/useAppToast';
 
 interface TextContentModalProps {
@@ -12,6 +12,7 @@ interface TextContentModalProps {
 export default function TextContentModal({ isOpen, onClose }: TextContentModalProps) {
   const textContent = useTextContent();
   const setTextContent = useSetTextContent();
+  const knowledgeBaseData = useKnowledgeBaseData();
   const toast = useAppToast();
   
   const [content, setContent] = useState('');
@@ -42,6 +43,14 @@ export default function TextContentModal({ isOpen, onClose }: TextContentModalPr
       // For now, update local state directly
       setTextContent(content.trim());
       toast.success('Text content saved successfully');
+
+      // Show regeneration suggestion if AI guidelines exist
+      if (knowledgeBaseData.aiGuidelines.content.trim()) {
+        setTimeout(() => {
+          toast.info('Consider regenerating your AI guidelines to include the updated content');
+        }, 1000);
+      }
+
       onClose();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to save content. Please try again.';

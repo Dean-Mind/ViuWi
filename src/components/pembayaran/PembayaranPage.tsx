@@ -17,6 +17,7 @@ import {
 } from '@/stores/paymentStore';
 import { PaymentProvider, PaymentProviderStatus } from '@/data/paymentProviderMockData';
 import { useAppToast } from '@/hooks/useAppToast';
+import MockDataNotice from '@/components/ui/MockDataNotice';
 
 export default function PembayaranPage() {
   const isFeatureEnabled = useFeature('pembayaran');
@@ -68,6 +69,9 @@ export default function PembayaranPage() {
           {/* Feature Content */}
           {isFeatureEnabled ? (
             <>
+              {/* Mock Data Notice */}
+              <MockDataNotice feature="pembayaran" />
+
               {/* Main Content */}
           <div className="flex gap-6 flex-1">
             {/* Provider Selection Sidebar */}

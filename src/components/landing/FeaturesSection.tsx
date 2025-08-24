@@ -131,21 +131,7 @@ export default function FeaturesSection() {
             ))}
           </div>
 
-          {/* Bottom CTA */}
-          <div className="text-center mt-16">
-            <div className="bg-gradient-to-r from-brand-orange/10 to-brand-orange-light/10 rounded-3xl p-8 border border-brand-orange/20">
-              <h3 className="text-2xl font-bold text-base-content mb-4">
-                Siap Tingkatkan Bisnis Anda?
-              </h3>
-              <p className="text-base-content/70 mb-6 max-w-2xl mx-auto">
-                Bergabunglah dengan ribuan bisnis yang telah menggunakan ViuWi untuk
-                transformasi digital mereka
-              </p>
-              <button className="btn bg-gradient-to-r from-brand-orange to-brand-orange-light hover:from-brand-orange-light hover:to-brand-orange text-white border-none rounded-2xl px-8 py-3 font-semibold">
-                Mulai Sekarang
-              </button>
-            </div>
-          </div>
+
         </div>
       </div>
     </section>

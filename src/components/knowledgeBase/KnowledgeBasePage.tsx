@@ -4,22 +4,49 @@ import React, { useEffect } from 'react';
 import {
   useKnowledgeBaseData,
   useLoadKnowledgeBaseFromStorage,
-  useGenerateAIGuidelines
+  useGenerateAIGuidelines,
+  useSystemPromptRegenerationNeeded,
+  useSetSystemPromptRegenerationNeeded
 } from '@/stores/knowledgeBaseStore';
+import { useAuth } from '@/stores/authStore';
+import { useBusinessProfileStore } from '@/stores/businessProfileStore';
+import { useAppToast } from '@/hooks/useAppToast';
 import DocumentsSection from './DocumentsSection';
 import TextContentSection from './TextContentSection';
 import URLContentSection from './URLContentSection';
 import AIGuidelinesSection from './AIGuidelinesSection';
+import SystemPromptRegenerationBanner from './SystemPromptRegenerationBanner';
 
 export default function KnowledgeBasePage() {
   const knowledgeBaseData = useKnowledgeBaseData();
   const loadFromStorage = useLoadKnowledgeBaseFromStorage();
   const generateAIGuidelines = useGenerateAIGuidelines();
+  const systemPromptRegenerationNeeded = useSystemPromptRegenerationNeeded();
+  const setSystemPromptRegenerationNeeded = useSetSystemPromptRegenerationNeeded();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { businessProfile, loadFromSupabase: loadBusinessProfile, isLoading: businessProfileLoading } = useBusinessProfileStore();
+  const [isRegenerating, setIsRegenerating] = React.useState(false);
+  const toast = useAppToast();
 
-  // Load data from storage on component mount
+  // Load business profile when user is authenticated
   useEffect(() => {
-    loadFromStorage();
-  }, [loadFromStorage]);
+    if (isAuthenticated && user && !businessProfile && !businessProfileLoading) {
+      loadBusinessProfile(user.id).catch(error => {
+        console.error('Failed to load business profile:', error);
+      });
+    }
+  }, [isAuthenticated, user, businessProfile, businessProfileLoading, loadBusinessProfile]);
+
+  // Load knowledge base data after auth and business profile are ready
+  useEffect(() => {
+    // Only load data after auth initialization is complete and business profile is loaded (if user is authenticated)
+    const authReady = !authLoading;
+    const businessProfileReady = !isAuthenticated || (businessProfile !== null || !businessProfileLoading);
+
+    if (authReady && businessProfileReady) {
+      loadFromStorage();
+    }
+  }, [loadFromStorage, authLoading, isAuthenticated, businessProfile, businessProfileLoading]);
 
   // Calculate statistics
   const stats = {
@@ -30,8 +57,48 @@ export default function KnowledgeBasePage() {
   };
 
   const handleGenerateGuidelines = async () => {
-    await generateAIGuidelines();
+    setIsRegenerating(true);
+    try {
+      await generateAIGuidelines();
+      toast.success('AI Guidelines regenerated successfully!');
+      // Clear the regeneration needed flag after generating
+      setSystemPromptRegenerationNeeded(false);
+    } catch (_error) {
+      toast.error('Failed to regenerate AI Guidelines. Please try again.');
+    } finally {
+      setIsRegenerating(false);
+    }
   };
+
+  const handleDismissRegenerationBanner = () => {
+    setSystemPromptRegenerationNeeded(false);
+  };
+
+  // Show loading state while auth or business profile is loading
+  if (authLoading || (isAuthenticated && businessProfileLoading)) {
+    return (
+      <div className="h-full overflow-y-auto no-scrollbar">
+        <div className="bg-base-100 rounded-3xl shadow-sm min-h-full flex flex-col">
+          <div className="p-6 space-y-6 flex-1">
+            <div>
+              <h1 className="text-3xl font-bold text-brand-orange">Knowledge Base</h1>
+              <p className="text-base-content/70 mt-1">
+                Kelola basis pengetahuan dan AI guidelines untuk chatbot Anda
+              </p>
+            </div>
+            <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center gap-4">
+                <span className="loading loading-spinner loading-lg text-brand-orange"></span>
+                <p className="text-base-content/70">
+                  {authLoading ? 'Initializing authentication...' : 'Loading your business profile...'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full overflow-y-auto no-scrollbar">
@@ -121,6 +188,18 @@ export default function KnowledgeBasePage() {
                   </button>
                 </div>
               )}
+
+              {/* System Prompt Regeneration Banner */}
+              {systemPromptRegenerationNeeded && stats.hasAIGuidelines && (
+                <SystemPromptRegenerationBanner
+                  onRegenerate={handleGenerateGuidelines}
+                  onDismiss={handleDismissRegenerationBanner}
+                  reason="Your knowledge base content has been updated"
+                  isLoading={isRegenerating}
+                />
+              )}
+
+
 
               {/* Main Content Sections */}
               <div className="space-y-6">

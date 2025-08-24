@@ -26,6 +26,7 @@ import OrderDetailModal from './OrderDetailModal';
 import OrderEditForm from './OrderEditForm';
 import PlusIcon from '@/components/icons/PlusIcon';
 import { Filter } from 'lucide-react';
+import MockDataNotice from '@/components/ui/MockDataNotice';
 
 export default function PesananPage() {
   const isFeatureEnabled = useFeature('pesanan');
@@ -130,6 +131,9 @@ export default function PesananPage() {
           {/* Feature Content */}
           {isFeatureEnabled ? (
             <>
+              {/* Mock Data Notice */}
+              <MockDataNotice feature="pesanan" />
+
               {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {/* Row 1: Total, Pending, Confirmed, Processing */}
