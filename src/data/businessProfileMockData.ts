@@ -134,6 +134,9 @@ export interface BusinessProfile {
   featureOrderManagement: boolean;
   featurePaymentSystem: boolean;
 
+  // Bot status
+  botStatusOnline: boolean;
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
@@ -174,6 +177,9 @@ export interface BusinessProfileFormData {
   featureProductCatalog: boolean;
   featureOrderManagement: boolean;
   featurePaymentSystem: boolean;
+
+  // Bot status
+  botStatusOnline: boolean;
 }
 
 // Store types (global state data)
@@ -365,6 +371,9 @@ export const mockBusinessProfile: BusinessProfile = {
   featureProductCatalog: true,
   featureOrderManagement: true,
   featurePaymentSystem: true,
+
+  // Bot status (default online for mock)
+  botStatusOnline: true,
 
   createdAt: new Date('2024-01-01T00:00:00Z'),
   updatedAt: new Date('2024-01-15T10:30:00Z')

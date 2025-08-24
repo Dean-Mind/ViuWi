@@ -528,6 +528,7 @@ class SupabaseBusinessProfileService {
       featureProductCatalog: data.feature_product_catalog || false,
       featureOrderManagement: data.feature_order_management || false,
       featurePaymentSystem: data.feature_payment_system || false,
+      botStatusOnline: data.bot_status_online ?? true,
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
     }
@@ -570,6 +571,49 @@ class SupabaseBusinessProfileService {
       return { data: profile, error: null, success: true };
     } catch (error) {
       console.error('Error updating feature settings:', error);
+      return {
+        data: null,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        success: false
+      };
+    }
+  }
+
+  /**
+   * Update bot status setting
+   */
+  async updateBotStatus(
+    businessProfileId: string,
+    botStatusOnline: boolean
+  ): Promise<ApiResponse<BusinessProfile>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('business_profiles')
+        .update({
+          bot_status_online: botStatusOnline,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', businessProfileId)
+        .select(`
+          *,
+          operating_hours(*),
+          social_media_links(*)
+        `)
+        .single();
+
+      if (error) {
+        console.error('Supabase error updating bot status:', error);
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error('No data returned from bot status update');
+      }
+
+      const profile = await this.convertToBusinessProfile(data);
+      return { data: profile, error: null, success: true };
+    } catch (error) {
+      console.error('Error updating bot status:', error);
       return {
         data: null,
         error: error instanceof Error ? error.message : 'Unknown error occurred',

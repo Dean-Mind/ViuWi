@@ -4,18 +4,32 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { MessageUser } from '@/data/csHandoverMockData';
 import { useToast } from '@/components/ui/ToastProvider';
+import { useBotStatusLogic } from '@/hooks/useBotStatusLogic';
 
 interface ChatHeaderProps {
   user: MessageUser;
   botEnabled: boolean;
+  conversationId: string;
   onBotToggle: (enabled: boolean) => void | Promise<void>;
 }
 
-export default function ChatHeader({ user, botEnabled, onBotToggle }: ChatHeaderProps) {
+export default function ChatHeader({ user, botEnabled, conversationId, onBotToggle }: ChatHeaderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
+  const {
+    isBotToggleDisabled,
+    getBotDisabledReason,
+    globalBotOnline
+  } = useBotStatusLogic();
 
   const handleBotToggle = async (enabled: boolean) => {
+    // Check if bot toggle is disabled due to global status
+    if (enabled && isBotToggleDisabled(conversationId)) {
+      const reason = getBotDisabledReason(conversationId);
+      showToast(reason || 'Cannot enable bot for this conversation', 'error');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -62,11 +76,13 @@ export default function ChatHeader({ user, botEnabled, onBotToggle }: ChatHeader
               {user.name}
             </h3>
             <span className={`badge badge-sm ${
-              botEnabled
+              !globalBotOnline
+                ? 'badge-error badge-outline'
+                : botEnabled
                 ? 'badge-info badge-outline'
-                : 'badge-error badge-outline'
+                : 'badge-warning badge-outline'
             }`}>
-              {botEnabled ? 'BOT' : 'CS'}
+              {!globalBotOnline ? 'BOT OFFLINE' : botEnabled ? 'BOT' : 'CS'}
             </span>
           </div>
         </div>
@@ -90,9 +106,14 @@ export default function ChatHeader({ user, botEnabled, onBotToggle }: ChatHeader
         ) : (
           <button
             onClick={() => handleBotToggle(true)}
-            disabled={isLoading}
-            className="btn btn-sm bg-brand-orange hover:bg-brand-orange-light text-white transition-all duration-200 focus:ring-2 focus:ring-brand-orange-light focus:ring-offset-2 rounded-full px-6"
+            disabled={isLoading || isBotToggleDisabled(conversationId)}
+            className={`btn btn-sm transition-all duration-200 focus:ring-2 focus:ring-offset-2 rounded-full px-6 ${
+              isBotToggleDisabled(conversationId)
+                ? 'btn-disabled bg-base-300 text-base-content/50'
+                : 'bg-brand-orange hover:bg-brand-orange-light text-white focus:ring-brand-orange-light'
+            }`}
             aria-label="Activate AI bot for this conversation"
+            title={getBotDisabledReason(conversationId) || undefined}
             aria-busy={isLoading}
           >
             {isLoading && (

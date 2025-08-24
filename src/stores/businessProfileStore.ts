@@ -48,6 +48,7 @@ interface BusinessProfileState {
     featureOrderManagement?: boolean;
     featurePaymentSystem?: boolean;
   }) => Promise<void>;
+  updateBotStatus: (botStatusOnline: boolean) => Promise<void>;
 
   // Form population actions
   populateFormFromProfile: (profile: BusinessProfile) => void;
@@ -89,7 +90,8 @@ const getDefaultFormData = (): Partial<BusinessProfileFormData> => ({
   taxId: '',
   featureProductCatalog: false,
   featureOrderManagement: false,
-  featurePaymentSystem: false
+  featurePaymentSystem: false,
+  botStatusOnline: true
 });
 
 export const useBusinessProfileStore = create<BusinessProfileState>()((set, get) => ({
@@ -518,6 +520,41 @@ export const useBusinessProfileStore = create<BusinessProfileState>()((set, get)
       set({
         isSaving: false,
         error: error instanceof Error ? error.message : 'Failed to update feature settings'
+      });
+      throw error;
+    }
+  },
+
+  updateBotStatus: async (botStatusOnline: boolean) => {
+    const { businessProfile } = get();
+    if (!businessProfile) {
+      throw new Error('No business profile found');
+    }
+
+    set({ isSaving: true, error: null });
+
+    try {
+      const result = await supabaseBusinessProfileAPI.updateBotStatus(
+        businessProfile.id,
+        botStatusOnline
+      );
+
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Failed to update bot status');
+      }
+
+      // Update local state with the returned data
+      set({
+        businessProfile: result.data,
+        isSaving: false,
+        lastSaved: new Date(),
+        error: null
+      });
+    } catch (error) {
+      console.error('Failed to update bot status:', error);
+      set({
+        isSaving: false,
+        error: error instanceof Error ? error.message : 'Failed to update bot status'
       });
       throw error;
     }

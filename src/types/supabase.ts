@@ -31,6 +31,7 @@ export interface Database {
           feature_product_catalog: boolean
           feature_order_management: boolean
           feature_payment_system: boolean
+          bot_status_online: boolean
           created_at: string
           updated_at: string
         }
@@ -58,6 +59,7 @@ export interface Database {
           feature_product_catalog?: boolean
           feature_order_management?: boolean
           feature_payment_system?: boolean
+          bot_status_online?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -85,6 +87,7 @@ export interface Database {
           feature_product_catalog?: boolean
           feature_order_management?: boolean
           feature_payment_system?: boolean
+          bot_status_online?: boolean
           created_at?: string
           updated_at?: string
         }

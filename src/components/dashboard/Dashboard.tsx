@@ -6,6 +6,7 @@ import { NavigationItem, DashboardProps } from '@/data/dashboardMockData';
 import { getNavigationInfo } from '@/utils/routeMapping';
 import { useInitializeFeatures } from '@/stores/featureToggleStore';
 import { useAuthActions } from '@/stores/authStore';
+import { useBotStatusStore } from '@/stores/botStatusStore';
 import { getPostLogoutRoute } from '@/utils/userJourney';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -26,15 +27,17 @@ export default function Dashboard(props: DashboardProps) {
   const router = useRouter();
   const { logout } = useAuthActions();
   const initializeFeatures = useInitializeFeatures();
+  const { loadBotStatus } = useBotStatusStore();
   const [activeNavItem, setActiveNavItem] = useState<NavigationItem>(props.activeNavItem);
   const [isChatOpen, setIsChatOpen] = useState(props.isChatOpen);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isLive, setIsLive] = useState(props.isLive);
+  // Remove local isLive state - now handled by global bot status store
 
-  // Initialize feature toggles on mount
+  // Initialize feature toggles and bot status on mount
   useEffect(() => {
     initializeFeatures();
-  }, [initializeFeatures]);
+    loadBotStatus();
+  }, [initializeFeatures, loadBotStatus]);
 
   // Load collapsed state from localStorage on mount
   useEffect(() => {
@@ -104,7 +107,6 @@ export default function Dashboard(props: DashboardProps) {
           <div className="flex-1">
             <Header
               user={props.user}
-              isLive={isLive}
               language={props.language}
               hasNotifications={props.hasNotifications}
               isChatOpen={isChatOpen}
@@ -125,11 +127,6 @@ export default function Dashboard(props: DashboardProps) {
                   logout();
                   router.push(getPostLogoutRoute());
                 }
-              }}
-              onLiveToggle={(newLiveStatus) => {
-                setIsLive(newLiveStatus);
-                console.log('Live status changed to:', newLiveStatus);
-                // In a real app, this would update the live status on the server
               }}
               onChatToggle={handleChatToggle}
             />

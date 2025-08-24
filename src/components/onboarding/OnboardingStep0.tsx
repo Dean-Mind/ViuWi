@@ -152,7 +152,9 @@ export default function OnboardingStep0({
         // Feature flags - preserve existing settings, default to false only as last resort
         featureProductCatalog: formData.featureProductCatalog ?? businessProfile?.featureProductCatalog ?? false,
         featureOrderManagement: formData.featureOrderManagement ?? businessProfile?.featureOrderManagement ?? false,
-        featurePaymentSystem: formData.featurePaymentSystem ?? businessProfile?.featurePaymentSystem ?? false
+        featurePaymentSystem: formData.featurePaymentSystem ?? businessProfile?.featurePaymentSystem ?? false,
+        // Bot status - default to online
+        botStatusOnline: formData.botStatusOnline ?? businessProfile?.botStatusOnline ?? true
       };
 
 
