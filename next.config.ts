@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // Enable local images from public directory
+    domains: ['localhost'],
+    // Allow images from the public directory
+    unoptimized: false,
   },
   // Exclude Supabase Edge Functions from build
   webpack: (config) => {

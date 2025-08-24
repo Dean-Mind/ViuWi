@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { NavigationItem as NavItemType } from '@/data/dashboardMockData';
 
 interface SidebarProps {
@@ -137,9 +138,19 @@ export default function Sidebar({ activeNavItem, onNavItemClick, isCollapsed, on
       {/* Logo & Toggle */}
       {isCollapsed ? (
         <div className="p-2 text-center">
-          <span className="text-brand-orange font-nunito text-xl font-bold transition-opacity duration-200 opacity-100">
-            V
-          </span>
+          <div className="flex flex-col items-center gap-1">
+            <Image
+              src="/ViuWi.png"
+              alt="ViuWi"
+              width={24}
+              height={24}
+              className="object-contain"
+              priority={true}
+            />
+            <span className="text-brand-orange font-nunito text-xs font-bold transition-opacity duration-200 opacity-100">
+              ViuWi
+            </span>
+          </div>
           {/* Toggle Button - Integrated in collapsed state */}
           <button
             onClick={onToggleCollapse}
@@ -158,9 +169,19 @@ export default function Sidebar({ activeNavItem, onNavItemClick, isCollapsed, on
         </div>
       ) : (
         <div className="p-4 relative">
-          <h1 className="text-brand-orange font-nunito text-[28px] font-bold transition-opacity duration-200 delay-100 opacity-100">
-            ViuWi
-          </h1>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/ViuWi.png"
+              alt="ViuWi"
+              width={32}
+              height={32}
+              className="object-contain"
+              priority={true}
+            />
+            <h1 className="text-brand-orange font-nunito text-[28px] font-bold transition-opacity duration-200 delay-100 opacity-100">
+              ViuWi
+            </h1>
+          </div>
           {/* Toggle Button - Absolute positioned in expanded state */}
           <button
             onClick={onToggleCollapse}

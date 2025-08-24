@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function LandingHeader() {
@@ -35,9 +36,21 @@ export default function LandingHeader() {
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
           <div className="flex-shrink-0">
-            <div className="flex flex-col">
-              <h1 className="text-brand-heading text-brand-orange font-bold">ViuWi</h1>
-              <p className="text-xs text-base-content/60 -mt-1">AI Customer Service</p>
+            <div className="flex items-center gap-3">
+              <div className="relative flex-shrink-0">
+                <Image
+                  src="/ViuWi.png"
+                  alt="ViuWi Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                  priority={true}
+                />
+              </div>
+              <div className="flex flex-col">
+                <h1 className="text-brand-heading text-brand-orange font-bold">ViuWi</h1>
+                <p className="text-xs text-base-content/60 -mt-1">AI Customer Service</p>
+              </div>
             </div>
           </div>
 

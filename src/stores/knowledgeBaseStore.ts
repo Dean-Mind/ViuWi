@@ -65,9 +65,9 @@ interface KnowledgeBaseState {
   // Actions (maintain exact same interface for UI compatibility)
   setDocuments: (files: DocumentFile[]) => void;
   addDocuments: (files: DocumentFile[]) => void;
-  removeDocument: (documentId: string) => void;
-  setTextContent: (content: string) => void;
-  setUrlContent: (url: string, extractedContent?: string) => void;
+  removeDocument: (documentId: string) => Promise<void>;
+  setTextContent: (content: string) => Promise<void>;
+  setUrlContent: (url: string, extractedContent?: string) => Promise<void>;
   setUrlExtractionStatus: (status: 'idle' | 'extracting' | 'success' | 'error') => void;
   generateAIGuidelines: () => Promise<void>;
   unlockAIGuidelines: () => void;
@@ -76,7 +76,7 @@ interface KnowledgeBaseState {
   clearError: () => void;
   resetData: () => void;
   saveToStorage: () => void;
-  loadFromStorage: () => void;
+  loadFromStorage: () => Promise<void>;
 
   // New Supabase integration methods (internal)
   loadFromSupabase: () => Promise<void>;
@@ -316,11 +316,26 @@ export const useKnowledgeBaseStore = create<KnowledgeBaseState>()((set, get) => 
         const userContext = getUserContext()!;
 
         // Create URL entry (no automatic processing)
+        let title = 'Website';
+        try {
+          const trimmedUrl = url.trim();
+          if (trimmedUrl) {
+            // Ensure URL has a protocol
+            const urlWithProtocol = trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')
+              ? trimmedUrl
+              : `https://${trimmedUrl}`;
+            title = `Website: ${new URL(urlWithProtocol).hostname}`;
+          }
+        } catch (error) {
+          console.error('Failed to parse URL for title:', error);
+          title = `Website: ${url.trim() || 'invalid-url'}`;
+        }
+
         const urlResult = await supabaseKnowledgeBaseAPI.createUrlEntry(
           userContext.userId,
           userContext.businessProfileId,
           url.trim(),
-          `Website: ${new URL(url).hostname}`
+          title
         );
 
         if (urlResult.success && urlResult.data) {

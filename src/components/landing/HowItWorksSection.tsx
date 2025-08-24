@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 
 const steps = [
   {
@@ -132,12 +133,12 @@ export default function HowItWorksSection() {
                 dengan teknologi AI terdepan
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={() => window.location.href = '/auth/register'}
+                <Link
+                  href="/auth/register"
                   className="btn btn-primary bg-brand-orange border-brand-orange hover:bg-brand-orange-dark text-white transition-all duration-200 focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 rounded-2xl px-8 py-3 font-semibold"
                 >
                   Mulai Gratis Sekarang
-                </button>
+                </Link>
               </div>
             </div>
           </div>

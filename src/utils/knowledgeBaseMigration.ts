@@ -95,13 +95,28 @@ export async function migrateLocalStorageToSupabase(
     
     // Migrate URL content
     if (localData.urlContent?.url?.trim()) {
+      let title = 'Migrated Website';
+      try {
+        const trimmedUrl = localData.urlContent.url.trim();
+        if (trimmedUrl) {
+          // Ensure URL has a protocol
+          const urlWithProtocol = trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')
+            ? trimmedUrl
+            : `https://${trimmedUrl}`;
+          title = `Migrated Website: ${new URL(urlWithProtocol).hostname}`;
+        }
+      } catch (error) {
+        console.error('Failed to parse URL for migration title:', error);
+        title = `Migrated Website: ${localData.urlContent.url.trim() || 'invalid-url'}`;
+      }
+
       const urlResult = await supabaseKnowledgeBaseAPI.createUrlEntry(
         userId,
         businessProfileId,
         localData.urlContent.url.trim(),
-        `Migrated Website: ${new URL(localData.urlContent.url).hostname}`
+        title
       );
-      
+
       if (!urlResult.success) {
         console.error('Failed to migrate URL content:', urlResult.error);
       }
@@ -142,7 +157,8 @@ export function markAsMigrated(): void {
 export function clearLocalStorageData(): void {
   if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
     localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(MIGRATION_KEY);
+    // Note: We preserve MIGRATION_KEY to maintain migration completion status
+    // Only remove STORAGE_KEY to clear the actual data
   }
 }
 

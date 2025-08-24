@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import LottieMascot from './LottieMascot';
 import ThemeToggle from './ThemeToggle';
 
@@ -16,7 +17,19 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           <div className="flex items-center justify-between h-16">
             {/* Brand Logo */}
             <div className="flex-shrink-0">
-              <h1 className="text-brand-heading text-brand-orange">ViuWi</h1>
+              <div className="flex items-center gap-3">
+                <div className="relative flex-shrink-0">
+                  <Image
+                    src="/ViuWi.png"
+                    alt="ViuWi"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                    priority={true}
+                  />
+                </div>
+                <h1 className="text-brand-heading text-brand-orange">ViuWi</h1>
+              </div>
             </div>
 
             {/* Header Actions */}

@@ -156,9 +156,24 @@ export function mapUIDataToSupabaseEntries(
 
   // Add URL content if exists
   if (data.urlContent.url.trim()) {
+    let title = 'Website';
+    try {
+      const trimmedUrl = data.urlContent.url.trim();
+      if (trimmedUrl) {
+        // Ensure URL has a protocol
+        const urlWithProtocol = trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')
+          ? trimmedUrl
+          : `https://${trimmedUrl}`;
+        title = `Website: ${new URL(urlWithProtocol).hostname}`;
+      }
+    } catch (error) {
+      console.error('Failed to parse URL for title:', error);
+      title = `Website: ${data.urlContent.url.trim() || 'invalid-url'}`;
+    }
+
     entries.push({
       entryType: 'url',
-      title: `Website: ${new URL(data.urlContent.url).hostname}`,
+      title,
       sourceUrl: data.urlContent.url.trim()
     });
   }
@@ -173,10 +188,13 @@ export function mapSupabaseDataToUI(
   entries: KnowledgeBaseEntry[],
   systemPrompts: SystemPrompt[]
 ): KnowledgeBaseData {
+  // Filter entries to only document entries for lastUpdated computation
+  const documentEntries = entries.filter(entry => entry.entryType === 'document');
+
   return {
     documents: {
       files: mapEntriesToDocumentFiles(entries),
-      lastUpdated: entries.length > 0 ? new Date(Math.max(...entries.map(e => new Date(e.updatedAt).getTime()))) : null
+      lastUpdated: documentEntries.length > 0 ? new Date(Math.max(...documentEntries.map(e => new Date(e.updatedAt).getTime()))) : null
     },
     textContent: extractTextContentFromEntries(entries),
     urlContent: extractUrlContentFromEntries(entries),

@@ -26,13 +26,16 @@ export default function KnowledgeBasePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { businessProfile, loadFromSupabase: loadBusinessProfile, isLoading: businessProfileLoading } = useBusinessProfileStore();
   const [isRegenerating, setIsRegenerating] = React.useState(false);
+  const hasFetchedBusinessProfileRef = React.useRef(false);
   const toast = useAppToast();
 
   // Load business profile when user is authenticated
   useEffect(() => {
-    if (isAuthenticated && user && !businessProfile && !businessProfileLoading) {
+    if (isAuthenticated && user && !businessProfile && !businessProfileLoading && !hasFetchedBusinessProfileRef.current) {
+      hasFetchedBusinessProfileRef.current = true;
       loadBusinessProfile(user.id).catch(error => {
         console.error('Failed to load business profile:', error);
+        hasFetchedBusinessProfileRef.current = false; // Reset on error to allow retry
       });
     }
   }, [isAuthenticated, user, businessProfile, businessProfileLoading, loadBusinessProfile]);

@@ -76,7 +76,7 @@ export default function MockDataNotice({
           </div>
           <p className="text-sm text-base-content/70">
             Saat ini menampilkan data contoh untuk demonstrasi.
-            Integrasi dengan data real akan tersedia dalam pembaruan mendatang.
+            Integrasi dengan data real akan tersedia pada 27 September 2025.
           </p>
         </div>
       </div>
